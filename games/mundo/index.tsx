@@ -4,7 +4,10 @@ import type { GameDefinition, TimedRules } from "../types";
 import { countries } from "../_shared/geo";
 import { countriesByContinent } from "./continents";
 import { MundoCover } from "./Cover";
+import { MundoRecap } from "./Recap";
 import type { MundoFeedback, MundoPuzzle } from "./types";
+
+const COLOR = "#ffc21a";
 
 // O tabuleiro carrega o mapa-múndi (~110 KB): só baixa quando alguém abre o jogo.
 const MundoBoard = lazy(() => import("./Board"));
@@ -17,7 +20,7 @@ export const mundo: GameDefinition<MundoPuzzle, MundoFeedback, TimedRules> = {
     description: "Diga o nome de todos os países do mundo antes que o tempo acabe.",
     icon: Globe,
     rules: { type: "timed", seconds: 15 * 60, total: countries.length },
-    color: "#ffc21a",
+    color: COLOR,
     howToPlay: [
       `Escreva o nome de todos os ${countries.length} países que conseguir em 15 minutos.`,
       "Não precisa apertar Enter: o país entra quando faltam até 2 letras e não pode ser outro (\"Bras\" já vira Brasil). Nomes longos entram com 8 letras.",
@@ -29,6 +32,7 @@ export const mundo: GameDefinition<MundoPuzzle, MundoFeedback, TimedRules> = {
   },
   Board: MundoBoard,
   Cover: MundoCover,
+  Recap: ({ play }) => <MundoRecap play={play} color={COLOR} />,
   shareGrid(play) {
     const found = new Set(play.guesses.map((g) => g.feedback.code));
     return countriesByContinent

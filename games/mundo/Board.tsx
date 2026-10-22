@@ -1,14 +1,17 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
-import { Flag, Play } from "lucide-react";
+import { Flag, Play, Volume2, VolumeX } from "lucide-react";
+import { playSound, preloadSound } from "@/components/sounds/react-bits-sound";
+import tink from "@/components/sounds/tink";
 import { FocusInput } from "@/components/microkit/focus-input";
 import { normalize } from "@/lib/normalize";
+import { setMuted, useMuted } from "@/lib/sound";
 import { cn } from "@/lib/utils";
 import type { BoardProps, TimedRules } from "../types";
 import { countries, findCountry, nameKey, readPrefix, type Country } from "../_shared/geo";
 import { countriesByContinent } from "./continents";
-import map from "./data/map.json";
+import map from "../_shared/geo/world-map.json";
 import type { MundoFeedback, MundoPuzzle } from "./types";
 
 const COLOR = "#ffc21a";
@@ -48,6 +51,7 @@ export default function MundoBoard({
   const finished = play.status !== "playing";
   const remaining = useRemaining(play.startedAt, rules.seconds, running);
 
+  const muted = useMuted();
   const found = useMemo(() => new Set(play.guesses.map((g) => g.feedback.code)), [play.guesses]);
   const left = useMemo(() => countries.filter((c) => !found.has(c.code)), [found]);
 
@@ -60,6 +64,11 @@ export default function MundoBoard({
     if (running) inputRef.current?.focus();
   }, [running]);
 
+  // O "tink" é sintetizado na primeira vez: prepara antes do primeiro acerto para não atrasar.
+  useEffect(() => {
+    preloadSound(tink);
+  }, []);
+
   async function accept(country: Country, typed: string) {
     const error = await submitGuess(country.name);
     if (error) {
@@ -67,6 +76,7 @@ export default function MundoBoard({
       return;
     }
     tail.current = { names: [country.name, ...country.aliases].map(nameKey), typed };
+    playSound(tink).catch(() => {});
     setQuery("");
     setHint(null);
     setLastFound(country.code);
@@ -137,6 +147,16 @@ export default function MundoBoard({
               value={formatClock(remaining)}
               className={cn(running && remaining <= 60 && "text-destructive")}
             />
+            <button
+              type="button"
+              onClick={() => setMuted(!muted)}
+              aria-label={muted ? "Ligar som" : "Silenciar"}
+              aria-pressed={muted}
+              title={muted ? "Ligar som" : "Silenciar"}
+              className="grid size-10 place-items-center rounded-md text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+            >
+              {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+            </button>
             {running && (
               <button
                 type="button"

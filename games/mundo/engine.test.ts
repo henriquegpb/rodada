@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { countries } from "../_shared/geo";
 import { countriesByContinent } from "./continents";
 import { engine } from "./engine";
-import map from "./data/map.json";
+import map from "../_shared/geo/world-map.json";
 import type { MundoFeedback } from "./types";
 import type { Guess } from "../types";
 
