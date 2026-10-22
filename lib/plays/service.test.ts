@@ -10,7 +10,7 @@ Object.assign(globalThis, {
   },
 });
 
-const { startPlay, submitGuess, nextPracticeKey } = await import("./service");
+const { peekPlay, startPlay, submitGuess, nextPracticeKey } = await import("./service");
 const { dailyStore, practiceStore } = await import("./store");
 const { engine } = await import("@/games/palavra/engine");
 
@@ -83,5 +83,21 @@ describe("treino (Jogar outra)", () => {
     await submitGuess("palavra", TODAY, "carro");
     await submitGuess("palavra", TODAY, "pedra");
     expect((await startPlay("palavra", TODAY)).guesses).toHaveLength(2);
+  });
+
+  it("peekPlay só lê: ignora a partida velha sem apagar e sem avisar ninguém", async () => {
+    await submitGuess("palavra", TODAY, "carro");
+    const stale = dailyStore.getPlay("palavra", TODAY)!;
+    dailyStore.savePlay({
+      ...stale,
+      guesses: [{ input: "carro", feedback: { letters: [..."carro"], marks: ["correct", "correct", "correct", "correct", "absent"] } }],
+    });
+    // Roda durante o render: gravar ali avisaria outros componentes no meio dele.
+    const before = dailyStore.getPlays();
+    expect(peekPlay("palavra", TODAY)?.guesses).toEqual([]);
+    expect(dailyStore.getPlays()).toBe(before);
+    // A limpeza fica para o startPlay.
+    await startPlay("palavra", TODAY);
+    expect(dailyStore.getPlay("palavra", TODAY)).toBeUndefined();
   });
 });

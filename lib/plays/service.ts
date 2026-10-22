@@ -92,17 +92,24 @@ function matchesChallenge(engine: GameEngine, answer: unknown, stored: StoredPla
   return true;
 }
 
-function openPlay(engine: GameEngine, slug: string, dateKey: string, practice: boolean): PlayView {
+/**
+ * Abre a partida salva. Com `persist: false` só lê: a partida velha é ignorada sem ser apagada, e a
+ * de relógio vencido aparece encerrada sem ser gravada. É o modo do `peekPlay`, que roda durante o
+ * render: gravar avisa os componentes inscritos no armazenamento, e o React não aceita atualizar um
+ * componente no meio do render de outro. O `startPlay` que vem logo depois faz a limpeza.
+ */
+function openPlay(engine: GameEngine, slug: string, dateKey: string, practice: boolean, persist = true): PlayView {
   const store = storeFor(practice);
   const { puzzle, answer } = engine.createChallenge(dateKey);
   let stored = store.getPlay(slug, dateKey);
   if (stored && !matchesChallenge(engine, answer, stored)) {
-    store.deletePlay(slug, dateKey);
+    if (persist) store.deletePlay(slug, dateKey);
     stored = undefined;
   }
   // Quem fechou a aba com o relógio correndo volta e encontra a partida encerrada.
   if (stored?.status === "playing" && timeIsUp(rulesOf(slug), stored)) {
-    stored = close(store, stored, "done", engine.describeAnswer(answer));
+    const answerLabel = engine.describeAnswer(answer);
+    stored = persist ? close(store, stored, "done", answerLabel) : { ...stored, status: "done", answerLabel };
   }
   return toView(slug, dateKey, puzzle, practice, stored);
 }
@@ -111,10 +118,13 @@ export async function startPlay(slug: string, dateKey: string, practice = false)
   return openPlay(await loadEngine(slug), slug, dateKey, practice);
 }
 
-/** Igual a `startPlay`, mas na hora: só funciona se a engine já estiver carregada. */
+/**
+ * Igual a `startPlay`, mas na hora: só funciona se a engine já estiver carregada. Pode ser chamado
+ * durante o render, por isso não grava nada (veja `openPlay`).
+ */
 export function peekPlay(slug: string, dateKey: string, practice = false): PlayView | null {
   const engine = peekEngine(slug);
-  return engine ? openPlay(engine, slug, dateKey, practice) : null;
+  return engine ? openPlay(engine, slug, dateKey, practice, false) : null;
 }
 
 /** Jogos com tempo: cria a partida e começa o relógio. */
