@@ -270,8 +270,7 @@ const segmentClass: Record<LetterMark, string> = {
  * inteira ganha a cor; com vários, ela se divide em partes (lado a lado ou em quadrantes).
  * No celular ele fica preso embaixo da tela, logo acima da navegação, para nunca precisar rolar
  * até ele; por isso precisa ser o último filho da coluna do tabuleiro. A folga para a navegação
- * já vem no próprio teclado, então ele avança sobre a do `main` (-mb-28) para não sobrar um vão.
- * Com o teclado do aparelho aberto (`standby`) ele fica invisível, mas guarda o espaço: assim a
+ * vem no próprio teclado (pb-20). Com o teclado do aparelho aberto (`standby`) ele fica invisível, mas guarda o espaço: assim a
  * última linha ainda consegue subir até o meio da tela.
  */
 export function Keyboard({
@@ -292,7 +291,7 @@ export function Keyboard({
   return (
     <div
       className={cn(
-        "flex w-full flex-col gap-1.5 max-lg:sticky max-lg:bottom-0 max-lg:z-20 max-lg:-mb-28 max-lg:bg-background max-lg:pb-20 max-lg:pt-3",
+        "flex w-full flex-col gap-1.5 max-lg:sticky max-lg:bottom-0 max-lg:z-20 max-lg:bg-background max-lg:pb-20 max-lg:pt-3",
         standby && "max-lg:invisible",
         className,
       )}

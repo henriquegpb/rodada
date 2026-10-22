@@ -70,6 +70,11 @@ export interface GameMeta<R extends GameRules = GameRules> {
   /** O tabuleiro já mostra a resposta no fim; o resultado não repete o "Era …". */
   hideAnswer?: boolean;
   howToPlay: string[];
+  /**
+   * Título e descrição para buscadores e prévias de link, com as palavras que as pessoas buscam
+   * ("palavra do dia", "adivinhe a bandeira"). Não aparecem na tela; o título ganha " · Rodada".
+   */
+  seo: { title: string; description: string };
 }
 
 /** Estado de uma partida como a UI enxerga: sem a resposta enquanto não acabar. */

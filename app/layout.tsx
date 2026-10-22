@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { Providers } from "@/components/providers";
 import { AppShell } from "@/components/shell/app-shell";
 import { SITE_URL } from "@/lib/share";
+import { SITE_DESCRIPTION, SITE_TITLE } from "@/lib/seo";
 import { LOCALE, t } from "@/lib/i18n";
 import "./globals.css";
 
@@ -22,10 +23,14 @@ const mono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${t.brand.name} · jogos diários`,
+    default: SITE_TITLE,
     template: `%s · ${t.brand.name}`,
   },
-  description: t.brand.tagline,
+  description: SITE_DESCRIPTION,
+  applicationName: t.brand.name,
+  // Prévia padrão para páginas sem a sua (a home e os jogos montam a própria com pageMetadata).
+  openGraph: { type: "website", siteName: t.brand.name, locale: "pt_BR", title: SITE_TITLE, description: SITE_DESCRIPTION },
+  twitter: { card: "summary_large_image" },
 };
 
 export const viewport: Viewport = {

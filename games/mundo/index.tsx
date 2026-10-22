@@ -29,6 +29,11 @@ export const mundo: GameDefinition<MundoPuzzle, MundoFeedback, TimedRules> = {
       "Cada acerto pinta o país no mapa. No fim, os que faltaram aparecem em vermelho.",
       "O relógio continua correndo mesmo se você sair da página.",
     ],
+    seo: {
+      title: "Mundo: quantos países você sabe nomear em 15 minutos?",
+      description:
+        "Quiz de geografia em português: diga o nome de todos os países do mundo antes que os 15 minutos acabem.",
+    },
   },
   Board: MundoBoard,
   Cover: MundoCover,

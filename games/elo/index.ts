@@ -23,6 +23,11 @@ export const elo: GameDefinition<EloPuzzle, EloFeedback, UnlimitedRules> = {
       "As cores vão do grupo mais fácil (verde) ao mais difícil (vermelho), que costuma ser um trocadilho.",
       "Quanto menos chutes, melhor; dá para desistir e ver a resposta.",
     ],
+    seo: {
+      title: "Elo: separe 16 palavras em 4 grupos (tipo Conexo)",
+      description:
+        "Jogo de palavras diário em português: encontre os 4 grupos de 4 palavras que têm algo em comum. No estilo do Connections e do Conexo.",
+    },
   },
   Board: EloBoard,
   Cover: EloCover,

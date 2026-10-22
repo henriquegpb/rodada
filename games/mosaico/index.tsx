@@ -24,6 +24,11 @@ export const mosaico: GameDefinition<MosaicoPuzzle, CountryFeedback, AttemptRule
       "A cada erro você vê a distância até o país certo, a direção e quão perto chegou.",
       "Acerte em até 6 tentativas.",
     ],
+    seo: {
+      title: "Mosaico: adivinhe a bandeira que aparece aos poucos",
+      description:
+        "A bandeira do dia se revela uma peça a cada erro: descubra o país com o mínimo de peças. Jogo diário de geografia em português.",
+    },
   },
   Board: MosaicoBoard,
   Cover: MosaicoCover,

@@ -37,6 +37,11 @@ export const pais: GameDefinition<PaisPuzzle, CountryFeedback, AttemptRules> = {
       "A cada erro você vê a distância até o país certo, a direção para onde ele fica e quão perto chegou.",
       "Países muito pequenos podem ser chutados, mas nunca são a resposta.",
     ],
+    seo: {
+      title: "País do dia: adivinhe o país pelo contorno do mapa",
+      description:
+        "Descubra o país pela silhueta em até 6 tentativas, com dicas de distância e direção. Jogo diário de geografia em português, no estilo do Worldle.",
+    },
   },
   Board: PaisBoard,
   Cover: PaisCover,

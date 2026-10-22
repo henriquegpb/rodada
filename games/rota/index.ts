@@ -27,6 +27,11 @@ export const rota: GameDefinition<RotaPuzzle, RotaFeedback, AttemptRules> = {
       "Ganha quando os países que você disse ligam a partida ao destino, em até 9 chutes.",
       "Travou? Há 3 dicas: o próximo país, todos os contornos e as iniciais do caminho.",
     ],
+    seo: {
+      title: "Rota: ligue dois países por terra",
+      description:
+        "Desafio diário de geografia em português: ligue dois países dizendo os países no caminho, só por fronteiras terrestres. No estilo do Travle.",
+    },
   },
   Board: RotaBoard,
   Cover: RotaCover,
