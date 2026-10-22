@@ -1,8 +1,17 @@
 "use client";
 
-import { useCallback, useEffect, useState, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type InputEvent,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type ReactNode,
+} from "react";
 import { CornerDownLeft, Delete } from "lucide-react";
 import { toast } from "sonner";
+import { normalize } from "@/lib/normalize";
 import { cn } from "@/lib/utils";
 import type { LetterMark } from "./types";
 
@@ -15,6 +24,16 @@ const KEY_ROWS = ["qwertyuiop", "asdfghjkl", "zxcvbnm"];
 export const FLIP_STAGGER_MS = 260;
 export const FLIP_MS = 520;
 export const MARK_RANK: Record<LetterMark, number> = { absent: 0, present: 1, correct: 2 };
+/**
+ * Folga da linha da vez ao rolar até ela no celular: a barra do topo (56px) em cima e o teclado
+ * preso embaixo (12 + 180 + 80 = 272px), para a linha nunca ficar atrás deles.
+ */
+export const ACTIVE_ROW_SCROLL = "max-lg:scroll-mt-16 max-lg:scroll-mb-[288px]";
+/**
+ * O input escondido do teclado do celular sempre guarda este caractere invisível: se ele some,
+ * a pessoa apagou (com o campo vazio o Android nem avisa o apagar).
+ */
+const SENTINEL = "\u200b";
 
 export const markClass: Record<LetterMark, string> = {
   correct: "border-tile-correct bg-tile-correct text-ink",
@@ -31,6 +50,8 @@ const MARK_LABEL: Record<LetterMark, string> = {
 /**
  * A linha que está sendo digitada: letras, cursor (clique numa casa para editar), Enter, apagar,
  * setas e teclado físico. Depois de um chute aceito, `revealing` marca a linha que está virando.
+ * No celular, tocar no tabuleiro (`openKeyboard`) foca um input escondido (`input`, que o tabuleiro
+ * desenha) e abre o teclado do próprio aparelho; enquanto ele está aberto (`native`), o virtual sai.
  */
 export function useWordEntry({
   length,
@@ -49,6 +70,16 @@ export function useWordEntry({
   const [busy, setBusy] = useState(false);
   /** Linha que acabou de ser enviada e está virando; o teclado só atualiza depois. */
   const [revealing, setRevealing] = useState<number | null>(null);
+  /** Linha da vez (o tabuleiro liga o ref nela). */
+  const rowRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [native, setNative] = useState(false);
+
+  // No celular o teclado fica preso embaixo da tela: a linha da vez rola para não ficar atrás dele.
+  // O do aparelho cobre quase metade da tela (e no iPhone a página nem encolhe): a linha vai ao meio.
+  useEffect(() => {
+    rowRef.current?.scrollIntoView({ block: native ? "center" : "nearest", behavior: "smooth" });
+  }, [activeRow, native]);
 
   const type = useCallback(
     (key: string) => {
@@ -108,7 +139,58 @@ export function useWordEntry({
     return () => window.removeEventListener("keydown", onKey);
   }, [type]);
 
-  return { letters, cursor, setCursor, shaking, stopShaking: () => setShaking(false), revealing, type };
+  /** Só em tela de toque: no computador o teclado físico já funciona sem foco nenhum. */
+  function openKeyboard() {
+    const input = inputRef.current;
+    if (!playing || !input || !window.matchMedia("(pointer: coarse)").matches) return;
+    // Já focado, mas com o teclado fechado (o "voltar" do Android): só blur + focus reabre.
+    input.blur();
+    input.focus({ preventScroll: true });
+  }
+
+  const input = {
+    ref: inputRef,
+    "aria-label": "Digitar palavra",
+    defaultValue: SENTINEL,
+    autoCapitalize: "none",
+    autoCorrect: "off",
+    autoComplete: "off",
+    spellCheck: false,
+    enterKeyHint: "send" as const,
+    // 16px: com fonte menor o iPhone dá zoom na página ao focar.
+    className: "pointer-events-none absolute left-1/2 top-0 size-px text-base opacity-0",
+    onFocus: () => setNative(true),
+    onBlur: () => setNative(false),
+    onKeyDown(e: ReactKeyboardEvent<HTMLInputElement>) {
+      const key = e.key.toLowerCase();
+      if (key === "enter" || key === "backspace" || key.startsWith("arrow")) {
+        e.preventDefault();
+        type(key);
+      }
+    },
+    // No celular as letras chegam aqui (o keydown delas costuma vir como "Unidentified").
+    onInput(e: InputEvent<HTMLInputElement>) {
+      const value = e.currentTarget.value;
+      e.currentTarget.value = SENTINEL;
+      if (!value.includes(SENTINEL)) return type("backspace");
+      const letter = normalize(value.replace(SENTINEL, "")).replace(/[^a-z]/g, "").slice(-1);
+      if (letter) type(letter);
+    },
+  };
+
+  return {
+    letters,
+    cursor,
+    setCursor,
+    shaking,
+    stopShaking: () => setShaking(false),
+    revealing,
+    type,
+    rowRef,
+    input,
+    native,
+    openKeyboard,
+  };
 }
 
 /** Uma casa do tabuleiro. `size` controla o tamanho (o Quadra usa casas menores). */
@@ -141,7 +223,8 @@ export function Tile({
       onClick={onClick}
       aria-label={letter ? `${letter}${mark ? `, ${MARK_LABEL[mark]}` : ""}` : "vazio"}
       className={cn(
-        "relative grid place-items-center rounded-md border-2 font-extrabold uppercase transition-colors select-none",
+        // Casa desabilitada deixa o toque passar: tocar em qualquer linha abre o teclado do celular.
+        "relative grid place-items-center rounded-md border-2 font-extrabold uppercase transition-colors select-none disabled:pointer-events-none",
         size,
         !mark && "border-tile-border bg-tile-empty",
         !mark && letter && "border-tile-filled-border animate-pop",
@@ -185,20 +268,36 @@ const segmentClass: Record<LetterMark, string> = {
 /**
  * Teclado virtual. `marks(key)` devolve a cor da tecla em cada tabuleiro: com um tabuleiro a tecla
  * inteira ganha a cor; com vários, ela se divide em partes (lado a lado ou em quadrantes).
+ * No celular ele fica preso embaixo da tela, logo acima da navegação, para nunca precisar rolar
+ * até ele; por isso precisa ser o último filho da coluna do tabuleiro. A folga para a navegação
+ * já vem no próprio teclado, então ele avança sobre a do `main` (-mb-28) para não sobrar um vão.
+ * Com o teclado do aparelho aberto (`standby`) ele fica invisível, mas guarda o espaço: assim a
+ * última linha ainda consegue subir até o meio da tela.
  */
 export function Keyboard({
   marks,
   boards,
   disabled,
+  standby,
   onKey,
+  className,
 }: {
   marks(key: string): (LetterMark | undefined)[];
   boards: number;
   disabled: boolean;
+  standby: boolean;
   onKey(key: string): void;
+  className?: string;
 }) {
   return (
-    <div className="flex w-full flex-col gap-1.5" aria-label="Teclado">
+    <div
+      className={cn(
+        "flex w-full flex-col gap-1.5 max-lg:sticky max-lg:bottom-0 max-lg:z-20 max-lg:-mb-28 max-lg:bg-background max-lg:pb-20 max-lg:pt-3",
+        standby && "max-lg:invisible",
+        className,
+      )}
+      aria-label="Teclado"
+    >
       {KEY_ROWS.map((row, i) => (
         <div key={row} className="flex justify-center gap-1.5">
           {[...row].map((k) => (

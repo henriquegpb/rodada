@@ -5,7 +5,7 @@ import { Check } from "lucide-react";
 import { normalize } from "@/lib/normalize";
 import { cn } from "@/lib/utils";
 import type { AttemptRules, BoardProps } from "../../types";
-import { FLIP_STAGGER_MS, Keyboard, MARK_RANK, Tile, useWordEntry } from "../../palavra/kit";
+import { ACTIVE_ROW_SCROLL, FLIP_STAGGER_MS, Keyboard, MARK_RANK, Tile, useWordEntry } from "../../palavra/kit";
 import type { LetterMark } from "../../palavra/types";
 import type { MultiWordFeedback, MultiWordPuzzle } from "./types";
 
@@ -29,7 +29,7 @@ export function MultiWordBoard({
   const { length, boards } = play.puzzle;
   const playing = play.status === "playing";
   const activeRow = play.guesses.length;
-  const { letters, cursor, setCursor, shaking, stopShaking, revealing, type } = useWordEntry({
+  const { letters, cursor, setCursor, shaking, stopShaking, revealing, type, rowRef, input, native, openKeyboard } = useWordEntry({
     length,
     playing,
     activeRow,
@@ -45,6 +45,8 @@ export function MultiWordBoard({
       ),
     [play.guesses, boards],
   );
+  /** A rolagem até a linha da vez segue o primeiro tabuleiro ainda aberto. */
+  const firstOpen = solvedAt.findIndex((s) => s < 0);
 
   const keyMarks = useMemo(() => {
     const perBoard = Array.from({ length: boards }, () => new Map<string, LetterMark>());
@@ -63,7 +65,9 @@ export function MultiWordBoard({
 
   return (
     <div className="flex flex-col items-center gap-8">
-      <div className={cn("grid w-fit gap-x-4 gap-y-5 [perspective:800px]", gridClass)}>
+      {/* Tocar em qualquer parte dos tabuleiros abre o teclado do celular. */}
+      <div className={cn("relative grid w-fit gap-x-4 gap-y-5 [perspective:800px]", gridClass)} onClick={openKeyboard}>
+        <input {...input} />
         {Array.from({ length: boards }, (_, b) => {
           const solved = solvedAt[b] >= 0 && (revealing === null || solvedAt[b] < revealing);
           return (
@@ -92,7 +96,8 @@ export function MultiWordBoard({
                 return (
                   <div
                     key={row}
-                    className={cn("grid gap-1", isActive && shaking && "animate-shake", after && "opacity-30")}
+                    ref={isActive && b === firstOpen ? rowRef : undefined}
+                    className={cn("grid gap-1", ACTIVE_ROW_SCROLL, isActive && shaking && "animate-shake", after && "opacity-30")}
                     style={{ gridTemplateColumns: `repeat(${length}, minmax(0, 1fr))` }}
                     onAnimationEnd={stopShaking}
                   >
@@ -118,9 +123,7 @@ export function MultiWordBoard({
         })}
       </div>
 
-      <div className="w-full max-w-[620px]">
-        <Keyboard marks={keyMarks} boards={boards} disabled={!playing} onKey={type} />
-      </div>
+      <Keyboard marks={keyMarks} boards={boards} disabled={!playing} standby={native} onKey={type} className="max-w-[620px]" />
     </div>
   );
 }
