@@ -22,6 +22,11 @@ export const dupla: GameDefinition<MultiWordPuzzle, MultiWordFeedback, AttemptRu
       "Quando você acerta uma palavra, aquele tabuleiro para; continue na outra.",
       "No teclado, cada tecla se divide em duas: a cor da esquerda é do 1º tabuleiro, a da direita do 2º.",
     ],
+    seo: {
+      title: "Dupla: duas palavras do dia ao mesmo tempo (tipo Dueto)",
+      description:
+        "Descubra duas palavras de 5 letras ao mesmo tempo em até 7 tentativas. Jogo de palavras diário em português, no estilo do Dueto do Termo.",
+    },
   },
   Board: (props) => (
     <MultiWordBoard

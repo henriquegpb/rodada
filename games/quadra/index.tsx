@@ -24,6 +24,11 @@ export const quadra: GameDefinition<MultiWordPuzzle, MultiWordFeedback, AttemptR
       "Quando você acerta uma palavra, aquele tabuleiro para; continue nas outras.",
       "No teclado, cada tecla se divide em quatro partes, uma por tabuleiro, na mesma posição deles na tela.",
     ],
+    seo: {
+      title: "Quadra: quatro palavras do dia ao mesmo tempo (tipo Quarteto)",
+      description:
+        "Descubra quatro palavras de 5 letras ao mesmo tempo em até 9 tentativas. Jogo de palavras diário em português, no estilo do Quarteto do Termo.",
+    },
   },
   Board: (props) => (
     <MultiWordBoard

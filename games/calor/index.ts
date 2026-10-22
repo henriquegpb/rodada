@@ -24,6 +24,11 @@ export const calor: GameDefinition<CalorPuzzle, CalorFeedback, UnlimitedRules> =
       "Vermelho-escuro (0 km) quer dizer que o chute faz fronteira com ele.",
       "Arraste o globo para girar. Quanto menos chutes, melhor; dá para desistir e ver a resposta.",
     ],
+    seo: {
+      title: "Calor: ache o país secreto no globo, quente ou frio",
+      description:
+        "Chute países e veja no globo se está quente ou frio até achar o país secreto do dia. Jogo diário de geografia em português.",
+    },
   },
   Board: CalorBoard,
   Cover: CalorCover,

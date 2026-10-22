@@ -24,6 +24,11 @@ export const palavra: GameDefinition<PalavraPuzzle, PalavraFeedback, AttemptRule
       "⬛ cinza: a letra não está na palavra.",
       "Acentos e cedilha são preenchidos sozinhos. Clique numa casa para editar uma letra.",
     ],
+    seo: {
+      title: "Palavra do dia: adivinhe a palavra de 5 letras (tipo Termo)",
+      description:
+        "Jogo de palavras diário em português, no estilo Termo e Wordle: descubra a palavra de 5 letras em até 6 tentativas. Grátis e sem cadastro.",
+    },
   },
   Board: PalavraBoard,
   Cover: PalavraCover,

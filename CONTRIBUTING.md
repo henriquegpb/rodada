@@ -112,6 +112,11 @@ export const capital: GameDefinition<CapitalPuzzle, CapitalFeedback, AttemptRule
     rules: { type: "attempts", maxAttempts: 6 },
     color: "#a855f7",         // cor do card e dos destaques
     howToPlay: ["Uma frase por item."],
+    // Para o Google e as prévias de link; não aparece na tela.
+    seo: {
+      title: "Capital do dia: adivinhe a capital do país",
+      description: "Jogo diário de geografia em português: descubra a capital do país em até 6 tentativas.",
+    },
   },
   Board: CapitalBoard,
   Cover: CapitalCover,
@@ -129,6 +134,8 @@ export const capital: GameDefinition<CapitalPuzzle, CapitalFeedback, AttemptRule
 - `{ type: "timed", seconds, total }`: achar o máximo de itens antes do relógio zerar. O tabuleiro recebe `begin()` (começa o relógio) e `finish()` (tempo esgotado ou desistência). Cada tentativa aceita é um item achado, e `solved: true` encerra com vitória quando acha todos. A plataforma mostra "142/197". O jogo `mundo/` é o modelo.
 
 Placar, estatísticas, sequências e compartilhamento se adaptam sozinhos às regras.
+
+**SEO.** `seo.title` é o título da aba e do Google (ganha " · Rodada" no fim) e deve usar as palavras que as pessoas buscam, como "do dia" e o tipo de jogo; `seo.description` é o resumo que aparece no resultado da busca. A página do jogo já sai com as regras (`howToPlay`) em texto no fim, com a imagem de prévia na cor do jogo e no sitemap, sem configurar nada.
 
 **Modos.** Um jogo pode ser modo de outro com `parent: "<slug do pai>"` no meta (Dupla e Quadra são modos do Palavra). Ele tem desafio, partida e estatísticas próprios, mas não entra na rodada: aparece como aba na página do jogo pai, que mantém o título e o lugar na sidebar.
 
