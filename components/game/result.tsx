@@ -32,7 +32,7 @@ function useResult(game: GameDefinition, play: PlayView) {
     headline,
     score: formatResult(rules, play.status, play.guesses.length),
     /** Jogos por tentativas revelam a resposta; os com tempo não têm uma. */
-    answer: play.answerLabel || null,
+    answer: game.meta.hideAnswer ? null : play.answerLabel || null,
     async share() {
       const result = await shareText(buildShareText(game, play));
       if (result !== "failed") trackEvent("result_shared", { game: game.meta.slug, method: result });

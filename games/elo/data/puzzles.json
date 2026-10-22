@@ -1,0 +1,395 @@
+[
+  {
+    "groups": [
+      { "label": "Frutas", "level": 0, "words": ["MANGA", "CAJU", "PERA", "FIGO"] },
+      { "label": "Partes da camisa", "level": 1, "words": ["GOLA", "PUNHO", "BOTÃO", "BOLSO"] },
+      { "label": "Instrumentos de percussão", "level": 2, "words": ["CAIXA", "PANDEIRO", "BUMBO", "CUÍCA"] },
+      { "label": "Escondem um animal", "level": 3, "words": ["PRATO", "PERUCA", "TATUAGEM", "LÉGUA"] }
+    ]
+  },
+  {
+    "groups": [
+      { "label": "Dias da semana", "level": 0, "words": ["TERÇA", "QUARTA", "SÁBADO", "DOMINGO"] },
+      { "label": "Cômodos da casa", "level": 1, "words": ["SALA", "COZINHA", "VARANDA", "QUARTO"] },
+      { "label": "Unidades de tempo", "level": 2, "words": ["SEGUNDO", "MINUTO", "HORA", "SEMANA"] },
+      { "label": "Bate-___", "level": 3, "words": ["PAPO", "BOCA", "ESTACA", "VOLTA"] }
+    ]
+  },
+  {
+    "groups": [
+      { "label": "Bebidas", "level": 0, "words": ["CERVEJA", "SUCO", "CAFÉ", "CHÁ"] },
+      { "label": "Pedras preciosas", "level": 1, "words": ["ESMERALDA", "SAFIRA", "TOPÁZIO", "AMETISTA"] },
+      { "label": "Frutas silvestres", "level": 2, "words": ["MORANGO", "AMORA", "MIRTILO", "GROSELHA"] },
+      { "label": "Tons de vermelho", "level": 3, "words": ["VINHO", "RUBI", "CEREJA", "CARMIM"] }
+    ]
+  },
+  {
+    "groups": [
+      { "label": "Roupas", "level": 0, "words": ["CALÇA", "SAIA", "BLUSA", "CASACO"] },
+      { "label": "Partes do carro", "level": 1, "words": ["CAPÔ", "PNEU", "BUZINA", "FAROL"] },
+      { "label": "Posições no futebol", "level": 2, "words": ["GOLEIRO", "LATERAL", "VOLANTE", "MEIA"] },
+      { "label": "Escondem uma parte do corpo", "level": 3, "words": ["IRMÃO", "REPOLHO", "CUNHADO", "ACIDENTE"] }
+    ]
+  },
+  {
+    "groups": [
+      { "label": "Datas comemorativas", "level": 0, "words": ["CARNAVAL", "PÁSCOA", "FINADOS", "RÉVEILLON"] },
+      { "label": "Sinônimos de sucesso", "level": 1, "words": ["TRIUNFO", "ÊXITO", "CONQUISTA", "GLÓRIA"] },
+      { "label": "O que a plateia faz", "level": 2, "words": ["VAIA", "APLAUSO", "ASSOBIO", "BIS"] },
+      { "label": "Capitais brasileiras", "level": 3, "words": ["NATAL", "VITÓRIA", "PALMAS", "BELÉM"] }
+    ]
+  },
+  {
+    "groups": [
+      { "label": "Frutas", "level": 0, "words": ["GOIABA", "JACA", "ACEROLA", "PITANGA"] },
+      { "label": "Pecados capitais", "level": 1, "words": ["GULA", "INVEJA", "AVAREZA", "PREGUIÇA"] },
+      { "label": "Folclore brasileiro", "level": 2, "words": ["SACI", "CURUPIRA", "BOITATÁ", "IARA"] },
+      { "label": "Gírias para cabeça", "level": 3, "words": ["CUCA", "COCO", "CACHOLA", "MOLEIRA"] }
+    ]
+  },
+  {
+    "groups": [
+      { "label": "Felinos", "level": 0, "words": ["LEÃO", "TIGRE", "LINCE", "CHITA"] },
+      { "label": "Tecidos", "level": 1, "words": ["SEDA", "LINHO", "VELUDO", "CETIM"] },
+      { "label": "Instrumentos de sopro", "level": 2, "words": ["FLAUTA", "CLARINETE", "TROMPETE", "SAXOFONE"] },
+      { "label": "Gírias para dinheiro", "level": 3, "words": ["GRANA", "TUTU", "GAITA", "ONÇA"] }
+    ]
+  },
+  {
+    "groups": [
+      { "label": "Laticínios", "level": 0, "words": ["IOGURTE", "MANTEIGA", "NATA", "REQUEIJÃO"] },
+      { "label": "Temperos", "level": 1, "words": ["PIMENTA", "ORÉGANO", "COMINHO", "PÁPRICA"] },
+      { "label": "Partes da perna", "level": 2, "words": ["CANELA", "JOELHO", "COXA", "TORNOZELO"] },
+      { "label": "Pão de ___", "level": 3, "words": ["QUEIJO", "AÇÚCAR", "LÓ", "FORMA"] }
+    ]
+  },
+  {
+    "groups": [
+      { "label": "Aves", "level": 0, "words": ["TUCANO", "CORUJA", "GAIVOTA", "PELICANO"] },
+      { "label": "Ossos do esqueleto", "level": 1, "words": ["CRÂNIO", "COSTELA", "VÉRTEBRA", "FÊMUR"] },
+      { "label": "Instrumentos de navegação", "level": 2, "words": ["BÚSSOLA", "SONAR", "SEXTANTE", "ASTROLÁBIO"] },
+      { "label": "Palíndromos", "level": 3, "words": ["ARARA", "OSSO", "RADAR", "REVIVER"] }
+    ]
+  },
+  {
+    "groups": [
+      { "label": "Ferramentas", "level": 0, "words": ["MARTELO", "ALICATE", "FURADEIRA", "TRENA"] },
+      { "label": "Para o cabelo", "level": 1, "words": ["ESCOVA", "SECADOR", "CHAPINHA", "PRESILHA"] },
+      { "label": "Hortaliças", "level": 2, "words": ["CEBOLA", "CENOURA", "ABOBRINHA", "CHUCHU"] },
+      { "label": "Têm dentes", "level": 3, "words": ["PENTE", "SERROTE", "ZÍPER", "ALHO"] }
+    ]
+  },
+  {
+    "groups": [
+      { "label": "Costura", "level": 0, "words": ["AGULHA", "LINHA", "DEDAL", "TESOURA"] },
+      { "label": "Elementos químicos", "level": 1, "words": ["FERRO", "ZINCO", "CÁLCIO", "POTÁSSIO"] },
+      { "label": "Material de construção", "level": 2, "words": ["TIJOLO", "CIMENTO", "AREIA", "TELHA"] },
+      { "label": "Têm cabeça", "level": 3, "words": ["ALFINETE", "FÓSFORO", "PREGO", "ALHO"] }
+    ]
+  },
+  {
+    "groups": [
+      { "label": "Frutas", "level": 0, "words": ["MAMÃO", "MARACUJÁ", "CAQUI", "MELANCIA"] },
+      { "label": "Na parede da sala", "level": 1, "words": ["QUADRO", "ESPELHO", "PRATELEIRA", "TOMADA"] },
+      { "label": "Partes da boca", "level": 2, "words": ["LÍNGUA", "LÁBIO", "GENGIVA", "PALATO"] },
+      { "label": "Têm coroa", "level": 3, "words": ["ABACAXI", "MOEDA", "RELÓGIO", "DENTE"] }
+    ]
+  },
+  {
+    "groups": [
+      { "label": "Animais da fazenda", "level": 0, "words": ["PORCO", "CABRA", "OVELHA", "GALINHA"] },
+      { "label": "Personagens de contos", "level": 1, "words": ["BRUXA", "PRÍNCIPE", "DRAGÃO", "DUENDE"] },
+      { "label": "Material de pintura", "level": 2, "words": ["PINCEL", "ROLO", "TELA", "CAVALETE"] },
+      { "label": "Mão de ___", "level": 3, "words": ["VACA", "OBRA", "TINTA", "FADA"] }
+    ]
+  },
+  {
+    "groups": [
+      { "label": "Patentes militares", "level": 0, "words": ["SOLDADO", "SARGENTO", "TENENTE", "CORONEL"] },
+      { "label": "Partes da faca", "level": 1, "words": ["LÂMINA", "PONTA", "FIO", "CABO"] },
+      { "label": "Animais do mar", "level": 2, "words": ["POLVO", "LULA", "SIRI", "OSTRA"] },
+      { "label": "Água-___", "level": 3, "words": ["VIVA", "BENTA", "OXIGENADA", "MARINHA"] }
+    ]
+  },
+  {
+    "groups": [
+      { "label": "Fenômenos do tempo", "level": 0, "words": ["GAROA", "NEBLINA", "GEADA", "TROVOADA"] },
+      { "label": "Astros", "level": 1, "words": ["LUA", "ESTRELA", "COMETA", "PLANETA"] },
+      { "label": "Partes do tronco", "level": 2, "words": ["PEITO", "BARRIGA", "OMBRO", "CINTURA"] },
+      { "label": "Guarda-___", "level": 3, "words": ["CHUVA", "ROUPA", "COSTAS", "SOL"] }
+    ]
+  },
+  {
+    "groups": [
+      { "label": "Armas brancas", "level": 0, "words": ["ADAGA", "LANÇA", "PUNHAL", "SABRE"] },
+      { "label": "Gente do circo", "level": 1, "words": ["MÁGICO", "TRAPEZISTA", "DOMADOR", "ACROBATA"] },
+      { "label": "Animais da fazenda", "level": 2, "words": ["OVELHA", "CABRA", "CAVALO", "PATO"] },
+      { "label": "Peixe-___", "level": 3, "words": ["BOI", "ESPADA", "PALHAÇO", "GALO"] }
+    ]
+  },
+  {
+    "groups": [
+      { "label": "Louça", "level": 0, "words": ["PRATO", "PIRES", "TIGELA", "COPO"] },
+      { "label": "Partes do rosto", "level": 1, "words": ["TESTA", "QUEIXO", "BOCHECHA", "TÊMPORA"] },
+      { "label": "Meios de transporte", "level": 2, "words": ["TREM", "NAVIO", "METRÔ", "ÔNIBUS"] },
+      { "label": "Têm asa", "level": 3, "words": ["XÍCARA", "NARIZ", "AVIÃO", "ANJO"] }
+    ]
+  },
+  {
+    "groups": [
+      { "label": "Metais", "level": 0, "words": ["OURO", "PRATA", "COBRE", "ESTANHO"] },
+      { "label": "Programas de TV", "level": 1, "words": ["SERIADO", "DESENHO", "TELEJORNAL", "MINISSÉRIE"] },
+      { "label": "Para comer com café", "level": 2, "words": ["PÃO", "BOLO", "ROSCA", "TORRADA"] },
+      { "label": "Escondem um número", "level": 3, "words": ["BISCOITO", "BRONZE", "NOVELA", "RAPIDEZ"] }
+    ]
+  },
+  {
+    "groups": [
+      { "label": "Calçados", "level": 0, "words": ["SANDÁLIA", "CHINELO", "TAMANCO", "BOTA"] },
+      { "label": "Trabalham no transporte", "level": 1, "words": ["MOTORISTA", "PILOTO", "MAQUINISTA", "TAXISTA"] },
+      { "label": "Roupa de cama", "level": 2, "words": ["LENÇOL", "EDREDOM", "FRONHA", "COBERTOR"] },
+      { "label": "Escondem um animal", "level": 3, "words": ["COBRADOR", "CURSO", "GALOCHA", "MANTA"] }
+    ]
+  },
+  {
+    "groups": [
+      { "label": "Tipos de vento", "level": 0, "words": ["BRISA", "TUFÃO", "FURACÃO", "TORNADO"] },
+      { "label": "Sinônimos de criança", "level": 1, "words": ["GAROTO", "PIRRALHO", "GURI", "MENINO"] },
+      { "label": "Animais com chifre", "level": 2, "words": ["BODE", "CARNEIRO", "BÚFALO", "ALCE"] },
+      { "label": "Pé de ___", "level": 3, "words": ["MOLEQUE", "CABRA", "MEIA", "VENTO"] }
+    ]
+  },
+  {
+    "groups": [
+      { "label": "Castanhas", "level": 0, "words": ["AMÊNDOA", "AVELÃ", "PISTACHE", "AMENDOIM"] },
+      { "label": "Jogos de mesa", "level": 1, "words": ["XADREZ", "DAMAS", "DOMINÓ", "GAMÃO"] },
+      { "label": "Coisas do inverno", "level": 2, "words": ["NEVE", "GEADA", "CACHECOL", "LAREIRA"] },
+      { "label": "Quebra-___", "level": 3, "words": ["CABEÇA", "MOLAS", "NOZES", "GELO"] }
+    ]
+  },
+  {
+    "groups": [
+      { "label": "Comida italiana", "level": 0, "words": ["LASANHA", "NHOQUE", "RISOTO", "PIZZA"] },
+      { "label": "Bijuterias", "level": 1, "words": ["ANEL", "BRINCO", "COLAR", "PULSEIRA"] },
+      { "label": "Sinônimos de zangado", "level": 2, "words": ["FURIOSO", "BRAVO", "NERVOSO", "INVOCADO"] },
+      { "label": "Gírias para legal", "level": 3, "words": ["MASSA", "JOIA", "MANEIRO", "IRADO"] }
+    ]
+  },
+  {
+    "groups": [
+      { "label": "Partes da árvore", "level": 0, "words": ["RAIZ", "CASCA", "CAULE", "FRUTO"] },
+      { "label": "Partes do sapato", "level": 1, "words": ["SOLADO", "CADARÇO", "PALMILHA", "BICO"] },
+      { "label": "Partes da mão", "level": 2, "words": ["DEDO", "UNHA", "POLEGAR", "MINDINHO"] },
+      { "label": "Tire a 1ª letra e vira outra palavra", "level": 3, "words": ["GALHO", "SALTO", "PALMA", "CASA"] }
+    ]
+  },
+  {
+    "groups": [
+      { "label": "Doces de festa", "level": 0, "words": ["BRIGADEIRO", "QUINDIM", "COCADA", "CAJUZINHO"] },
+      { "label": "Carinhos", "level": 1, "words": ["ABRAÇO", "CAFUNÉ", "AFAGO", "BEIJINHO"] },
+      { "label": "Reações do corpo", "level": 2, "words": ["BOCEJO", "SOLUÇO", "ESPIRRO", "SUSPIRO"] },
+      { "label": "Uma dormidinha", "level": 3, "words": ["SONECA", "SESTA", "PESTANA", "COCHILO"] }
+    ]
+  },
+  {
+    "groups": [
+      { "label": "No cachorro-quente", "level": 0, "words": ["PÃO", "PURÊ", "VINAGRETE", "MOSTARDA"] },
+      { "label": "Religiosos", "level": 1, "words": ["PADRE", "FREIRA", "BISPO", "MONGE"] },
+      { "label": "Lutas", "level": 2, "words": ["JUDÔ", "CARATÊ", "ESGRIMA", "CAPOEIRA"] },
+      { "label": "Raças de cachorro", "level": 3, "words": ["BOXER", "PASTOR", "SALSICHA", "DÁLMATA"] }
+    ]
+  },
+  {
+    "groups": [
+      { "label": "Realeza", "level": 0, "words": ["REI", "RAINHA", "PRÍNCIPE", "DUQUE"] },
+      { "label": "Estampas", "level": 1, "words": ["XADREZ", "LISTRADO", "FLORAL", "POÁ"] },
+      { "label": "No castelo", "level": 2, "words": ["MURALHA", "FOSSO", "CALABOUÇO", "TRONO"] },
+      { "label": "Peças de xadrez", "level": 3, "words": ["TORRE", "BISPO", "CAVALO", "PEÃO"] }
+    ]
+  },
+  {
+    "groups": [
+      { "label": "Peixes", "level": 0, "words": ["TILÁPIA", "SARDINHA", "ATUM", "BACALHAU"] },
+      { "label": "Animais lentos", "level": 1, "words": ["PREGUIÇA", "CARACOL", "LESMA", "JABUTI"] },
+      { "label": "Moedas", "level": 2, "words": ["PESO", "LIBRA", "FRANCO", "IENE"] },
+      { "label": "Estão nas notas de real", "level": 3, "words": ["TARTARUGA", "GARÇA", "GAROUPA", "MICO-LEÃO"] }
+    ]
+  },
+  {
+    "groups": [
+      { "label": "Doenças", "level": 0, "words": ["GRIPE", "DENGUE", "SARAMPO", "CATAPORA"] },
+      { "label": "Animais peçonhentos", "level": 1, "words": ["ARANHA", "LACRAIA", "VESPA", "ARRAIA"] },
+      { "label": "Gado", "level": 2, "words": ["BOI", "VACA", "BEZERRO", "NOVILHO"] },
+      { "label": "Signos", "level": 3, "words": ["CÂNCER", "ESCORPIÃO", "TOURO", "GÊMEOS"] }
+    ]
+  },
+  {
+    "groups": [
+      { "label": "Legumes", "level": 0, "words": ["QUIABO", "CHUCHU", "PEPINO", "JILÓ"] },
+      { "label": "Para pintar parede", "level": 1, "words": ["PINCEL", "TINTA", "LIXA", "ESPÁTULA"] },
+      { "label": "Recipientes", "level": 2, "words": ["JARRO", "BALDE", "TIGELA", "VASO"] },
+      { "label": "Bolo de ___", "level": 3, "words": ["FUBÁ", "CENOURA", "ROLO", "POTE"] }
+    ]
+  },
+  {
+    "groups": [
+      { "label": "Na mesa do jantar", "level": 0, "words": ["GARFO", "FACA", "PRATO", "COPO"] },
+      { "label": "Jeitos de chamar alguém", "level": 1, "words": ["MANO", "BICHO", "PARÇA", "VÉIO"] },
+      { "label": "Dá para montar", "level": 2, "words": ["CAMELO", "BURRO", "MULA", "ELEFANTE"] },
+      { "label": "___ de pau", "level": 3, "words": ["CARA", "PERNA", "COLHER", "CAVALO"] }
+    ]
+  },
+  {
+    "source": "Only Connect Wall: ff23_03 350e_01 104d_01 fcc8_04",
+    "groups": [
+      { "label": "Frutas", "level": 0, "words": ["MARACUJÁ", "FRUTA-PÃO", "KIWI", "CARAMBOLA"] },
+      { "label": "Capitais sul-americanas", "level": 1, "words": ["LIMA", "PARAMARIBO", "ASSUNÇÃO", "QUITO"] },
+      { "label": "Algo muito fácil", "level": 2, "words": ["MOLEZA", "CANJA", "FICHINHA", "BARBADA"] },
+      { "label": "Anti___", "level": 3, "words": ["HORÁRIO", "CRISTO", "NEUTRINO", "CLÍMAX"] }
+    ]
+  },
+  {
+    "source": "Only Connect Wall: 3458_03 48df_04 d3ca_01 9e43_01",
+    "groups": [
+      { "label": "Naipes de cartas", "level": 0, "words": ["COPAS", "OUROS", "ESPADAS", "PAUS"] },
+      { "label": "Títulos de nobreza", "level": 1, "words": ["CONDESSA", "VICE-REI", "EMIR", "CONDE"] },
+      { "label": "Ficar pensando", "level": 2, "words": ["PONDERAR", "REMOER", "DEVANEAR", "MATUTAR"] },
+      { "label": "Derivam de Júlio César", "level": 3, "words": ["KAISER", "JULHO", "CZAR", "CESÁREA"] }
+    ]
+  },
+  {
+    "source": "Only Connect Wall: 761c_02 047f_04 f7f0_01 f4bf_01",
+    "groups": [
+      { "label": "No deserto", "level": 0, "words": ["MIRAGEM", "OÁSIS", "CAMELO", "DUNA"] },
+      { "label": "Maquiagem", "level": 1, "words": ["BASE", "RÍMEL", "RUGE", "PÓ"] },
+      { "label": "Formações do litoral", "level": 2, "words": ["CABO", "PONTA", "FALÉSIA", "RESTINGA"] },
+      { "label": "Capitais africanas", "level": 3, "words": ["VITÓRIA", "CAIRO", "JUBA", "PRAIA"] }
+    ]
+  },
+  {
+    "source": "Only Connect Wall: 491b_02 51dd_01 0c0a_04 ed1e_03",
+    "groups": [
+      { "label": "Gêneros de filme", "level": 0, "words": ["ROMANCE", "TERROR", "MUSICAL", "NOIR"] },
+      { "label": "Patos da Disney", "level": 1, "words": ["MARGARIDA", "ZEZINHO", "DONALD", "LUISINHO"] },
+      { "label": "Óleo de ___", "level": 2, "words": ["GERGELIM", "PALMA", "GIRASSOL", "ARGAN"] },
+      { "label": "Gramíneas", "level": 3, "words": ["MILHO", "CANA", "ARROZ", "BAMBU"] }
+    ]
+  },
+  {
+    "source": "Only Connect Wall: 9eea_02 41a2_01 5660_01 f9d5_02",
+    "groups": [
+      { "label": "Esportes com bola", "level": 0, "words": ["GOLFE", "CRÍQUETE", "RÚGBI", "POLO"] },
+      { "label": "Sinônimos de copiar", "level": 1, "words": ["MACAQUEAR", "CLONAR", "IMITAR", "PAPAGUEAR"] },
+      { "label": "Fêmeas de animais", "level": 2, "words": ["JUMENTA", "CORÇA", "PORCA", "GALINHA"] },
+      { "label": "Luva de ___", "level": 3, "words": ["PELICA", "BOXE", "FORNO", "BORRACHA"] }
+    ]
+  },
+  {
+    "source": "Only Connect Wall: 118b_02 88f2_02 f480_01 761c_04",
+    "groups": [
+      { "label": "Energias renováveis", "level": 0, "words": ["SOLAR", "EÓLICA", "BIOMASSA", "GEOTÉRMICA"] },
+      { "label": "Situações complicadas", "level": 1, "words": ["APERTO", "ENRASCADA", "DILEMA", "APURO"] },
+      { "label": "Craques da seleção brasileira", "level": 2, "words": ["SÓCRATES", "LEONARDO", "DIDI", "CAFU"] },
+      { "label": "Pintores espanhóis", "level": 3, "words": ["DALÍ", "GOYA", "MIRÓ", "VELÁZQUEZ"] }
+    ]
+  },
+  {
+    "source": "Only Connect Wall: e8f0_01 4f29_02 410f_03 ffbc_03",
+    "groups": [
+      { "label": "Desavença", "level": 0, "words": ["BRIGA", "RIXA", "BATE-BOCA", "QUEBRA-PAU"] },
+      { "label": "Invertebrados aquáticos", "level": 1, "words": ["OURIÇO", "HIDRA", "ESPONJA", "CORAL"] },
+      { "label": "Tipos de radiação", "level": 2, "words": ["GAMA", "ALFA", "NÊUTRON", "BETA"] },
+      { "label": "Tipos de tinta", "level": 3, "words": ["TATUAGEM", "INVISÍVEL", "NANQUIM", "LULA"] }
+    ]
+  },
+  {
+    "source": "Only Connect Wall: 0c0a_03 a63f_01 4362_01 e4c2_03",
+    "groups": [
+      { "label": "Fora da lei", "level": 0, "words": ["VIGARISTA", "CRIMINOSO", "INFRATOR", "MALFEITOR"] },
+      { "label": "Animações da Disney", "level": 1, "words": ["ENROLADOS", "MULAN", "CINDERELA", "FANTASIA"] },
+      { "label": "Tipos de número", "level": 2, "words": ["PERFEITO", "IRRACIONAL", "REAL", "COMPLEXO"] },
+      { "label": "Auto___", "level": 3, "words": ["RETRATO", "SERVIÇO", "DEFESA", "ESTIMA"] }
+    ]
+  },
+  {
+    "source": "Only Connect Wall: ccb8_01 82ec_01 0292_04 9e43_02",
+    "groups": [
+      { "label": "Sinônimos de reclamação", "level": 0, "words": ["LAMÚRIA", "QUEIXA", "CHIADEIRA", "RESMUNGO"] },
+      { "label": "O Mágico de Oz", "level": 1, "words": ["GLINDA", "DOROTHY", "ESPANTALHO", "TOTÓ"] },
+      { "label": "Tipos de vendedor", "level": 2, "words": ["CAMELÔ", "MASCATE", "CAMBISTA", "MERCADOR"] },
+      { "label": "Quinto de cada sequência", "level": 3, "words": ["MAIO", "ÉPSILON", "SOL", "BORO"] }
+    ]
+  },
+  {
+    "source": "Only Connect Wall: acee_01 7fc3_03 aaf4_04 0fac_01",
+    "groups": [
+      { "label": "Coisas a solucionar", "level": 0, "words": ["CHARADA", "ENIGMA", "PROBLEMA", "MISTÉRIO"] },
+      { "label": "Sobrenomes de super-heróis", "level": 1, "words": ["BANNER", "STARK", "PARKER", "KENT"] },
+      { "label": "Ajudam a flutuar", "level": 2, "words": ["PRANCHA", "COLETE", "BRAÇADEIRA", "ESPAGUETE"] },
+      { "label": "Nos títulos de Harry Potter", "level": 3, "words": ["PRÍNCIPE", "FOGO", "PEDRA", "FÊNIX"] }
+    ]
+  },
+  {
+    "source": "Only Connect Wall: 9459_02 0299_03 1871_04 acab_02",
+    "groups": [
+      { "label": "Equipamento de pesca", "level": 0, "words": ["MOLINETE", "CHUMBADA", "ISCA", "LINHA"] },
+      { "label": "Tons de verde", "level": 1, "words": ["LIMÃO", "ESMERALDA", "JADE", "OLIVA"] },
+      { "label": "___ de roupa", "level": 2, "words": ["VARAL", "PREGADOR", "SECADOR", "ESCOVA"] },
+      { "label": "Categorias de peso no boxe", "level": 3, "words": ["CRUZADOR", "MÉDIO", "MOSCA", "LEVE"] }
+    ]
+  },
+  {
+    "source": "Only Connect Wall: 11d2_01 49dc_01 074d_02 aaa9_01",
+    "groups": [
+      { "label": "Jeitos de chamar parentes", "level": 0, "words": ["VOVÓ", "MANO", "MANA", "MAMÃE"] },
+      { "label": "Sólidos geométricos", "level": 1, "words": ["CONE", "PRISMA", "ESFEROIDE", "TETRAEDRO"] },
+      { "label": "Estruturas de sustentação", "level": 2, "words": ["ESTACA", "MASTRO", "ESCORA", "POSTE"] },
+      { "label": "Estrela ___", "level": 3, "words": ["ANÃ", "CADENTE", "POLAR", "VESPERTINA"] }
+    ]
+  },
+  {
+    "source": "Only Connect Wall: acab_01 e4fb_03 59eb_04 525a_01",
+    "groups": [
+      { "label": "Sinônimos de olhar", "level": 0, "words": ["FITAR", "VER", "OBSERVAR", "ESPIAR"] },
+      { "label": "X-Men", "level": 1, "words": ["CICLOPE", "TEMPESTADE", "VAMPIRA", "ANJO"] },
+      { "label": "Cortes de carne bovina", "level": 2, "words": ["ACÉM", "PALETA", "FRALDINHA", "CONTRAFILÉ"] },
+      { "label": "___ meteorológico(a)", "level": 3, "words": ["BOLETIM", "PREVISÃO", "BALÃO", "ESTAÇÃO"] }
+    ]
+  },
+  {
+    "source": "Only Connect Wall: 074d_04 3f3e_02 9fce_02 9d28_01",
+    "groups": [
+      { "label": "Imperfeições na pele", "level": 0, "words": ["ESPINHA", "VERRUGA", "PINTA", "PÚSTULA"] },
+      { "label": "Vilões da Disney", "level": 1, "words": ["SCAR", "ÚRSULA", "STROMBOLI", "HADES"] },
+      { "label": "Conduzem água", "level": 2, "words": ["VALA", "CALHA", "BUEIRO", "CANAL"] },
+      { "label": "Colocados nos dentes", "level": 3, "words": ["JAQUETA", "COROA", "PONTE", "FACETA"] }
+    ]
+  },
+  {
+    "source": "Only Connect Wall: 499d_03 e829_03 314b_01 8cde_02",
+    "groups": [
+      { "label": "Terreno encharcado", "level": 0, "words": ["BREJO", "LAMAÇAL", "PÂNTANO", "ATOLEIRO"] },
+      { "label": "Categorias do Nobel", "level": 1, "words": ["ECONOMIA", "FÍSICA", "QUÍMICA", "PAZ"] },
+      { "label": "Da família do pepino", "level": 2, "words": ["CABOTIÁ", "ABOBRINHA", "ABÓBORA", "CABAÇA"] },
+      { "label": "Itens do quadribol", "level": 3, "words": ["VASSOURA", "GOLES", "BASTÃO", "BALAÇO"] }
+    ]
+  },
+  {
+    "source": "Only Connect Wall: cb38_02 c2ce_01 d1d8_02 3d4a_01",
+    "groups": [
+      { "label": "Estados de tristeza", "level": 0, "words": ["SOFRIMENTO", "PESAR", "DEPRÊ", "FOSSA"] },
+      { "label": "Partes do ouvido", "level": 1, "words": ["ESTRIBO", "TÍMPANO", "BIGORNA", "MARTELO"] },
+      { "label": "Têm espécies venenosas", "level": 2, "words": ["COGUMELO", "ÁGUA-VIVA", "COBRA", "ALGA"] },
+      { "label": "Leis da/do ___", "level": 3, "words": ["MOVIMENTO", "NATUREZA", "ROBÓTICA", "ATRAÇÃO"] }
+    ]
+  },
+  {
+    "source": "Only Connect Wall: df65_04 41d6_01 0106_02 91ff_03",
+    "groups": [
+      { "label": "Pokémon", "level": 0, "words": ["SNORLAX", "JIGGLYPUFF", "BULBASAUR", "DITTO"] },
+      { "label": "Começo ou origem", "level": 1, "words": ["GÊNESE", "SEMENTE", "AURORA", "FONTE"] },
+      { "label": "Símbolos do zodíaco", "level": 2, "words": ["ARQUEIRO", "TOURO", "VIRGEM", "BALANÇA"] },
+      { "label": "Gráfico de ___", "level": 3, "words": ["RADAR", "PIZZA", "DISPERSÃO", "LINHA"] }
+    ]
+  }
+]

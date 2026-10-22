@@ -12,6 +12,7 @@ Jogos diários curtos num lugar só. Todo dia sai um desafio novo de cada jogo, 
 | **Rota**     | Dois países e um caminho por terra entre eles: diga os países do meio até ligar um ao outro. Verde/amarelo/vermelho mostram quão perto do caminho mais curto cada chute ficou; há 3 dicas. |
 | **Calor**    | Ache o país secreto: cada chute aparece num globo que gira, colorido pela distância entre as fronteiras (mais quente = mais perto). Sem limite de chutes; dá para desistir. |
 | **Mundo**    | Nomear os 197 países em 15 minutos. O mapa pinta cada acerto e a tabela mostra o progresso por continente. |
+| **Elo**      | Separar 16 palavras em 4 grupos de 4 com algo em comum, do grupo mais óbvio ao trocadilho. Sem limite de chutes; dá para desistir. |
 
 O foco do produto é a camada social: grupos, ranking diário e sequências. Esta primeira fase é **só o frontend**: as partidas ficam salvas no navegador. Backend, login e grupos são as próximas fases (veja o [roadmap](#roadmap)).
 
@@ -60,7 +61,7 @@ scripts/build-data.ts gera os dados dos jogos a partir das fontes abertas
 
 **Engine e UI separadas.** Cada jogo tem uma `engine.ts`, que gera o desafio e valida as tentativas, e um `index.ts` com a interface. A UI nunca importa a engine: ela fala com `lib/plays/service.ts`. Hoje esse serviço chama a engine no próprio navegador. Na fase de backend ele vira chamadas a route handlers, e a resposta deixa de chegar ao cliente antes do fim do jogo. **Até lá, quem abrir o DevTools consegue achar a resposta.** Isso é aceitável enquanto não há ranking.
 
-**Dois tipos de jogo.** Cada jogo declara suas regras (`meta.rules`): **por tentativas** (Palavra, Bandeira, País, Mosaico, Rota: acertar em até N chutes) **sem limite** (Calor: chutar até acertar, ou desistir) ou **por tempo** (Mundo: achar o máximo antes do relógio zerar). No jogo por tempo, o relógio começa ao clicar em "Começar" e continua correndo mesmo se a pessoa fechar a página.
+**Dois tipos de jogo.** Cada jogo declara suas regras (`meta.rules`): **por tentativas** (Palavra, Bandeira, País, Mosaico, Rota: acertar em até N chutes) **sem limite** (Calor e Elo: chutar até acertar, ou desistir) ou **por tempo** (Mundo: achar o máximo antes do relógio zerar). No jogo por tempo, o relógio começa ao clicar em "Começar" e continua correndo mesmo se a pessoa fechar a página.
 
 **Pontuação** (para o ranking dos grupos, que ainda não existe): nos jogos por tentativas, `tentativas máximas + 1 − tentativas usadas`, e derrota vale 0. No jogo por tempo, um ponto por item achado. A interface ainda não mostra pontos.
 
@@ -72,6 +73,8 @@ scripts/build-data.ts gera os dados dos jogos a partir das fontes abertas
 | -------------------------------------- | ------------------------------------------------------------------------------------------------- | ----------------- |
 | Palavras válidas (léxico, conjugações, frequência) | [fserb/pt-br](https://github.com/fserb/pt-br)                                          | MIT               |
 | Respostas do Palavra                   | Curadoria própria sobre a lista acima (`games/palavra/data/answers.json`)                          | MIT               |
+| Grupos do Elo                          | Curadoria própria (`games/elo/data/puzzles.json`)                                                  | MIT               |
+| Grupos do Elo traduzidos               | [Only Connect Wall](https://github.com/TaatiTeam/OCW) (Alavi et al., NeurIPS 2023): grupos traduzidos e adaptados ao português, recombinados em desafios novos. Os ids originais ficam no campo `source` | MIT               |
 | Geometria e centroides dos países      | [Natural Earth](https://www.naturalearthdata.com/) 1:50m Admin 0                                  | Domínio público   |
 | Distância entre fronteiras (Calor)     | Calculada dos contornos do Natural Earth 1:110m (1:50m para microestados) em `scripts/build-data.ts` | Domínio público   |
 | Fronteiras terrestres (Rota)           | Calculadas da geometria do Natural Earth: vizinhos compartilham vértices na divisa (`scripts/build-data.ts`) | Domínio público   |
@@ -81,14 +84,6 @@ scripts/build-data.ts gera os dados dos jogos a partir das fontes abertas
 | Animação da chama da sequência        | "Streak Fire", de Dhawal Patel, na [LottieFiles](https://lottiefiles.com) (`components/streak/fire-streak.json`) | Lottie Simple License |
 
 Os países são os 193 membros da ONU mais Kosovo, Palestina, Taiwan e Vaticano. No País, os que têm menos de 10.000 km² podem ser chutados, mas nunca são a resposta, porque a silhueta deles vira um pontinho.
-
-## Roadmap
-
-1. ~~Plataforma e os três jogos (frontend)~~
-2. Supabase: auth (Google e magic link), tabelas com RLS e validação das tentativas no servidor
-3. Importar as partidas do navegador ao logar
-4. Grupos, convite por link e ranking diário do grupo
-5. Perfil sincronizado entre dispositivos
 
 ## Contribuindo
 
