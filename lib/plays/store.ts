@@ -28,6 +28,7 @@ export interface PlayStore {
   getPlays(): PlayMap;
   getPlay(slug: string, dateKey: string): StoredPlay | undefined;
   savePlay(play: StoredPlay): void;
+  deletePlay(slug: string, dateKey: string): void;
   usePlays(): PlayMap;
 }
 
@@ -51,15 +52,25 @@ function createPlayStore(storageKey: string, { latestOnly = false } = {}): PlayS
 
   const getPlays = () => (typeof window === "undefined" ? EMPTY : read());
 
-  function savePlay(play: StoredPlay) {
-    const kept = latestOnly ? Object.fromEntries(Object.entries(read()).filter(([, p]) => p.slug !== play.slug)) : read();
-    cache = { ...kept, [playKey(play.slug, play.dateKey)]: play };
+  function write(next: PlayMap) {
+    cache = next;
     try {
       localStorage.setItem(storageKey, JSON.stringify(cache));
     } catch {
       // Modo privado ou cota cheia: a partida segue só em memória.
     }
     listeners.forEach((l) => l());
+  }
+
+  function savePlay(play: StoredPlay) {
+    const kept = latestOnly ? Object.fromEntries(Object.entries(read()).filter(([, p]) => p.slug !== play.slug)) : read();
+    write({ ...kept, [playKey(play.slug, play.dateKey)]: play });
+  }
+
+  function deletePlay(slug: string, dateKey: string) {
+    const rest = { ...read() };
+    delete rest[playKey(slug, dateKey)];
+    write(rest);
   }
 
   function subscribe(listener: () => void) {
@@ -80,6 +91,7 @@ function createPlayStore(storageKey: string, { latestOnly = false } = {}): PlayS
     getPlays,
     getPlay: (slug, dateKey) => getPlays()[playKey(slug, dateKey)],
     savePlay,
+    deletePlay,
     usePlays: () => useSyncExternalStore(subscribe, getPlays, () => EMPTY),
   };
 }

@@ -2,7 +2,7 @@
 
 import { loadEngine, peekEngine } from "@/games/engines";
 import { getGame } from "@/games";
-import type { GameEngine, GameRules, PlayStatus, PlayView } from "@/games/types";
+import type { GameEngine, GameRules, Guess, PlayStatus, PlayView } from "@/games/types";
 import { addDays, challengeNumber } from "@/lib/daily/date";
 import { dailyStore, practiceStore, type PlayStore, type StoredPlay } from "./store";
 
@@ -77,10 +77,29 @@ export function nextPracticeKey(slug: string): string {
   return addDays(PRACTICE_FROM, Math.floor(Math.random() * PRACTICE_DAYS));
 }
 
+/**
+ * A partida salva ainda é deste desafio? Refaz cada tentativa contra a resposta atual: se alguma
+ * der outro resultado, o desafio mudou desde que ela foi jogada (nova data de estreia, lista de
+ * palavras atualizada…) e as cores salvas não valem mais.
+ */
+function matchesChallenge(engine: GameEngine, answer: unknown, stored: StoredPlay): boolean {
+  const replayed: Guess[] = [];
+  for (const guess of stored.guesses) {
+    const result = engine.checkGuess(guess.input, answer, replayed);
+    if (!result.ok || JSON.stringify(result.feedback) !== JSON.stringify(guess.feedback)) return false;
+    replayed.push({ input: guess.input, feedback: result.feedback });
+  }
+  return true;
+}
+
 function openPlay(engine: GameEngine, slug: string, dateKey: string, practice: boolean): PlayView {
   const store = storeFor(practice);
   const { puzzle, answer } = engine.createChallenge(dateKey);
   let stored = store.getPlay(slug, dateKey);
+  if (stored && !matchesChallenge(engine, answer, stored)) {
+    store.deletePlay(slug, dateKey);
+    stored = undefined;
+  }
   // Quem fechou a aba com o relógio correndo volta e encontra a partida encerrada.
   if (stored?.status === "playing" && timeIsUp(rulesOf(slug), stored)) {
     stored = close(store, stored, "done", engine.describeAnswer(answer));

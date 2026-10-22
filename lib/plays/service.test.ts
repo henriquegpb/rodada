@@ -17,7 +17,13 @@ const { engine } = await import("@/games/palavra/engine");
 const TODAY = "2026-10-22";
 
 describe("treino (Jogar outra)", () => {
-  beforeEach(() => memory.clear());
+  // Limpa pelo próprio armazenamento: ele guarda um cache em memória além do localStorage.
+  beforeEach(() => {
+    for (const store of [dailyStore, practiceStore]) {
+      for (const p of Object.values(store.getPlays())) store.deletePlay(p.slug, p.dateKey);
+    }
+    memory.clear();
+  });
 
   it("fica guardado à parte e não mexe nas partidas do dia", async () => {
     const answer = engine.createChallenge(TODAY).answer;
@@ -55,5 +61,27 @@ describe("treino (Jogar outra)", () => {
     const second = nextPracticeKey("palavra");
     await submitGuess("palavra", second, "carro", true);
     expect(Object.keys(practiceStore.getPlays())).toEqual([`palavra:${second}`]);
+  });
+
+  it("descarta a partida salva se o desafio mudou desde que ela foi jogada", async () => {
+    const answer = engine.createChallenge(TODAY).answer;
+    await submitGuess("palavra", TODAY, "carro");
+    // Simula um desafio antigo: as cores salvas não batem com a resposta de hoje.
+    const stale = dailyStore.getPlay("palavra", TODAY)!;
+    dailyStore.savePlay({
+      ...stale,
+      guesses: [{ input: "carro", feedback: { letters: [..."carro"], marks: ["correct", "correct", "correct", "correct", "absent"] } }],
+    });
+    const play = await startPlay("palavra", TODAY);
+    expect(play.guesses).toEqual([]);
+    expect(dailyStore.getPlay("palavra", TODAY)).toBeUndefined();
+    // E dá para jogar de novo normalmente.
+    expect(await submitGuess("palavra", TODAY, answer)).toMatchObject({ play: { status: "won" } });
+  });
+
+  it("mantém a partida salva quando ela bate com o desafio", async () => {
+    await submitGuess("palavra", TODAY, "carro");
+    await submitGuess("palavra", TODAY, "pedra");
+    expect((await startPlay("palavra", TODAY)).guesses).toHaveLength(2);
   });
 });
