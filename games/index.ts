@@ -8,12 +8,13 @@ import { mosaico } from "./mosaico";
 import { rota } from "./rota";
 import { calor } from "./calor";
 import { mundo } from "./mundo";
+import { elo } from "./elo";
 
 /**
  * Registro dos jogos (e modos), na ordem em que aparecem no site.
  * Ao adicionar um jogo, registre também a engine em ./engines.ts.
  */
-export const games: GameDefinition[] = [palavra, dupla, quadra, bandeira, pais, mosaico, rota, calor, mundo] as GameDefinition[];
+export const games: GameDefinition[] = [palavra, dupla, quadra, bandeira, pais, mosaico, rota, calor, mundo, elo] as GameDefinition[];
 
 /** Os jogos da rodada do dia: tudo que não é modo de outro jogo. */
 export const roundGames = games.filter((g) => !g.meta.parent);
