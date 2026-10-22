@@ -1,8 +1,8 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ChartColumn, CircleHelp, Dumbbell } from "lucide-react";
-import { getGame } from "@/games";
+import { getGame, rootGame } from "@/games";
 import type { PlayView } from "@/games/types";
 import { useToday } from "@/lib/daily/hooks";
 import { beginPlay, finishPlay, nextPracticeKey, peekPlay, startPlay, submitGuess } from "@/lib/plays/service";
@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 import { HowToPlayDialog } from "./how-to-play";
 import { ResultDialog, ResultStrip } from "./result";
+import { ModeTabs, modeMove } from "./mode-tabs";
 import { StatsDialog } from "./stats-dialog";
 
 /** Espera a última jogada terminar de animar antes de abrir o resultado. */
@@ -70,20 +71,49 @@ export function GameScreen({ slug }: { slug: string }) {
     if (ended.status !== "playing") setDialog("result");
   }
 
+  const rootRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+
+  // Animação de entrada (roda ao montar e quando o Next reexibe a página guardada).
+  // Trocando de modo (Palavra → Dupla) título e abas ficam parados e só o jogo desliza, para o
+  // lado da aba escolhida. Vindo de qualquer outro lugar, a página inteira entra com fade.
+  useLayoutEffect(() => {
+    const { from, to } = modeMove(slug);
+    const easing = "cubic-bezier(.22,1,.36,1)";
+    if (from >= 0 && from !== to) {
+      const dx = from < to ? 32 : -32;
+      stageRef.current?.animate(
+        [
+          { opacity: 0, transform: `translateX(${dx}px)` },
+          { opacity: 1, transform: "none" },
+        ],
+        { duration: 380, easing },
+      );
+    } else {
+      rootRef.current?.animate(
+        [
+          { opacity: 0, transform: "translateY(4px)" },
+          { opacity: 1, transform: "none" },
+        ],
+        { duration: 260, easing },
+      );
+    }
+  }, [slug]);
+
   const finished = play !== null && play.status !== "playing";
   const used = play?.guesses.length ?? 0;
   const { rules } = meta;
 
   return (
     // Palco estreito por padrão; o jogo com tempo precisa de espaço para mapa e tabela.
-    // O fade também roda quando o Next reexibe uma página já visitada (o display volta de none).
-    <div className={cn("mx-auto animate-fade-in", rules.type === "timed" ? "max-w-5xl" : "max-w-[620px]")}>
+    <div ref={rootRef} className={cn("mx-auto", meta.wide || rules.type === "timed" ? "max-w-5xl" : "max-w-[620px]")}>
       <header className="flex flex-wrap items-end justify-between gap-x-4 gap-y-3">
         <div>
           <p className="h-5 text-sm text-muted-foreground">
             {practice ? t.practice.label : play && `Nº ${play.number}`}
           </p>
-          <h1 className="font-display text-4xl leading-none sm:text-5xl">{meta.name}</h1>
+          {/* Nos modos (Dupla, Quadra) o título é o do jogo pai; o modo aparece nas abas. */}
+          <h1 className="font-display text-4xl leading-none sm:text-5xl">{rootGame(slug)?.meta.name ?? meta.name}</h1>
         </div>
         <div className="flex items-center gap-5 pb-1">
           {rules.type === "attempts" && (
@@ -108,40 +138,44 @@ export function GameScreen({ slug }: { slug: string }) {
         </div>
       </header>
 
-      {practice && (
-        <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-lg border border-dashed border-border px-4 py-3 text-sm">
-          <Dumbbell size={16} className="shrink-0 text-muted-foreground" />
-          <p className="min-w-0 flex-1 text-muted-foreground">
-            <strong className="font-semibold text-foreground">{t.practice.label}.</strong> {t.practice.notice}
-          </p>
-          <button type="button" onClick={backToToday} className="font-semibold text-primary">
-            {t.practice.back}
-          </button>
-        </div>
-      )}
+      <ModeTabs slug={slug} className="mt-6" />
 
-      {finished && (
-        <div className="mt-6 animate-rise">
-          <ResultStrip game={game} play={play} onOpen={() => setDialog("result")} onPlayAnother={playAnother} />
-        </div>
-      )}
-
-      <div className="mt-8">
-        {play ? (
-          <Suspense fallback={<Loading />}>
-            {/* Cada partida (hoje ou treino) começa com o tabuleiro zerado. */}
-            <Board
-              key={`${play.practice ? "treino" : "hoje"}:${play.dateKey}`}
-              play={play}
-              rules={rules}
-              submitGuess={submit}
-              begin={begin}
-              finish={finish}
-            />
-          </Suspense>
-        ) : (
-          <Loading />
+      <div ref={stageRef}>
+        {practice && (
+          <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-lg border border-dashed border-border px-4 py-3 text-sm">
+            <Dumbbell size={16} className="shrink-0 text-muted-foreground" />
+            <p className="min-w-0 flex-1 text-muted-foreground">
+              <strong className="font-semibold text-foreground">{t.practice.label}.</strong> {t.practice.notice}
+            </p>
+            <button type="button" onClick={backToToday} className="font-semibold text-primary">
+              {t.practice.back}
+            </button>
+          </div>
         )}
+
+        {finished && (
+          <div className="mt-6 animate-rise">
+            <ResultStrip game={game} play={play} onOpen={() => setDialog("result")} onPlayAnother={playAnother} />
+          </div>
+        )}
+
+        <div className="mt-8">
+          {play ? (
+            <Suspense fallback={<Loading />}>
+              {/* Cada partida (hoje ou treino) começa com o tabuleiro zerado. */}
+              <Board
+                key={`${play.practice ? "treino" : "hoje"}:${play.dateKey}`}
+                play={play}
+                rules={rules}
+                submitGuess={submit}
+                begin={begin}
+                finish={finish}
+              />
+            </Suspense>
+          ) : (
+            <Loading />
+          )}
+        </div>
       </div>
 
       <HowToPlayDialog
