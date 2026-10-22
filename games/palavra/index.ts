@@ -2,6 +2,7 @@ import { Type } from "lucide-react";
 import type { AttemptRules, GameDefinition } from "../types";
 import { PalavraBoard } from "./Board";
 import { PalavraCover } from "./Cover";
+import { PalavraRecap } from "./Recap";
 import type { LetterMark, PalavraFeedback, PalavraPuzzle } from "./types";
 
 const EMOJI: Record<LetterMark, string> = { correct: "🟧", present: "🟦", absent: "⬛" };
@@ -26,5 +27,6 @@ export const palavra: GameDefinition<PalavraPuzzle, PalavraFeedback, AttemptRule
   },
   Board: PalavraBoard,
   Cover: PalavraCover,
+  Recap: PalavraRecap,
   shareGrid: (play) => play.guesses.map((g) => g.feedback.marks.map((m) => EMOJI[m]).join("")).join("\n"),
 };

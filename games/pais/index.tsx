@@ -1,10 +1,13 @@
 import { Earth } from "lucide-react";
 import type { AttemptRules, BoardProps, GameDefinition } from "../types";
 import { CountryBoard } from "../_shared/geo/CountryBoard";
+import { CountryRecap } from "../_shared/geo/CountryRecap";
 import { proximityEmoji } from "../_shared/geo";
 import type { CountryFeedback } from "../_shared/geo/types";
 import type { PaisPuzzle } from "./types";
 import { PaisCover } from "./Cover";
+
+const COLOR = "#19b46e";
 
 function PaisBoard(props: BoardProps<PaisPuzzle, CountryFeedback, AttemptRules>) {
   return (
@@ -27,7 +30,7 @@ export const pais: GameDefinition<PaisPuzzle, CountryFeedback, AttemptRules> = {
     description: "Descubra o país pela silhueta em até 6 tentativas.",
     icon: Earth,
     rules: { type: "attempts", maxAttempts: 6 },
-    color: "#19b46e",
+    color: COLOR,
     howToPlay: [
       "Descubra qual é o país pela silhueta em até 6 tentativas.",
       "Digite um país e escolha na lista.",
@@ -37,5 +40,6 @@ export const pais: GameDefinition<PaisPuzzle, CountryFeedback, AttemptRules> = {
   },
   Board: PaisBoard,
   Cover: PaisCover,
+  Recap: ({ play }) => <CountryRecap play={play} color={COLOR} />,
   shareGrid: (play) => play.guesses.map((g) => proximityEmoji(g.feedback)).join("\n"),
 };

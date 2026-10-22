@@ -1,10 +1,13 @@
 import { Flag } from "lucide-react";
 import type { AttemptRules, BoardProps, GameDefinition } from "../types";
 import { CountryBoard } from "../_shared/geo/CountryBoard";
+import { CountryRecap } from "../_shared/geo/CountryRecap";
 import { proximityEmoji } from "../_shared/geo";
 import type { CountryFeedback } from "../_shared/geo/types";
 import type { BandeiraPuzzle } from "./types";
 import { BandeiraCover } from "./Cover";
+
+const COLOR = "#2f7cf6";
 
 function BandeiraBoard(props: BoardProps<BandeiraPuzzle, CountryFeedback, AttemptRules>) {
   return (
@@ -31,7 +34,7 @@ export const bandeira: GameDefinition<BandeiraPuzzle, CountryFeedback, AttemptRu
     description: "Descubra o país pela bandeira em até 6 tentativas.",
     icon: Flag,
     rules: { type: "attempts", maxAttempts: 6 },
-    color: "#2f7cf6",
+    color: COLOR,
     howToPlay: [
       "Descubra de qual país é a bandeira em até 6 tentativas.",
       "Digite um país e escolha na lista.",
@@ -40,5 +43,6 @@ export const bandeira: GameDefinition<BandeiraPuzzle, CountryFeedback, AttemptRu
   },
   Board: BandeiraBoard,
   Cover: BandeiraCover,
+  Recap: ({ play }) => <CountryRecap play={play} color={COLOR} />,
   shareGrid: (play) => play.guesses.map((g) => proximityEmoji(g.feedback)).join("\n"),
 };

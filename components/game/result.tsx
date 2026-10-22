@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { ShareButton } from "@/components/microkit/cursor-follow-share-button";
@@ -40,6 +40,18 @@ function useResult(game: GameDefinition, play: PlayView) {
   };
 }
 
+function PlayAnotherButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="inline-flex items-center gap-1.5 font-semibold text-muted-foreground transition-colors hover:text-foreground"
+    >
+      <RotateCcw size={14} /> {t.practice.playAnother}
+    </button>
+  );
+}
+
 function NextLink({ next, className }: { next?: { slug: string; name: string }; className?: string }) {
   return (
     <Link href={next ? `/${next.slug}` : "/"} className={className}>
@@ -54,10 +66,12 @@ export function ResultStrip({
   game,
   play,
   onOpen,
+  onPlayAnother,
 }: {
   game: GameDefinition;
   play: PlayView;
   onOpen: () => void;
+  onPlayAnother: () => void;
 }) {
   const { won, next, headline, score, answer } = useResult(game, play);
   return (
@@ -78,6 +92,7 @@ export function ResultStrip({
         <button type="button" onClick={onOpen} className="text-muted-foreground transition-colors hover:text-foreground">
           {t.game.seeResult}
         </button>
+        <PlayAnotherButton onClick={onPlayAnother} />
         <NextLink next={next} className="inline-flex items-center gap-1.5 text-primary" />
       </div>
     </div>
@@ -90,11 +105,13 @@ export function ResultDialog({
   play,
   open,
   onOpenChange,
+  onPlayAnother,
 }: {
   game: GameDefinition;
   play: PlayView;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onPlayAnother: () => void;
 }) {
   const { next, headline, score, answer, share } = useResult(game, play);
   return (
@@ -105,7 +122,7 @@ export function ResultDialog({
       >
         <div className="px-6 pb-5 pt-7 text-ink" style={{ background: game.meta.color }}>
           <DialogTitle className="text-sm font-semibold text-ink/70">
-            {game.meta.name} Nº {play.number}
+            {game.meta.name} · {play.practice ? t.practice.label : `Nº ${play.number}`}
           </DialogTitle>
           <p className="font-display mt-2 text-6xl leading-none tabular-nums">{score}</p>
           <DialogDescription className="mt-3 text-[15px] font-medium text-ink">
@@ -119,14 +136,28 @@ export function ResultDialog({
           </DialogDescription>
         </div>
         <div className="flex flex-col gap-5 p-6">
-          <div className="rounded-md bg-secondary/60 px-4 py-3">
-            <pre className="mx-auto w-fit whitespace-pre-wrap font-sans text-lg leading-snug">{game.shareGrid(play)}</pre>
+          <game.Recap play={play} />
+          {play.practice ? (
+            // Treino não se compartilha: o principal é emendar outra.
+            <button
+              type="button"
+              onClick={onPlayAnother}
+              className="flex h-14 items-center justify-center gap-2 rounded-full bg-primary text-[17px] font-semibold text-primary-foreground transition-[filter,transform] hover:brightness-110 active:scale-[0.99]"
+            >
+              <RotateCcw size={18} /> {t.practice.playAnother}
+            </button>
+          ) : (
+            <ShareButton label={t.game.share} onClick={share} />
+          )}
+          <div className="flex items-center justify-between gap-4 text-sm">
+            {play.practice ? (
+              <span className="text-muted-foreground">{t.practice.notice}</span>
+            ) : (
+              <PlayAnotherButton onClick={onPlayAnother} />
+            )}
+            <NextLink next={next} className="inline-flex shrink-0 items-center gap-1.5 font-semibold text-primary" />
           </div>
-          <ShareButton label={t.game.share} onClick={share} />
-          <div className="flex items-center justify-between text-sm">
-            <Countdown />
-            <NextLink next={next} className="inline-flex items-center gap-1.5 font-semibold text-primary" />
-          </div>
+          {!play.practice && <Countdown className="justify-center" />}
         </div>
       </DialogContent>
     </Dialog>
