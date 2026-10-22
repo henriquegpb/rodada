@@ -1,11 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Lightbulb } from "lucide-react";
+import { Lightbulb, LocateFixed, Minus, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { AttemptRules, BoardProps } from "../types";
 import { getCountry } from "../_shared/geo";
 import { CountryInput } from "../_shared/geo/CountryInput";
+import { usePanZoom, type View } from "../_shared/geo/usePanZoom";
 import map from "../_shared/geo/world-map.json";
 import { END_COLOR, START_COLOR, VERDICT_COLOR, VERDICT_LABEL } from "./colors";
 import type { RotaFeedback, RotaPuzzle, RotaVerdict } from "./types";
@@ -13,12 +14,21 @@ import type { RotaFeedback, RotaPuzzle, RotaVerdict } from "./types";
 const paths: Record<string, string> = map.paths;
 const dots: Record<string, number[]> = map.dots;
 const bounds: Record<string, number[]> = map.bounds;
+const anchors: Record<string, number[]> = map.anchors;
+const WORLD = { width: map.width, height: map.height };
 
 const HINTS = ["Mostrar o próximo país", "Mostrar todos os contornos", "Mostrar as iniciais"] as const;
 
-/** Enquadra o mapa nos países dados, com folga e proporção mínima de 16:10. */
-function frame(codes: string[]): string {
-  const boxes = codes.map((c) => bounds[c]).filter(Boolean);
+/**
+ * Enquadra o mapa: a parte principal da partida e do destino, mais o ponto central de cada país do
+ * caminho (a Rússia inteira, por exemplo, abriria o mapa no mundo todo). Folga e proporção 16:10.
+ */
+function frame(start: string, end: string, route: string[]): View {
+  const point = (code: string) => {
+    const [x, y] = anchors[code];
+    return [x, y, x, y];
+  };
+  const boxes = [bounds[start], bounds[end], ...route.map(point)].filter(Boolean);
   let x0 = Math.min(...boxes.map((b) => b[0]));
   let y0 = Math.min(...boxes.map((b) => b[1]));
   let x1 = Math.max(...boxes.map((b) => b[2]));
@@ -35,7 +45,7 @@ function frame(codes: string[]): string {
     y0 -= extra / 2;
     y1 += extra / 2;
   }
-  return `${x0} ${y0} ${x1 - x0} ${y1 - y0}`;
+  return { x: x0, y: y0, w: x1 - x0, h: y1 - y0 };
 }
 
 const hintKey = (dateKey: string) => `rodada:rota-dicas:${dateKey}`;
@@ -55,7 +65,8 @@ export default function RotaBoard({ play, rules, submitGuess }: BoardProps<RotaP
   const [hints, setHints] = useState(() => readHints(play.dateKey));
   const guessed = useMemo(() => new Map(play.guesses.map((g) => [g.feedback.code, g.feedback.verdict])), [play.guesses]);
   const exclude = useMemo(() => new Set([start, end, ...guessed.keys()]), [start, end, guessed]);
-  const viewBox = useMemo(() => frame([start, end, ...route]), [start, end, route]);
+  const initialView = useMemo(() => frame(start, end, route), [start, end, route]);
+  const { svgRef, viewBox, handlers, zoomIn, zoomOut, reset } = usePanZoom(initialView, WORLD);
 
   const nextHidden = route.find((c) => !guessed.has(c));
   /** Contornos de dica: o próximo país do caminho, todos eles, ou o caminho inteiro no fim. */
@@ -88,15 +99,22 @@ export default function RotaBoard({ play, rules, submitGuess }: BoardProps<RotaP
         </span>
       </p>
 
-      <div className="overflow-hidden rounded-lg bg-card">
-        <svg viewBox={viewBox} className="aspect-[16/10] w-full" role="img" aria-label="Mapa da rota">
+      <div className="relative overflow-hidden rounded-lg bg-card">
+        <svg
+          ref={svgRef}
+          viewBox={viewBox}
+          className="aspect-[16/10] w-full cursor-grab touch-none select-none active:cursor-grabbing"
+          role="img"
+          aria-label="Mapa da rota"
+          {...handlers}
+        >
           <path d={map.graticule} fill="none" stroke="var(--border)" strokeWidth={0.4} />
           {hints >= 2 &&
             Object.entries(paths).map(([code, d]) => (
               <path key={`all-${code}`} d={d} fill="none" stroke="var(--input)" strokeWidth={0.4} />
             ))}
           {outlined.map((code) => (
-            <Shape key={`hint-${code}`} code={code} fill="none" stroke="var(--muted-foreground)" dashed />
+            <Shape key={`hint-${code}`} code={code} fill="var(--foreground)" fillOpacity={0.08} stroke="var(--foreground)" dashed />
           ))}
           {[...guessed].map(([code, verdict]) => (
             <Shape key={code} code={code} fill={VERDICT_COLOR[verdict]} />
@@ -104,6 +122,17 @@ export default function RotaBoard({ play, rules, submitGuess }: BoardProps<RotaP
           <Shape code={start} fill={START_COLOR} />
           <Shape code={end} fill={END_COLOR} />
         </svg>
+        <div className="absolute right-3 top-3 flex flex-col gap-1.5">
+          <MapButton label="Aproximar" onClick={zoomIn}>
+            <Plus size={16} />
+          </MapButton>
+          <MapButton label="Afastar" onClick={zoomOut}>
+            <Minus size={16} />
+          </MapButton>
+          <MapButton label="Recentralizar" onClick={reset}>
+            <LocateFixed size={16} />
+          </MapButton>
+        </div>
       </div>
 
       {playing && <CountryInput onGuess={submitGuess} exclude={exclude} />}
@@ -169,17 +198,44 @@ export default function RotaBoard({ play, rules, submitGuess }: BoardProps<RotaP
   );
 }
 
-function Shape({ code, fill, stroke, dashed }: { code: string; fill: string; stroke?: string; dashed?: boolean }) {
+function Shape({
+  code,
+  fill,
+  fillOpacity,
+  stroke,
+  dashed,
+}: {
+  code: string;
+  fill: string;
+  fillOpacity?: number;
+  stroke?: string;
+  dashed?: boolean;
+}) {
   const common = {
     fill,
+    fillOpacity,
     stroke: stroke ?? "var(--card)",
-    strokeWidth: dashed ? 0.8 : 0.5,
-    strokeDasharray: dashed ? "2 1.5" : undefined,
+    strokeWidth: dashed ? 1.2 : 0.5,
+    strokeDasharray: dashed ? "4 3" : undefined,
     vectorEffect: "non-scaling-stroke" as const,
   };
   if (paths[code]) return <path d={paths[code]} {...common} className="transition-[fill] duration-500" />;
   const [x, y] = dots[code] ?? [];
   return x === undefined ? null : <circle cx={x} cy={y} r={2.5} {...common} />;
+}
+
+function MapButton({ label, onClick, children }: { label: string; onClick(): void; children: React.ReactNode }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      title={label}
+      className="grid size-9 place-items-center rounded-md border border-border bg-background/80 text-muted-foreground backdrop-blur transition-colors hover:text-foreground"
+    >
+      {children}
+    </button>
+  );
 }
 
 function Legend() {
