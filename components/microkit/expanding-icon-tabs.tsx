@@ -24,7 +24,7 @@ export function ExpandingIconTabs({
 }) {
   return (
     <nav
-      className="flex items-center justify-between gap-1 rounded-2xl border border-border bg-card/95 p-1.5 text-sm text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,.04),0_10px_24px_rgba(0,0,0,.35)] backdrop-blur"
+      className="flex items-center justify-between gap-0.5 rounded-2xl border border-border bg-card/95 p-1.5 text-sm text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,.04),0_10px_24px_rgba(0,0,0,.35)] backdrop-blur"
       aria-label={label}
     >
       {items.map((item) => {
@@ -37,8 +37,8 @@ export function ExpandingIconTabs({
             aria-current={active ? "page" : undefined}
             className={`inline-flex h-11 items-center rounded-xl text-sm font-medium [transition:gap_.5s_cubic-bezier(.32,.72,0,1),padding_.5s_cubic-bezier(.32,.72,0,1),background-color_.3s_ease,color_.3s_ease] focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-offset-[-1.5px] focus-visible:outline-[#f97316] ${
               active
-                ? "gap-2 bg-secondary px-4 text-foreground"
-                : "gap-0 bg-transparent px-3 text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
+                ? "gap-2 bg-secondary px-3 text-foreground"
+                : "gap-0 bg-transparent px-2 text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
             }`}
           >
             <span

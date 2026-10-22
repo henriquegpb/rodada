@@ -1,18 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Check, Flame, LayoutGrid, UserRound, X } from "lucide-react";
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { games } from "@/games";
+import { preloadEngine } from "@/games/engines";
 import type { GameMeta } from "@/games/types";
 import { Countdown } from "@/components/countdown";
 import { Logo, LogoMark } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SpotlightNav } from "@/components/microkit/spotlight-indicator";
 import { ExpandingIconTabs } from "@/components/microkit/expanding-icon-tabs";
+import BranchedMenu from "@/components/BranchedMenu";
 import { useToday } from "@/lib/daily/hooks";
-import { challengeNumber } from "@/lib/daily/date";
 import { usePlayRecords, useRound } from "@/lib/plays/hooks";
 import type { DayStatus } from "@/lib/plays/status";
 import { formatResult } from "@/lib/plays/result";
@@ -32,18 +33,33 @@ const mobileItems = [
  */
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const { today, round } = useRound();
+  const router = useRouter();
+  const { round } = useRound();
 
-  const sidebarItems = [
-    { href: "/", label: t.nav.home, leading: <LayoutGrid size={17} strokeWidth={2} /> },
-    ...round.map(({ meta, status }, i) => ({
-      href: `/${meta.slug}`,
-      label: meta.name,
-      heading: i === 0 ? `${t.nav.games}${today ? ` · Nº ${challengeNumber(today)}` : ""}` : undefined,
-      leading: <span className="size-3 rounded-[3px]" style={{ background: meta.color }} />,
-      trailing: <RoundStatus meta={meta} status={status} />,
-    })),
-    { href: "/perfil", label: t.nav.profile, heading: t.nav.you, leading: <UserRound size={17} strokeWidth={2} /> },
+  // As páginas dos jogos já ficam prontas: clicar no menu troca na hora, sem esperar a rede.
+  useEffect(() => {
+    for (const g of games) router.prefetch(`/${g.meta.slug}`);
+  }, [router]);
+
+  const homeItem = { href: "/", label: t.nav.home, leading: <LayoutGrid size={17} strokeWidth={2} /> };
+  const profileItem = {
+    href: "/perfil",
+    label: t.nav.profile,
+    heading: t.nav.you,
+    leading: <UserRound size={17} strokeWidth={2} />,
+  };
+  // Os jogos da rodada como galhos de uma árvore (React Bits · Branched Menu).
+  const gamesMenu = [
+    {
+      label: "",
+      children: round.map(({ meta, status }) => ({
+        value: meta.slug,
+        label: meta.name,
+        color: meta.color,
+        icon: <span className="size-2.5 rounded-[3px]" style={{ background: meta.color }} />,
+        trailing: <RoundStatus meta={meta} status={status} />,
+      })),
+    },
   ];
 
   return (
@@ -53,7 +69,24 @@ export function AppShell({ children }: { children: ReactNode }) {
       <aside className="hidden h-dvh flex-col border-r border-sidebar-border bg-sidebar px-4 py-6 lg:flex">
         <Logo className="px-3" />
         <div className="mt-8">
-          <SpotlightNav items={sidebarItems} activeHref={pathname} label="Navegação" />
+          <SpotlightNav items={[homeItem]} activeHref={pathname} label={t.nav.home} />
+          <div className="mt-3 pl-2">
+            <BranchedMenu
+              items={gamesMenu}
+              active={pathname.slice(1)}
+              onSelect={(slug) => router.push(`/${slug}`)}
+              onHover={preloadEngine}
+              color="var(--sidebar-foreground)"
+              accentColor="#ff6a1a"
+              lineColor="var(--border)"
+              width={204}
+              rowHeight={38}
+              indent={36}
+              fontSize={15}
+              className="!w-full"
+            />
+          </div>
+          <SpotlightNav items={[profileItem]} activeHref={pathname} label={t.nav.profile} />
         </div>
         <div className="mt-auto border-t border-sidebar-border px-3 pt-5">
           <StreakLine />
