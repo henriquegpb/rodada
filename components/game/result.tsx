@@ -11,6 +11,7 @@ import { useRound } from "@/lib/plays/hooks";
 import { formatResult } from "@/lib/plays/result";
 import { isDone } from "@/lib/plays/status";
 import { buildShareText, shareText } from "@/lib/share";
+import { trackEvent } from "@/lib/analytics";
 import { t } from "@/lib/i18n";
 
 function useResult(game: GameDefinition, play: PlayView) {
@@ -34,6 +35,7 @@ function useResult(game: GameDefinition, play: PlayView) {
     answer: play.answerLabel || null,
     async share() {
       const result = await shareText(buildShareText(game, play));
+      if (result !== "failed") trackEvent("result_shared", { game: game.meta.slug, method: result });
       if (result === "copied") toast.success(t.game.copied);
       else if (result === "failed") toast.error(t.game.copyFailed);
     },

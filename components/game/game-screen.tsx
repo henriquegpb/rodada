@@ -6,6 +6,7 @@ import { getGame, rootGame } from "@/games";
 import type { PlayView } from "@/games/types";
 import { useToday } from "@/lib/daily/hooks";
 import { beginPlay, finishPlay, nextPracticeKey, peekPlay, startPlay, submitGuess } from "@/lib/plays/service";
+import { trackEvent } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 import { HowToPlayDialog } from "./how-to-play";
@@ -40,6 +41,7 @@ export function GameScreen({ slug }: { slug: string }) {
   }, [slug, today, practiceKey]);
 
   function playAnother() {
+    trackEvent("play_another", { game: slug });
     setDialog(null);
     setPlay(null);
     setPracticeKey(nextPracticeKey(slug));
@@ -51,24 +53,46 @@ export function GameScreen({ slug }: { slug: string }) {
     setPracticeKey(null);
   }
 
+  /** Eventos de fim de partida (o resultado já vem salvo do serviço). */
+  function trackFinished(ended: PlayView) {
+    trackEvent("game_finished", {
+      game: slug,
+      practice,
+      result: ended.status,
+      attempts: ended.guesses.length,
+    });
+  }
+
   async function submit(input: string) {
     if (!play) return null;
+    // Jogos com tempo contam o início no "Começar"; os outros, na primeira tentativa aceita.
+    const firstGuess = play.guesses.length === 0 && rules.type !== "timed";
     const result = await submitGuess(slug, play.dateKey, input, practice);
     if ("error" in result) return result.error;
     setPlay(result.play);
-    if (result.play.status !== "playing") window.setTimeout(() => setDialog("result"), RESULT_DELAY_MS);
+    if (firstGuess) trackEvent("game_started", { game: slug, practice });
+    if (result.play.status !== "playing") {
+      trackFinished(result.play);
+      window.setTimeout(() => setDialog("result"), RESULT_DELAY_MS);
+    }
     return null;
   }
 
   async function begin() {
-    if (play) setPlay(await beginPlay(slug, play.dateKey, practice));
+    if (!play) return;
+    setPlay(await beginPlay(slug, play.dateKey, practice));
+    trackEvent("game_started", { game: slug, practice });
   }
 
   async function finish() {
     if (!play || play.status !== "playing") return;
     const ended = await finishPlay(slug, play.dateKey, practice);
     setPlay(ended);
-    if (ended.status !== "playing") setDialog("result");
+    if (ended.status === "playing") return;
+    // Sem tempo, encerrar antes da hora é desistir.
+    if (rules.type !== "timed") trackEvent("game_given_up", { game: slug, practice, attempts: ended.guesses.length });
+    trackFinished(ended);
+    setDialog("result");
   }
 
   const rootRef = useRef<HTMLDivElement>(null);

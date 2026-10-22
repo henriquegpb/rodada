@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Lightbulb, LocateFixed, Minus, Plus } from "lucide-react";
+import { trackEvent } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 import type { AttemptRules, BoardProps } from "../types";
 import { getCountry } from "../_shared/geo";
@@ -75,6 +76,7 @@ export default function RotaBoard({ play, rules, submitGuess }: BoardProps<RotaP
   function takeHint() {
     const next = Math.min(HINTS.length, hints + 1);
     setHints(next);
+    trackEvent("hint_used", { game: "rota", hint: next, practice: Boolean(play.practice) });
     try {
       localStorage.setItem(hintKey(play.dateKey), String(next));
     } catch {}

@@ -6,6 +6,7 @@ import { playSound, preloadSound } from "@/components/sounds/react-bits-sound";
 import tink from "@/components/sounds/tink";
 import { FocusInput } from "@/components/microkit/focus-input";
 import { normalize } from "@/lib/normalize";
+import { trackEvent } from "@/lib/analytics";
 import { setMuted, useMuted } from "@/lib/sound";
 import { cn } from "@/lib/utils";
 import type { BoardProps, TimedRules } from "../types";
@@ -149,7 +150,10 @@ export default function MundoBoard({
             />
             <button
               type="button"
-              onClick={() => setMuted(!muted)}
+              onClick={() => {
+                setMuted(!muted);
+                trackEvent("sound_toggled", { muted: !muted });
+              }}
               aria-label={muted ? "Ligar som" : "Silenciar"}
               aria-pressed={muted}
               title={muted ? "Ligar som" : "Silenciar"}
