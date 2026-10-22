@@ -130,6 +130,8 @@ export const capital: GameDefinition<CapitalPuzzle, CapitalFeedback, AttemptRule
 
 Placar, estatísticas, sequências e compartilhamento se adaptam sozinhos às regras.
 
+**Modos.** Um jogo pode ser modo de outro com `parent: "<slug do pai>"` no meta (Dupla e Quadra são modos do Palavra). Ele tem desafio, partida e estatísticas próprios, mas não entra na rodada: aparece como aba na página do jogo pai, que mantém o título e o lugar na sidebar.
+
 A **capa** (`Cover.tsx`) é a ilustração do card na home e no cabeçalho do "como jogar". É um SVG próprio, `viewBox="0 0 240 200"`, desenhado com `currentColor` (a tinta escura) e branco sobre a cor do jogo. Veja as capas de `palavra/`, `bandeira/` e `pais/`. Não use ícone pronto como capa.
 
 ### 5. Registre nos dois índices

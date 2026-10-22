@@ -5,6 +5,7 @@ Jogos diários curtos num lugar só. Todo dia sai um desafio novo de cada jogo, 
 | Jogo         | O desafio                                                                                   |
 | ------------ | ------------------------------------------------------------------------------------------- |
 | **Palavra**  | Adivinhar uma palavra de 5 letras em 6 tentativas, com feedback por letra.                   |
+| **Palavra · Dupla e Quadra** | Modos dentro do Palavra: 2 palavras em 7 tentativas ou 4 em 9, com o teclado colorido por tabuleiro. Cada modo tem desafio e estatísticas próprios. |
 | **Bandeira** | Descobrir o país pela bandeira. Cada erro mostra a distância e a direção até o país certo.  |
 | **País**     | A mesma mecânica, mas o jogador vê a silhueta do país.                                       |
 | **Mosaico**  | A bandeira escondida em 6 peças: começa com uma à mostra e cada erro revela mais uma. Mesmo feedback de distância e direção. |
