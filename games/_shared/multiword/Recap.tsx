@@ -32,7 +32,7 @@ export function MultiWordRecap({ play }: { play: PlayView<unknown, MultiWordFeed
   );
 }
 
-const EMOJI: Record<LetterMark, string> = { correct: "🟧", present: "🟦", absent: "⬛" };
+const EMOJI: Record<LetterMark, string> = { correct: "🟦", present: "🟧", absent: "⬛" };
 
 /** Compartilhamento: em quantas tentativas cada palavra saiu e a grade de cada tabuleiro. */
 export function multiWordShareGrid(play: PlayView<unknown, MultiWordFeedback>): string {

@@ -5,7 +5,7 @@ import { PalavraCover } from "./Cover";
 import { PalavraRecap } from "./Recap";
 import type { LetterMark, PalavraFeedback, PalavraPuzzle } from "./types";
 
-const EMOJI: Record<LetterMark, string> = { correct: "🟧", present: "🟦", absent: "⬛" };
+const EMOJI: Record<LetterMark, string> = { correct: "🟦", present: "🟧", absent: "⬛" };
 
 export const palavra: GameDefinition<PalavraPuzzle, PalavraFeedback, AttemptRules> = {
   meta: {
@@ -19,8 +19,8 @@ export const palavra: GameDefinition<PalavraPuzzle, PalavraFeedback, AttemptRule
     howToPlay: [
       "Descubra a palavra de 5 letras em até 6 tentativas.",
       "Depois de cada tentativa, as letras mudam de cor:",
-      "🟧 laranja: a letra está na palavra e no lugar certo.",
-      "🟦 azul: a letra está na palavra, mas em outro lugar.",
+      "🟦 azul: a letra está na palavra e no lugar certo.",
+      "🟧 laranja: a letra está na palavra, mas em outro lugar.",
       "⬛ cinza: a letra não está na palavra.",
       "Acentos e cedilha são preenchidos sozinhos. Clique numa casa para editar uma letra.",
     ],

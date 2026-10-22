@@ -50,7 +50,7 @@ export function CountryBoard<P>({
               <tr
                 key={i}
                 className={cn("h-12 border-t border-border", i === lastAdded && "animate-rise")}
-                style={correct ? { color: "var(--tile-correct)" } : undefined}
+                style={correct ? { color: "var(--primary)" } : undefined}
               >
                 <td className="tabular-nums text-muted-foreground">{i + 1}</td>
                 {g ? (
@@ -91,5 +91,5 @@ export function CountryBoard<P>({
 
 /** Proximidade em cor: longe = apagado, perto = laranja do Rodada. */
 function heat(proximity: number): string {
-  return `color-mix(in oklab, var(--tile-correct) ${Math.round(proximity ** 1.6 / 100 ** 0.6)}%, var(--muted-foreground))`;
+  return `color-mix(in oklab, var(--primary) ${Math.round(proximity ** 1.6 / 100 ** 0.6)}%, var(--muted-foreground))`;
 }

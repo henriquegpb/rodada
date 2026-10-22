@@ -105,9 +105,9 @@
   /* Tinta: a cor escura usada sobre as capas coloridas, igual nos dois temas. */
   --ink: #0b0f14;
 
-  /* Estados das tentativas: laranja = lugar certo, azul = existe, cinza = não existe. */
-  --tile-correct: #ff6a1a;
-  --tile-present: #2f7cf6;
+  /* Estados das tentativas: azul = lugar certo, laranja = existe, cinza = não existe. */
+  --tile-correct: #2f7cf6;
+  --tile-present: #ff6a1a;
   --tile-absent: #9aa4b1;
   --tile-empty: #ffffff;
   --tile-border: #cfd4db;
@@ -148,8 +148,8 @@
   --sidebar-border: #1a232d;
   --sidebar-ring: #ff6a1a;
 
-  --tile-correct: #ff6a1a;
-  --tile-present: #2f7cf6;
+  --tile-correct: #2f7cf6;
+  --tile-present: #ff6a1a;
   --tile-absent: #26313d;
   --tile-empty: #0b0f14;
   --tile-border: #26313d;

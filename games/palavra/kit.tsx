@@ -36,8 +36,8 @@ export const ACTIVE_ROW_SCROLL = "max-lg:scroll-mt-16 max-lg:scroll-mb-[288px]";
 const SENTINEL = "\u200b";
 
 export const markClass: Record<LetterMark, string> = {
-  correct: "border-tile-correct bg-tile-correct text-ink",
-  present: "border-tile-present bg-tile-present text-white",
+  correct: "border-tile-correct bg-tile-correct text-white",
+  present: "border-tile-present bg-tile-present text-ink",
   absent: "border-tile-absent bg-tile-absent text-foreground/80",
 };
 
