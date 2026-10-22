@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Check, Flame, LayoutGrid, UserRound, X } from "lucide-react";
-import { useEffect, type ReactNode } from "react";
-import { games } from "@/games";
+import { Check, Flame, Gamepad2, LayoutGrid, UserRound, X } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
+import { games, rootGame } from "@/games";
 import { preloadEngine } from "@/games/engines";
 import type { GameMeta } from "@/games/types";
 import { Countdown } from "@/components/countdown";
@@ -12,20 +12,17 @@ import { Logo, LogoMark } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SpotlightNav } from "@/components/microkit/spotlight-indicator";
 import { ExpandingIconTabs } from "@/components/microkit/expanding-icon-tabs";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import BranchedMenu from "@/components/BranchedMenu";
 import { useToday } from "@/lib/daily/hooks";
 import { usePlayRecords, useRound } from "@/lib/plays/hooks";
 import type { DayStatus } from "@/lib/plays/status";
 import { formatResult } from "@/lib/plays/result";
 import { overallStreak } from "@/lib/stats";
+import { notePath } from "@/lib/nav-history";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 
-const mobileItems = [
-  { href: "/", label: t.nav.home, icon: LayoutGrid },
-  ...games.map((g) => ({ href: `/${g.meta.slug}`, label: g.meta.name, icon: g.meta.icon })),
-  { href: "/perfil", label: t.nav.profile, icon: UserRound },
-];
 
 /**
  * Desktop: barra lateral que também é o placar da rodada (cada jogo com o status de hoje).
@@ -35,6 +32,9 @@ export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { round } = useRound();
+
+  // Anota a página atual depois que ela montou: as animações de entrada sabem de onde se veio.
+  useEffect(() => notePath(pathname), [pathname]);
 
   // As páginas dos jogos já ficam prontas: clicar no menu troca na hora, sem esperar a rede.
   useEffect(() => {
@@ -73,7 +73,8 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="mt-3 pl-2">
             <BranchedMenu
               items={gamesMenu}
-              active={pathname.slice(1)}
+              // Nos modos (Dupla, Quadra) o galho aceso continua sendo o do Palavra.
+              active={rootGame(pathname.slice(1))?.meta.slug ?? ""}
               onSelect={(slug) => router.push(`/${slug}`)}
               onHover={preloadEngine}
               color="var(--sidebar-foreground)"
@@ -114,9 +115,64 @@ export function AppShell({ children }: { children: ReactNode }) {
       </div>
 
       <div className="fixed inset-x-3 bottom-3 z-40 lg:hidden">
-        <ExpandingIconTabs items={mobileItems} activeHref={pathname} label="Navegação" />
+        <MobileNav pathname={pathname} />
       </div>
     </div>
+  );
+}
+
+/**
+ * Celular: Hoje · Jogos · Perfil. Com 9 jogos não cabe um ícone para cada; "Jogos" abre a lista
+ * (e, dentro de um jogo, mostra o nome e o ícone dele).
+ */
+function MobileNav({ pathname }: { pathname: string }) {
+  const [open, setOpen] = useState(false);
+  const { round } = useRound();
+  const currentSlug = rootGame(pathname.slice(1))?.meta.slug;
+  const current = round.find((r) => r.meta.slug === currentSlug)?.meta;
+  return (
+    <>
+      <ExpandingIconTabs
+        label="Navegação"
+        activeHref={pathname}
+        items={[
+          { href: "/", label: t.nav.home, icon: LayoutGrid },
+          {
+            label: current?.name ?? t.nav.gamesShort,
+            icon: current?.icon ?? Gamepad2,
+            color: current?.color,
+            active: Boolean(current),
+            onSelect: () => setOpen(true),
+          },
+          { href: "/perfil", label: t.nav.profile, icon: UserRound },
+        ]}
+      />
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetContent side="bottom" className="max-h-[80dvh] rounded-t-2xl pb-6">
+          <SheetHeader>
+            <SheetTitle className="font-display text-xl">{t.nav.gamesShort}</SheetTitle>
+          </SheetHeader>
+          <ul className="flex flex-col gap-1 overflow-y-auto px-4">
+            {round.map(({ meta, status }) => (
+              <li key={meta.slug}>
+                <Link
+                  href={`/${meta.slug}`}
+                  onClick={() => setOpen(false)}
+                  aria-current={current?.slug === meta.slug ? "page" : undefined}
+                  className="flex h-12 items-center gap-3 rounded-lg px-3 text-[15px] font-medium transition-colors hover:bg-secondary aria-[current=page]:bg-secondary"
+                >
+                  <span className="size-3 rounded-[3px]" style={{ background: meta.color }} />
+                  {meta.name}
+                  <span className="ml-auto">
+                    <RoundStatus meta={meta} status={status} />
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </SheetContent>
+      </Sheet>
+    </>
   );
 }
 

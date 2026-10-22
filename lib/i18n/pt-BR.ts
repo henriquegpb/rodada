@@ -10,6 +10,7 @@ export const ptBR = {
   nav: {
     home: "Hoje",
     games: "Rodada de hoje",
+    gamesShort: "Jogos",
     profile: "Perfil",
     you: "Você",
     theme: "Alternar tema",
