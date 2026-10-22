@@ -81,6 +81,7 @@ scripts/build-data.ts gera os dados dos jogos a partir das fontes abertas
 | Bandeiras                              | [flag-icons](https://github.com/lipis/flag-icons)                                                 | MIT               |
 | Nomes dos países em PT-BR              | Unicode CLDR, via `Intl.DisplayNames`, com ajustes em `scripts/country-list.ts`                    | Unicode License   |
 | Microinterações                        | [Microkit](https://microkit.co)                                                                   | MIT               |
+| Fonte das imagens de prévia de link    | [Archivo](https://fonts.google.com/specimen/Archivo), de Omnibus-Type (`assets/fonts/`)            | SIL Open Font License |
 | Animação da chama da sequência        | "Streak Fire", de Dhawal Patel, na [LottieFiles](https://lottiefiles.com) (`components/streak/fire-streak.json`) | Lottie Simple License |
 
 Os países são os 193 membros da ONU mais Kosovo, Palestina, Taiwan e Vaticano. No País, os que têm menos de 10.000 km² podem ser chutados, mas nunca são a resposta, porque a silhueta deles vira um pontinho.
