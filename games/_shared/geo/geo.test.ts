@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest";
 import { addDays, EPOCH_DATE } from "@/lib/daily/date";
 import { engine as bandeira } from "../../bandeira/engine";
 import { engine as pais } from "../../pais/engine";
+import { engine as mosaico } from "../../mosaico/engine";
 import shapes from "../../pais/data/shapes.json";
+import { borders, connects, shortestPath } from "./borders";
 import {
   bearing,
   countries,
@@ -66,6 +68,7 @@ describe("distância e direção", () => {
 describe.each([
   ["bandeira", bandeira],
   ["pais", pais],
+  ["mosaico", mosaico],
 ])("engine %s", (_, engine) => {
   it("é determinística por data", () => {
     for (let i = 0; i < 20; i++) {
@@ -147,5 +150,40 @@ describe("readPrefix (aceite pelo começo do nome)", () => {
   it("ignora apóstrofo e hífen", () => {
     expect(findCountry("cote divoire")?.code).toBe("ci");
     expect(findCountry("guine bissau")?.code).toBe("gw");
+  });
+});
+
+describe("Mosaico", () => {
+  it("a ordem das peças é uma permutação de 0 a 5, fixa por dia e diferente entre dias", () => {
+    const a = mosaico.createChallenge("2026-10-22").puzzle.order;
+    expect([...a].sort()).toEqual([0, 1, 2, 3, 4, 5]);
+    expect(mosaico.createChallenge("2026-10-22").puzzle.order).toEqual(a);
+    const week = Array.from({ length: 7 }, (_, i) => mosaico.createChallenge(addDays("2026-10-22", i)).puzzle.order.join());
+    expect(new Set(week).size).toBeGreaterThan(1);
+  });
+});
+
+describe("fronteiras", () => {
+  it("são simétricas e só ligam países da lista", () => {
+    const codes = new Set(countries.map((x) => x.code));
+    for (const [a, list] of Object.entries(borders)) {
+      expect(codes.has(a)).toBe(true);
+      for (const b of list) expect(borders[b], `${a}-${b}`).toContain(a);
+    }
+  });
+
+  it("batem com o mundo real", () => {
+    expect([...borders.de]).toEqual(["at", "be", "ch", "cz", "dk", "fr", "lu", "nl", "pl"]);
+    expect(borders.va).toEqual(["it"]);
+    expect(borders.jp).toEqual([]);
+    // Guiana Francesa não conta: a França não faz fronteira com o Brasil no jogo.
+    expect(borders.br).not.toContain("fr");
+  });
+
+  it("menor caminho e conexão", () => {
+    expect(shortestPath("pt", "fr")).toEqual(["pt", "es", "fr"]);
+    expect(shortestPath("br", "jp")).toEqual([]);
+    expect(connects("pt", "fr", ["es"])).toBe(true);
+    expect(connects("pt", "de", ["es"])).toBe(false);
   });
 });

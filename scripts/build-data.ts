@@ -13,12 +13,15 @@
  *  - games/palavra/data/valid.json   palavras aceitas como tentativa
  *  - games/_shared/geo/countries.json
  *  - games/pais/data/shapes.json     silhuetas em path SVG (viewBox 0 0 100 100)
- *  - games/mundo/data/map.json       mapa-múndi: um path por país, ou um ponto para os minúsculos
+ *  - games/_shared/geo/borders.json  fronteiras terrestres entre os países
+ *  - games/calor/data/globe.json      contornos em graus para o globo do Calor
+ *  - games/calor/data/distances.json  menor distância entre as fronteiras de cada par de países
+ *  - games/_shared/geo/world-map.json mapa-múndi: um path por país, ou um ponto para os minúsculos
  *  - public/flags/<code>.svg
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync, copyFileSync } from "node:fs";
 import { join } from "node:path";
-import { geoArea, geoAzimuthalEqualArea, geoNaturalEarth1, geoPath } from "d3-geo";
+import { geoArea, geoAzimuthalEqualArea, geoGraticule10, geoNaturalEarth1, geoPath } from "d3-geo";
 import type { Feature, FeatureCollection, Geometry, MultiPolygon, Polygon } from "geojson";
 import { normalize } from "../lib/normalize";
 import { COUNTRY_ALIASES, COUNTRY_NAME_OVERRIDES, COUNTRY_CODES } from "./country-list";
@@ -207,6 +210,7 @@ function buildCountries() {
     );
   }
 
+  writeJson("games/_shared/geo/borders.json", computeBorders(byCode));
   dedupeAliases(countries);
   countries.sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
   writeJson("games/_shared/geo/countries.json", countries);
@@ -217,6 +221,48 @@ function buildCountries() {
 }
 
 const round = (n: number, d: number) => Math.round(n * 10 ** d) / 10 ** d;
+
+/**
+ * Fronteiras pelo próprio Natural Earth: a base é topologicamente consistente, então vizinhos
+ * compartilham exatamente os mesmos vértices na divisa. Dois vértices em comum = fronteira.
+ */
+const BORDER_EXCEPTIONS = [
+  // A França só "encosta" no Brasil e no Suriname pela Guiana Francesa: no jogo seria um atalho estranho.
+  ["FR", "BR"],
+  ["FR", "SR"],
+];
+
+function computeBorders(byCode: Map<string, Feature<Polygon | MultiPolygon, NEProps>[]>) {
+  const owners = new Map<string, Set<string>>();
+  for (const [code, parts] of byCode) {
+    for (const part of parts) {
+      const polygons = part.geometry.type === "Polygon" ? [part.geometry.coordinates] : part.geometry.coordinates;
+      for (const ring of polygons.flat()) {
+        for (const [x, y] of ring) {
+          const key = `${x.toFixed(5)},${y.toFixed(5)}`;
+          owners.set(key, (owners.get(key) ?? new Set()).add(code));
+        }
+      }
+    }
+  }
+  const shared = new Map<string, number>();
+  for (const set of owners.values()) {
+    if (set.size < 2) continue;
+    for (const a of set) for (const b of set) if (a < b) shared.set(`${a}|${b}`, (shared.get(`${a}|${b}`) ?? 0) + 1);
+  }
+  const excluded = new Set(BORDER_EXCEPTIONS.map(([a, b]) => [a, b].sort().join("|")));
+  const borders: Record<string, string[]> = {};
+  for (const code of COUNTRY_CODES) borders[code.toLowerCase()] = [];
+  for (const [pair, count] of shared) {
+    if (count < 2 || excluded.has(pair)) continue;
+    const [a, b] = pair.split("|").map((c) => c.toLowerCase());
+    borders[a].push(b);
+    borders[b].push(a);
+  }
+  for (const list of Object.values(borders)) list.sort();
+  console.log(`  ${Object.values(borders).flat().length / 2} fronteiras terrestres`);
+  return borders;
+}
 
 /**
  * Limpa os apelidos: tira "(Birmânia)" e variantes com " - " do CLDR, repetidos e iguais ao nome.
@@ -285,6 +331,8 @@ function buildWorldMap() {
 
   const paths: Record<string, string> = {};
   const dots: Record<string, [number, number]> = {};
+  /** Caixa [x0, y0, x1, y1] de cada país no mapa, para dar zoom numa região. */
+  const bounds: Record<string, number[]> = {};
   for (const c of countries) {
     const parts = byCode.get(c.code);
     const geometry: MultiPolygon | null = parts
@@ -297,9 +345,12 @@ function buildWorldMap() {
       : null;
     if (geometry && path.area(geometry) >= MIN_MAP_AREA) {
       paths[c.code] = path(geometry) ?? "";
+      const [[x0, by0], [x1, by1]] = path.bounds(geometry);
+      bounds[c.code] = [x0, by0, x1, by1].map((v) => round(v, 1));
     } else {
       const [x, y] = projection([c.lng, c.lat])!;
       dots[c.code] = [round(x, 1), round(y, 1)];
+      bounds[c.code] = [x - 3, y - 3, x + 3, y + 3].map((v) => round(v, 1));
     }
   }
 
@@ -313,12 +364,14 @@ function buildWorldMap() {
     }),
   };
 
-  writeJson("games/mundo/data/map.json", {
+  writeJson("games/_shared/geo/world-map.json", {
     width: MAP_WIDTH,
     height: Math.ceil(y1 - y0),
     background: path(others) ?? "",
+    graticule: path(geoGraticule10()) ?? "",
     paths,
     dots,
+    bounds,
   });
   console.log(`  mapa: ${Object.keys(paths).length} contornos, ${Object.keys(dots).length} pontos`);
 }
@@ -328,8 +381,87 @@ fetchSources()
     buildWords();
     buildCountries();
     buildWorldMap();
+    buildGlobe();
   })
   .catch((err) => {
     console.error(err);
     process.exit(1);
   });
+
+// ---------------------------------------------------------------- globo e distâncias (Calor)
+
+type Ring = number[][];
+
+function polygonsOf(features: Feature<Polygon | MultiPolygon, NEProps>[]): Ring[][] {
+  return features.flatMap((f) => (f.geometry.type === "Polygon" ? [f.geometry.coordinates] : f.geometry.coordinates));
+}
+
+const roundRing = (ring: Ring, digits: number) => ring.map(([x, y]) => [round(x, digits), round(y, digits)]);
+
+/** Menor distância em km entre dois conjuntos de vértices (lng, lat). */
+function minDistanceKm(a: number[][], b: number[][]): number {
+  const R = 6371;
+  const rad = Math.PI / 180;
+  let best = Infinity;
+  for (const [lng1, lat1] of a) {
+    const c1 = Math.cos(lat1 * rad);
+    for (const [lng2, lat2] of b) {
+      const dLat = (lat2 - lat1) * rad;
+      const dLng = (lng2 - lng1) * rad;
+      const h = Math.sin(dLat / 2) ** 2 + c1 * Math.cos(lat2 * rad) * Math.sin(dLng / 2) ** 2;
+      if (h < best) best = h;
+    }
+  }
+  return 2 * R * Math.asin(Math.sqrt(best));
+}
+
+/**
+ * Dados do Calor: contornos em graus (1:110m; 1:50m para quem não aparece no 110m) para desenhar
+ * o globo, e a distância entre as fronteiras mais próximas de cada par de países. Vizinhos = 0 km.
+ */
+function buildGlobe() {
+  const load = (file: string) =>
+    JSON.parse(readFileSync(join(RAW, file), "utf8")) as FeatureCollection<Polygon | MultiPolygon, NEProps>;
+  const coarse = load("ne_110m.geojson");
+  const fine = load("ne_50m.geojson");
+  const codeOf = (f: Feature<Polygon | MultiPolygon, NEProps>) =>
+    (MERGE_INTO[f.properties.NAME] ?? f.properties.ISO_A2_EH).toLowerCase();
+  const group = (fc: typeof coarse) => {
+    const map = new Map<string, Feature<Polygon | MultiPolygon, NEProps>[]>();
+    for (const f of fc.features) map.set(codeOf(f), [...(map.get(codeOf(f)) ?? []), f]);
+    return map;
+  };
+  const coarseBy = group(coarse);
+  const fineBy = group(fine);
+  const codes = COUNTRY_CODES.map((c) => c.toLowerCase());
+  const listed = new Set(codes);
+
+  const shapes: Record<string, Ring[][]> = {};
+  for (const code of codes) {
+    const coarseParts = coarseBy.get(code);
+    // 110m tem precisão de ~0,1°; os microestados (só no 50m) precisam de 2 casas para não sumirem.
+    shapes[code] = coarseParts
+      ? polygonsOf(coarseParts).map((p) => p.map((r) => roundRing(r, 1)))
+      : polygonsOf(fineBy.get(code)!).map((p) => p.map((r) => roundRing(r, 2)));
+  }
+  const others = coarse.features.filter((f) => !listed.has(codeOf(f)));
+
+  writeJson("games/calor/data/globe.json", {
+    countries: shapes,
+    other: polygonsOf(others).map((p) => p.map((r) => roundRing(r, 1))),
+  });
+
+  const borders: Record<string, string[]> = JSON.parse(
+    readFileSync(join(ROOT, "games/_shared/geo/borders.json"), "utf8"),
+  );
+  const vertices = codes.map((c) => shapes[c].flat(2));
+  const km: number[] = [];
+  for (let i = 0; i < codes.length; i++) {
+    for (let j = i + 1; j < codes.length; j++) {
+      const neighbors = borders[codes[i]].includes(codes[j]);
+      km.push(neighbors ? 0 : Math.round(minDistanceKm(vertices[i], vertices[j])));
+    }
+  }
+  writeJson("games/calor/data/distances.json", { codes, km });
+  console.log(`  globo: ${codes.length} países, ${km.length} distâncias entre fronteiras`);
+}

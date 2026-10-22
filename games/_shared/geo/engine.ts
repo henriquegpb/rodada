@@ -22,12 +22,13 @@ export function createCountryEngine<P>({
 }: {
   slug: string;
   pool: readonly Country[];
-  puzzleFor(country: Country): P;
+  /** O que o jogador vê. Recebe a data para sortear detalhes do dia (ordem de peças etc.). */
+  puzzleFor(country: Country, dateKey: string): P;
 }): GameEngine<P, string, CountryFeedback> {
   return {
     createChallenge(dateKey) {
       const country = pickDaily(pool, { slug, dateKey });
-      return { puzzle: puzzleFor(country), answer: country.code };
+      return { puzzle: puzzleFor(country, dateKey), answer: country.code };
     },
 
     checkGuess(input, answerCode, previous) {

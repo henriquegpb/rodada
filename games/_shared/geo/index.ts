@@ -113,6 +113,9 @@ export function toDirection(deg: number): Direction {
   return DIRECTIONS[Math.round(deg / 45) % 8];
 }
 
+/** Ângulo da seta de cada direção, para girar um ícone que aponta para cima. */
+export const DIRECTION_DEG: Record<Direction, number> = { N: 0, NE: 45, E: 90, SE: 135, S: 180, SO: 225, O: 270, NO: 315 };
+
 export const DIRECTION_EMOJI: Record<Direction, string> = {
   N: "⬆️",
   NE: "↗️",
