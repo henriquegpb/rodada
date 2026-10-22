@@ -11,6 +11,8 @@ import { setMuted, useMuted } from "@/lib/sound";
 import { cn } from "@/lib/utils";
 import type { BoardProps, TimedRules } from "../types";
 import { countries, findCountry, nameKey, readPrefix, type Country } from "../_shared/geo";
+import { MapControls } from "../_shared/geo/MapControls";
+import { usePanZoom } from "../_shared/geo/usePanZoom";
 import { countriesByContinent } from "./continents";
 import map from "../_shared/geo/world-map.json";
 import type { MundoFeedback, MundoPuzzle } from "./types";
@@ -18,6 +20,8 @@ import type { MundoFeedback, MundoPuzzle } from "./types";
 const COLOR = "#ffc21a";
 const paths: Record<string, string> = map.paths;
 const dots: Record<string, number[]> = map.dots;
+const WORLD = { width: map.width, height: map.height };
+const WHOLE_MAP = { x: 0, y: 0, w: map.width, h: map.height };
 
 /** Segundos restantes, atualizado 4× por segundo enquanto o relógio corre. */
 function useRemaining(startedAt: string | undefined, seconds: number, running: boolean): number {
@@ -243,24 +247,47 @@ function Readout({ label, value, className }: { label: string; value: string; cl
 }
 
 function WorldMap({ found, finished, lastFound }: { found: Set<string>; finished: boolean; lastFound: string | null }) {
+  const { svgRef, viewBox, zoom, handlers, zoomIn, zoomOut, reset } = usePanZoom(WHOLE_MAP, WORLD);
   const fill = (code: string) =>
     found.has(code) ? COLOR : finished ? "color-mix(in oklab, var(--destructive) 45%, var(--secondary))" : "var(--secondary)";
   return (
-    <svg viewBox={`0 0 ${map.width} ${map.height}`} className="h-auto w-full" role="img" aria-label="Mapa-múndi">
-      <path d={map.background} fill="var(--secondary)" opacity={0.5} />
-      {Object.entries(paths).map(([code, d]) => (
-        <path
-          key={code}
-          d={d}
-          fill={fill(code)}
-          stroke="var(--card)"
-          strokeWidth={0.6}
-          className={cn("transition-[fill] duration-500", code === lastFound && "animate-pop [transform-box:fill-box] [transform-origin:center]")}
-        />
-      ))}
-      {Object.entries(dots).map(([code, [x, y]]) => (
-        <circle key={code} cx={x} cy={y} r={3.2} fill={found.has(code) || finished ? fill(code) : "var(--input)"} stroke="var(--card)" strokeWidth={1} />
-      ))}
-    </svg>
+    <>
+      <svg
+        ref={svgRef}
+        viewBox={viewBox}
+        className="w-full cursor-grab touch-none select-none active:cursor-grabbing"
+        style={{ aspectRatio: `${map.width} / ${map.height}` }}
+        role="img"
+        aria-label="Mapa-múndi"
+        {...handlers}
+      >
+        <path d={map.background} fill="var(--secondary)" opacity={0.5} />
+        {Object.entries(paths).map(([code, d]) => (
+          <path
+            key={code}
+            d={d}
+            fill={fill(code)}
+            stroke="var(--card)"
+            strokeWidth={0.6}
+            vectorEffect="non-scaling-stroke"
+            className={cn("transition-[fill] duration-500", code === lastFound && "animate-pop [transform-box:fill-box] [transform-origin:center]")}
+          />
+        ))}
+        {/* Os países minúsculos continuam do mesmo tamanho na tela com qualquer zoom. */}
+        {Object.entries(dots).map(([code, [x, y]]) => (
+          <circle
+            key={code}
+            cx={x}
+            cy={y}
+            r={3.2 / zoom}
+            fill={found.has(code) || finished ? fill(code) : "var(--input)"}
+            stroke="var(--card)"
+            strokeWidth={1}
+            vectorEffect="non-scaling-stroke"
+          />
+        ))}
+      </svg>
+      <MapControls zoomIn={zoomIn} zoomOut={zoomOut} reset={reset} />
+    </>
   );
 }

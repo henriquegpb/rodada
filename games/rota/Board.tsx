@@ -1,12 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { Lightbulb, LocateFixed, Minus, Plus } from "lucide-react";
+import { Fragment, useMemo, useState } from "react";
+import { ArrowRight, Lightbulb } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 import type { AttemptRules, BoardProps } from "../types";
 import { getCountry } from "../_shared/geo";
 import { CountryInput } from "../_shared/geo/CountryInput";
+import { MapControls } from "../_shared/geo/MapControls";
 import { usePanZoom, type View } from "../_shared/geo/usePanZoom";
 import map from "../_shared/geo/world-map.json";
 import { END_COLOR, START_COLOR, VERDICT_COLOR, VERDICT_LABEL } from "./colors";
@@ -124,17 +125,7 @@ export default function RotaBoard({ play, rules, submitGuess }: BoardProps<RotaP
           <Shape code={start} fill={START_COLOR} />
           <Shape code={end} fill={END_COLOR} />
         </svg>
-        <div className="absolute right-3 top-3 flex flex-col gap-1.5">
-          <MapButton label="Aproximar" onClick={zoomIn}>
-            <Plus size={16} />
-          </MapButton>
-          <MapButton label="Afastar" onClick={zoomOut}>
-            <Minus size={16} />
-          </MapButton>
-          <MapButton label="Recentralizar" onClick={reset}>
-            <LocateFixed size={16} />
-          </MapButton>
-        </div>
+        <MapControls zoomIn={zoomIn} zoomOut={zoomOut} reset={reset} />
       </div>
 
       {playing && <CountryInput onGuess={submitGuess} exclude={exclude} />}
@@ -168,22 +159,36 @@ export default function RotaBoard({ play, rules, submitGuess }: BoardProps<RotaP
           <h3 className="mb-3 flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
             <Lightbulb size={15} /> Dicas · {hints}/{HINTS.length}
           </h3>
-          <div className="grid gap-2 sm:grid-cols-3">
+          {/* As setas mostram a ordem: cada dica só abre depois da anterior. */}
+          <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center">
             {HINTS.map((label, i) => (
-              <button
-                key={label}
-                type="button"
-                disabled={i !== hints}
-                onClick={takeHint}
-                className={cn(
-                  "h-11 rounded-md border border-border px-3 text-sm font-medium transition-colors",
-                  i < hints && "border-transparent bg-secondary text-muted-foreground",
-                  i === hints && "hover:border-foreground/40 hover:bg-secondary/50",
-                  i > hints && "opacity-40",
+              <Fragment key={label}>
+                {i > 0 && (
+                  <ArrowRight
+                    size={16}
+                    aria-hidden
+                    className={cn(
+                      "shrink-0 self-center rotate-90 transition-colors sm:rotate-0",
+                      i <= hints ? "text-foreground/60" : "text-muted-foreground/40",
+                    )}
+                  />
                 )}
-              >
-                {label}
-              </button>
+                <button
+                  type="button"
+                  disabled={i !== hints}
+                  onClick={takeHint}
+                  title={i > hints ? "Peça a dica anterior primeiro" : undefined}
+                  className={cn(
+                    // Na linha, cada botão cresce a partir do próprio texto: o rótulo longo não quebra.
+                    "h-11 flex-auto whitespace-nowrap rounded-md border border-border px-3 text-sm font-medium transition-colors sm:text-[13px]",
+                    i < hints && "border-transparent bg-secondary text-muted-foreground",
+                    i === hints && "hover:border-foreground/40 hover:bg-secondary/50",
+                    i > hints && "opacity-40",
+                  )}
+                >
+                  {label}
+                </button>
+              </Fragment>
             ))}
           </div>
           {hints >= 3 && (
@@ -224,20 +229,6 @@ function Shape({
   if (paths[code]) return <path d={paths[code]} {...common} className="transition-[fill] duration-500" />;
   const [x, y] = dots[code] ?? [];
   return x === undefined ? null : <circle cx={x} cy={y} r={2.5} {...common} />;
-}
-
-function MapButton({ label, onClick, children }: { label: string; onClick(): void; children: React.ReactNode }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-label={label}
-      title={label}
-      className="grid size-9 place-items-center rounded-md border border-border bg-background/80 text-muted-foreground backdrop-blur transition-colors hover:text-foreground"
-    >
-      {children}
-    </button>
-  );
 }
 
 function Legend() {

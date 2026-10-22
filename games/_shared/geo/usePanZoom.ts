@@ -107,6 +107,8 @@ export function usePanZoom(initial: View, limits: { width: number; height: numbe
 
   const handlers = {
     onPointerDown(e: ReactPointerEvent<SVGSVGElement>) {
+      // Arrastar o mapa não tira o foco do campo de digitação (no celular, o teclado continua aberto).
+      e.preventDefault();
       if (tween.current) cancelAnimationFrame(tween.current);
       e.currentTarget.setPointerCapture(e.pointerId);
       pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
@@ -139,6 +141,8 @@ export function usePanZoom(initial: View, limits: { width: number; height: numbe
   return {
     svgRef,
     viewBox: `${view.x} ${view.y} ${view.w} ${view.h}`,
+    /** Quanto a vista está ampliada em relação à inicial (1 = enquadramento inicial). */
+    zoom: initial.w / view.w,
     handlers,
     zoomIn: () => zoomBy(1 / 1.6),
     zoomOut: () => zoomBy(1.6),
