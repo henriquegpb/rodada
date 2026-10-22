@@ -19,6 +19,14 @@ export function StatStrip({ items, className }: { items: { label: string; value:
 
 /** Os números que importam em cada tipo de jogo. */
 export function statItems(stats: GameStats, rules: GameRules) {
+  if (rules.type === "unlimited") {
+    return [
+      { label: t.stats.played, value: stats.played },
+      { label: t.stats.fewestGuesses, value: stats.best },
+      { label: t.stats.averageGuesses, value: stats.average },
+      { label: t.stats.currentStreak, value: stats.streak.current },
+    ];
+  }
   return rules.type === "timed"
     ? [
         { label: t.stats.played, value: stats.played },

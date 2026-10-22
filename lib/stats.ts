@@ -22,7 +22,7 @@ export interface GameStats {
   winRate: number;
   /** Jogos por tentativas: distribution[i] = vitórias em i+1 tentativas. */
   distribution: number[];
-  /** Jogos com tempo: melhor resultado e média. */
+  /** Melhor resultado e média: itens achados (tempo) ou chutes até acertar (sem limite). */
   best: number;
   average: number;
   streak: Streak;
@@ -60,12 +60,14 @@ export function gameStats(plays: PlayRecord[], slug: string, rules: GameRules, t
   const wins = finished.filter((p) => p.status === "won");
   const distribution = rules.type === "attempts" ? Array<number>(rules.maxAttempts).fill(0) : [];
   if (rules.type === "attempts") for (const w of wins) distribution[w.count - 1]++;
-  const counts = finished.map((p) => p.count);
+  // Sem limite, o melhor é acertar com menos chutes (e só vitórias contam); com tempo, achar mais.
+  const fewerIsBetter = rules.type === "unlimited";
+  const counts = (fewerIsBetter ? wins : finished).map((p) => p.count);
   return {
     played: finished.length,
     winRate: finished.length ? Math.round((100 * wins.length) / finished.length) : 0,
     distribution,
-    best: counts.length ? Math.max(...counts) : 0,
+    best: counts.length ? (fewerIsBetter ? Math.min(...counts) : Math.max(...counts)) : 0,
     average: counts.length ? Math.round(counts.reduce((a, b) => a + b, 0) / counts.length) : 0,
     streak: computeStreak(new Map(finished.map((p) => [p.dateKey, countsForStreak(rules, p.status)])), today),
   };

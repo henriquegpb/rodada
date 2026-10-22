@@ -14,6 +14,7 @@ import type { LucideIcon } from "lucide-react";
 
 /**
  * - attempts: termina em "won" (acertou) ou "lost" (acabaram as tentativas).
+ * - unlimited: termina em "won" (acertou) ou "lost" (desistiu).
  * - timed: termina em "won" (completou tudo) ou "done" (o tempo acabou ou desistiu).
  */
 export type PlayStatus = "playing" | "won" | "lost" | "done";
@@ -22,11 +23,14 @@ export type PlayStatus = "playing" | "won" | "lost" | "done";
 export type GameRules =
   /** Acertar uma resposta em até N tentativas. Resultado: tentativas usadas. */
   | { type: "attempts"; maxAttempts: number }
+  /** Chutes sem limite até acertar (ou desistir). Resultado: quantos chutes levou. */
+  | { type: "unlimited" }
   /** Achar o máximo de itens antes do tempo acabar. Resultado: itens achados de `total`. */
   | { type: "timed"; seconds: number; total: number };
 
 export type AttemptRules = Extract<GameRules, { type: "attempts" }>;
 export type TimedRules = Extract<GameRules, { type: "timed" }>;
+export type UnlimitedRules = Extract<GameRules, { type: "unlimited" }>;
 
 export interface Guess<F = unknown> {
   input: string;
@@ -71,6 +75,8 @@ export interface PlayView<P = unknown, F = unknown> {
   startedAt?: string;
   /** Preenchido só quando a partida termina. */
   answerLabel?: string;
+  /** Partida de treino ("Jogar outra"): não conta para sequência nem estatísticas. */
+  practice?: boolean;
 }
 
 export interface BoardProps<P = unknown, F = unknown, R extends GameRules = GameRules> {
@@ -80,7 +86,7 @@ export interface BoardProps<P = unknown, F = unknown, R extends GameRules = Game
   submitGuess(input: string): Promise<string | null>;
   /** Jogos com tempo: começa o relógio. */
   begin(): Promise<void>;
-  /** Jogos com tempo: encerra a partida (tempo esgotado ou desistência). */
+  /** Encerra a partida antes da hora: tempo esgotado ou desistência. */
   finish(): Promise<void>;
 }
 
@@ -89,6 +95,8 @@ export interface GameDefinition<P = unknown, F = unknown, R extends GameRules = 
   Board: ComponentType<BoardProps<P, F, R>>;
   /** Ilustração da capa do jogo, desenhada com `currentColor` sobre a cor do jogo. */
   Cover: ComponentType<{ className?: string }>;
-  /** Linhas de emoji do compartilhamento; cabeçalho e link são do Rodada. */
+  /** Resumo visual da partida terminada, mostrado no modal de resultado. */
+  Recap: ComponentType<{ play: PlayView<P, F> }>;
+  /** Linhas de emoji do texto compartilhado (WhatsApp); cabeçalho e link são do Rodada. */
   shareGrid(play: PlayView<P, F>): string;
 }

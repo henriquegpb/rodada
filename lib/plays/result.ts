@@ -5,11 +5,12 @@ export const isFinished = (status: PlayStatus) => status !== "playing";
 
 /**
  * Placar curto da partida, igual para a UI e o compartilhamento.
- * Tentativas: "3/6" ou "X/6". Tempo: "142/197".
+ * Tentativas: "3/6" ou "X/6". Sem limite: "8 chutes" ou "X". Tempo: "142/197".
  * `count` é o número de tentativas aceitas (no jogo com tempo, itens achados).
  */
 export function formatResult(rules: GameRules, status: PlayStatus, count: number): string {
   if (rules.type === "timed") return `${count}/${rules.total}`;
+  if (rules.type === "unlimited") return status === "won" ? `${count} ${count === 1 ? "chute" : "chutes"}` : "X";
   return status === "won" ? `${count}/${rules.maxAttempts}` : `X/${rules.maxAttempts}`;
 }
 

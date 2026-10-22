@@ -26,6 +26,24 @@ describe("formatResult", () => {
   });
 });
 
+describe("regras sem limite", () => {
+  const OPEN: GameRules = { type: "unlimited" };
+  it("placar, pontos e sequência", () => {
+    expect(formatResult(OPEN, "won", 8)).toBe("8 chutes");
+    expect(formatResult(OPEN, "won", 1)).toBe("1 chute");
+    expect(formatResult(OPEN, "lost", 12)).toBe("X");
+    expect(scorePlay(OPEN, "won", 1)).toBe(10);
+    expect(scorePlay(OPEN, "won", 30)).toBe(1);
+    expect(scorePlay(OPEN, "lost", 5)).toBe(0);
+    expect(countsForStreak(OPEN, "lost")).toBe(false);
+  });
+
+  it("melhor = menos chutes, só entre vitórias", () => {
+    const plays = [play("2026-10-21", "won", 9, "calor"), play("2026-10-22", "won", 4, "calor"), play("2026-10-20", "lost", 2, "calor")];
+    expect(gameStats(plays, "calor", OPEN, "2026-10-22")).toMatchObject({ best: 4, average: 7 });
+  });
+});
+
 describe("scorePlay", () => {
   it("tentativas: menos tentativas = mais pontos; derrota = 0", () => {
     expect(scorePlay(SIX, "won", 1)).toBe(6);
