@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { games } from "@/games";
+import { roundGames as games } from "@/games";
 import { addDays } from "@/lib/daily/date";
 import { formatResult } from "@/lib/plays/result";
 import type { PlayRecord } from "@/lib/stats";

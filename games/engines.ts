@@ -8,6 +8,8 @@ import type { GameEngine } from "./types";
  */
 const loaders: Record<string, () => Promise<{ engine: GameEngine }>> = {
   palavra: () => import("./palavra/engine"),
+  dupla: () => import("./dupla/engine"),
+  quadra: () => import("./quadra/engine"),
   bandeira: () => import("./bandeira/engine"),
   pais: () => import("./pais/engine"),
   mosaico: () => import("./mosaico/engine"),

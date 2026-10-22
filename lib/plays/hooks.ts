@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { games } from "@/games";
+import { roundGames } from "@/games";
 import type { GameMeta } from "@/games/types";
 import { useToday } from "@/lib/daily/hooks";
 import type { PlayRecord } from "@/lib/stats";
@@ -27,7 +27,7 @@ export function usePlayRecords(): PlayRecord[] {
 export function useRound(): { today: string | null; round: { meta: GameMeta; status: DayStatus }[] } {
   const today = useToday();
   const plays = usePlays();
-  const round = games.map((g) => ({
+  const round = roundGames.map((g) => ({
     meta: g.meta,
     status: today ? statusOf(plays[playKey(g.meta.slug, today)]) : ({ kind: "new" } as DayStatus),
   }));

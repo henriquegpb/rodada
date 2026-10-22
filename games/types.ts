@@ -60,6 +60,13 @@ export interface GameMeta<R extends GameRules = GameRules> {
   rules: R;
   /** Cor do card do jogo (qualquer cor CSS). */
   color: string;
+  /** Usa o palco largo da página do jogo (padrão: estreito, exceto jogos com tempo). */
+  wide?: boolean;
+  /**
+   * Slug do jogo do qual este é um modo (ex.: Dupla e Quadra são modos do Palavra). Modos têm
+   * desafio, partida e estatísticas próprios, mas não aparecem na rodada: ficam numa aba do jogo pai.
+   */
+  parent?: string;
   howToPlay: string[];
 }
 
