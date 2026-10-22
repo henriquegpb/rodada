@@ -30,7 +30,7 @@ export function PalavraBoard({ play, rules, submitGuess }: BoardProps<PalavraPuz
   }, [settledGuesses]);
 
   return (
-    <div className="flex flex-col items-center gap-8">
+    <div className="flex flex-col items-center gap-4">
       {/* Tocar em qualquer parte do tabuleiro abre o teclado do celular. */}
       <div className="relative grid gap-1.5 [perspective:800px]" aria-label="Tabuleiro" onClick={openKeyboard}>
         <input {...input} />
@@ -57,8 +57,8 @@ export function PalavraBoard({ play, rules, submitGuess }: BoardProps<PalavraPuz
                   flipping={flipping}
                   celebrating={celebrating}
                   delay={celebrating ? col * 90 : col * FLIP_STAGGER_MS}
-                  // No celular as 6 linhas cabem entre a barra do topo e o teclado (56 + 272 + vãos).
-                  size="size-[min(15.5vw,64px)] max-lg:size-[clamp(40px,calc((100dvh_-_382px)/6),min(15.5vw,64px))] text-[min(8vw,30px)]"
+                  // No celular as 6 linhas cabem entre a barra do topo, a legenda e o teclado (56 + 16 + 272 + vãos).
+                  size="size-[min(15.5vw,64px)] max-lg:size-[clamp(40px,calc((100dvh_-_398px)/6),min(15.5vw,64px))] text-[min(8vw,30px)]"
                   onClick={() => setCursor(col)}
                 />
               ))}
@@ -67,7 +67,29 @@ export function PalavraBoard({ play, rules, submitGuess }: BoardProps<PalavraPuz
         })}
       </div>
 
+      <Legend />
+
       <Keyboard marks={(k) => [keyMarks.get(k)]} boards={1} disabled={!playing} standby={native} onKey={type} />
     </div>
+  );
+}
+
+const LEGEND: [LetterMark, string, string][] = [
+  ["correct", "bg-tile-correct", "Lugar certo"],
+  ["present", "bg-tile-present", "Outro lugar"],
+  ["absent", "bg-tile-absent", "Não tem"],
+];
+
+/** O que cada cor quer dizer, numa linha só: no celular ela entra na conta do tamanho das casas. */
+function Legend() {
+  return (
+    <ul className="flex h-4 items-center gap-4 text-xs text-muted-foreground" aria-label="Legenda das cores">
+      {LEGEND.map(([mark, swatch, label]) => (
+        <li key={mark} className="flex items-center gap-1.5">
+          <span className={cn("size-3 rounded-[3px]", swatch)} />
+          {label}
+        </li>
+      ))}
+    </ul>
   );
 }
