@@ -2,7 +2,7 @@
 export const TIMEZONE = "America/Sao_Paulo";
 
 /** Primeiro dia do Rodada: o desafio desta data é o #1. */
-export const EPOCH_DATE = "2026-10-01";
+export const EPOCH_DATE = "2026-10-22";
 
 const DAY_MS = 86_400_000;
 
