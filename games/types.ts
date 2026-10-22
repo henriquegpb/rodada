@@ -67,6 +67,8 @@ export interface GameMeta<R extends GameRules = GameRules> {
    * desafio, partida e estatísticas próprios, mas não aparecem na rodada: ficam numa aba do jogo pai.
    */
   parent?: string;
+  /** O tabuleiro já mostra a resposta no fim; o resultado não repete o "Era …". */
+  hideAnswer?: boolean;
   howToPlay: string[];
 }
 

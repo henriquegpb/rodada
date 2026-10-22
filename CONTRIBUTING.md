@@ -164,5 +164,6 @@ Se o jogo precisa de dados gerados (listas, geometrias), adicione a geração em
 ## Outras contribuições
 
 - **Palavras:** as respostas do Palavra ficam em `games/palavra/data/answers.json`. São substantivos e adjetivos comuns, poucos verbos no infinitivo, e nada de nomes próprios, plurais ou palavrões. Depois de editar, rode `pnpm data:build` para regenerar as palavras válidas e `pnpm test` para checar duplicatas.
+- **Grupos do Elo:** os desafios ficam em `games/elo/data/puzzles.json`, cada um com 4 grupos de 4 palavras do nível 0 (óbvio) ao 3 (trocadilho). Em maiúsculas, com acento e até 10 letras, para caber na grade do celular. As iscas são bem-vindas, mas confira que só existe um jeito de dividir as 16 palavras. Desafios com `source` vêm de grupos traduzidos do Only Connect Wall; os sem `source` são curadoria própria. Rode `pnpm test` para checar o formato. Como a ordem dos desafios depende do tamanho da lista, adicionar desafios embaralha todos os dias, inclusive o de hoje (a partida em andamento recomeça); prefira adicionar em lote.
 - **Nomes de países:** para corrigir um nome ou adicionar um apelido aceito, edite `scripts/country-list.ts` e rode `pnpm data:build`.
 - **Textos:** os textos da plataforma ficam em `lib/i18n/pt-BR.ts`. Não deixe texto solto em componente.
