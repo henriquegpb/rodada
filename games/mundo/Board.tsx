@@ -247,7 +247,7 @@ function Readout({ label, value, className }: { label: string; value: string; cl
 }
 
 function WorldMap({ found, finished, lastFound }: { found: Set<string>; finished: boolean; lastFound: string | null }) {
-  const { svgRef, viewBox, zoom, handlers, zoomIn, zoomOut, reset } = usePanZoom(WHOLE_MAP, WORLD);
+  const { svgRef, viewBox, zoom, canPan, handlers, zoomIn, zoomOut, reset } = usePanZoom(WHOLE_MAP, WORLD);
   const fill = (code: string) =>
     found.has(code) ? COLOR : finished ? "color-mix(in oklab, var(--destructive) 45%, var(--secondary))" : "var(--secondary)";
   return (
@@ -255,7 +255,7 @@ function WorldMap({ found, finished, lastFound }: { found: Set<string>; finished
       <svg
         ref={svgRef}
         viewBox={viewBox}
-        className="w-full cursor-grab touch-none select-none active:cursor-grabbing"
+        className={cn("w-full touch-none select-none", canPan && "cursor-grab active:cursor-grabbing")}
         style={{ aspectRatio: `${map.width} / ${map.height}` }}
         role="img"
         aria-label="Mapa-múndi"
