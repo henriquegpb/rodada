@@ -331,8 +331,14 @@ function buildWorldMap() {
 
   const paths: Record<string, string> = {};
   const dots: Record<string, [number, number]> = {};
-  /** Caixa [x0, y0, x1, y1] de cada país no mapa, para dar zoom numa região. */
+  /**
+   * Caixa [x0, y0, x1, y1] da parte principal (maior pedaço) de cada país, para dar zoom numa região.
+   * O país inteiro não serve: a Rússia atravessa a linha de data e a França inclui a Guiana, e a
+   * caixa viraria o mundo todo.
+   */
   const bounds: Record<string, number[]> = {};
+  /** Ponto central de cada país no mapa (o ponto de rótulo do Natural Earth). */
+  const anchors: Record<string, [number, number]> = {};
   for (const c of countries) {
     const parts = byCode.get(c.code);
     const geometry: MultiPolygon | null = parts
@@ -343,9 +349,14 @@ function buildWorldMap() {
           ),
         }
       : null;
+    const [ax, ay] = projection([c.lng, c.lat])!;
+    anchors[c.code] = [round(ax, 1), round(ay, 1)];
     if (geometry && path.area(geometry) >= MIN_MAP_AREA) {
       paths[c.code] = path(geometry) ?? "";
-      const [[x0, by0], [x1, by1]] = path.bounds(geometry);
+      const largest = geometry.coordinates
+        .map((coordinates) => ({ type: "Polygon" as const, coordinates }))
+        .sort((a, b) => path.area(b) - path.area(a))[0];
+      const [[x0, by0], [x1, by1]] = path.bounds(largest);
       bounds[c.code] = [x0, by0, x1, by1].map((v) => round(v, 1));
     } else {
       const [x, y] = projection([c.lng, c.lat])!;
@@ -372,6 +383,7 @@ function buildWorldMap() {
     paths,
     dots,
     bounds,
+    anchors,
   });
   console.log(`  mapa: ${Object.keys(paths).length} contornos, ${Object.keys(dots).length} pontos`);
 }
