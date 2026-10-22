@@ -216,3 +216,33 @@
   font-weight: 800;
   letter-spacing: -0.01em;
 }
+
+/*
+ * Troca de tema (lib/theme-transition.ts): uma faixa a 45° começa fora da tela como uma fatia de
+ * área zero e cresce até cobrir tudo, revelando o tema novo por cima do antigo. O escuro entra pela
+ * diagonal superior esquerda; o claro, pela inferior direita. Mesmo efeito do gradesinteli.
+ */
+::view-transition-old(root) {
+  animation: none;
+  z-index: -1;
+}
+::view-transition-new(root) {
+  animation: theme-reveal-light 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+:root[data-theme-to="dark"]::view-transition-new(root) {
+  animation-name: theme-reveal-dark;
+}
+/* Sem isso, os elementos com transition-colors desbotam para as cores novas dentro da faixa. */
+:root[data-theme-to] *,
+:root[data-theme-to] *::before,
+:root[data-theme-to] *::after {
+  transition: none !important;
+}
+@keyframes theme-reveal-dark {
+  from { clip-path: polygon(50% -71%, -50% 71%, -50% 71%, 50% -71%); }
+  to { clip-path: polygon(50% -71%, -50% 71%, 50% 171%, 171% 50%); }
+}
+@keyframes theme-reveal-light {
+  from { clip-path: polygon(171% 50%, 50% 171%, 50% 171%, 171% 50%); }
+  to { clip-path: polygon(171% 50%, 50% 171%, -50% 71%, 50% -71%); }
+}
