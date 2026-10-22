@@ -99,6 +99,7 @@ import { Landmark } from "lucide-react";
 import type { AttemptRules, GameDefinition } from "../types";
 import { CapitalBoard } from "./Board";
 import { CapitalCover } from "./Cover";
+import { CapitalRecap } from "./Recap";
 import type { CapitalFeedback, CapitalPuzzle } from "./types";
 
 export const capital: GameDefinition<CapitalPuzzle, CapitalFeedback, AttemptRules> = {
@@ -114,6 +115,8 @@ export const capital: GameDefinition<CapitalPuzzle, CapitalFeedback, AttemptRule
   },
   Board: CapitalBoard,
   Cover: CapitalCover,
+  // Resumo visual no modal de resultado (o texto com emojis é só para o WhatsApp).
+  Recap: CapitalRecap,
   // Só a grade; o cabeçalho "Rodada · Capital #12 · 3/6" e o link são da plataforma.
   shareGrid: (play) => play.guesses.map((g) => (g.feedback.correct ? "🟧" : "⬛")).join(""),
 };
@@ -122,6 +125,7 @@ export const capital: GameDefinition<CapitalPuzzle, CapitalFeedback, AttemptRule
 **Regras.** `rules` diz como a partida termina e como o resultado é contado:
 
 - `{ type: "attempts", maxAttempts }`: acertar em até N tentativas. A partida acaba em `won` ou `lost`, e a plataforma mostra "3/6" ou "X/6".
+- `{ type: "unlimited" }`: chutes sem limite até acertar. O tabuleiro pode chamar `finish()` para desistir, e a partida acaba em `lost`. A plataforma mostra "8 chutes" ou "X". O jogo `calor/` é o modelo.
 - `{ type: "timed", seconds, total }`: achar o máximo de itens antes do relógio zerar. O tabuleiro recebe `begin()` (começa o relógio) e `finish()` (tempo esgotado ou desistência). Cada tentativa aceita é um item achado, e `solved: true` encerra com vitória quando acha todos. A plataforma mostra "142/197". O jogo `mundo/` é o modelo.
 
 Placar, estatísticas, sequências e compartilhamento se adaptam sozinhos às regras.
