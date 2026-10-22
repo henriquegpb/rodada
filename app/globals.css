@@ -47,6 +47,10 @@
   --color-tile-filled-border: var(--tile-filled-border);
   --color-key: var(--key);
   --color-ink: var(--ink);
+  /* O Tailwind descarta variáveis que nenhuma regra usa: mapear aqui mantém as do globo (Calor). */
+  --color-globe-ocean: var(--globe-ocean);
+  --color-globe-ocean-edge: var(--globe-ocean-edge);
+  --color-globe-land: var(--globe-land);
   --color-key-foreground: var(--key-foreground);
   --color-success: var(--success);
   --animate-pop: pop 120ms ease-out;
@@ -54,6 +58,7 @@
   --animate-flip: flip 520ms ease-in-out both;
   --animate-hop: hop 520ms ease-out both;
   --animate-rise: rise 420ms cubic-bezier(.22,1,.36,1) both;
+  --animate-fade-in: fade-in 260ms cubic-bezier(.22,1,.36,1) both;
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -110,6 +115,9 @@
   --key: #dfe3e8;
   --key-foreground: #0d1218;
   --success: #19b46e;
+  --globe-ocean: #cfe2f3;
+  --globe-ocean-edge: #a9c7e3;
+  --globe-land: #f4f1ea;
 }
 
 .dark {
@@ -149,6 +157,9 @@
   --key: #1f2933;
   --key-foreground: #edf1f5;
   --success: #22c47e;
+  --globe-ocean: #16314d;
+  --globe-ocean-edge: #0b1828;
+  --globe-land: #2c3846;
 }
 
 @layer base {
@@ -189,6 +200,10 @@
   0%, 100% { transform: translateY(0); }
   40% { transform: translateY(-14px); }
   70% { transform: translateY(2px); }
+}
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
 }
 @keyframes rise {
   from { opacity: 0; transform: translateY(8px); }
