@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Check, Flame, Gamepad2, LayoutGrid, UserRound, X } from "lucide-react";
+import { Check, Flame, Gamepad2, LayoutGrid, Star, UserRound, X } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { games, rootGame } from "@/games";
 import { preloadEngine } from "@/games/engines";
@@ -19,6 +19,7 @@ import { usePlayRecords, useRound } from "@/lib/plays/hooks";
 import type { DayStatus } from "@/lib/plays/status";
 import { formatResult } from "@/lib/plays/result";
 import { overallStreak } from "@/lib/stats";
+import { trackEvent } from "@/lib/analytics";
 import { notePath } from "@/lib/nav-history";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
@@ -90,8 +91,8 @@ export function AppShell({ children }: { children: ReactNode }) {
           <SpotlightNav items={[profileItem]} activeHref={pathname} label={t.nav.profile} />
         </div>
         <div className="mt-auto border-t border-sidebar-border px-3 pt-5">
-          <StreakLine />
-          <div className="mt-3 flex items-center justify-between">
+          <GitHubStar />
+          <div className="flex items-center justify-between">
             <Countdown />
             <ThemeToggle className="-mr-2" />
           </div>
@@ -106,7 +107,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             </Link>
             <div className="ml-auto flex items-center gap-4">
               <Countdown />
-              <StreakLine compact />
+              <StreakLine />
               <ThemeToggle className="-mr-2" />
             </div>
           </div>
@@ -192,7 +193,29 @@ function RoundStatus({ meta, status }: { meta: GameMeta; status: DayStatus }) {
   );
 }
 
-function StreakLine({ compact }: { compact?: boolean }) {
+const REPO_URL = "https://github.com/henriquegpb/rodada";
+
+/** Convite discreto para dar uma estrela no repositório (o projeto é open source). */
+function GitHubStar() {
+  return (
+    <a
+      href={REPO_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={() => trackEvent("github_star_clicked", {})}
+      className="group mb-4 flex items-center gap-2 text-xs text-muted-foreground transition-colors hover:text-foreground"
+    >
+      <svg viewBox="0 0 16 16" className="size-3.5 fill-current" aria-hidden="true">
+        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
+      </svg>
+      {t.nav.github}
+      <Star size={13} className="ml-auto transition-colors group-hover:fill-[#ffc21a] group-hover:text-[#ffc21a]" />
+    </a>
+  );
+}
+
+/** Sequência geral no topo do celular (no desktop ela fica na home). */
+function StreakLine() {
   const today = useToday();
   const records = usePlayRecords();
   const streak = today ? overallStreak(records, today).current : 0;
@@ -203,7 +226,6 @@ function StreakLine({ compact }: { compact?: boolean }) {
     >
       <Flame size={16} className={streak > 0 ? "fill-primary text-primary" : ""} />
       <span className="font-semibold tabular-nums text-foreground">{streak}</span>
-      {!compact && <span>{streak === 1 ? "dia seguido" : "dias seguidos"}</span>}
     </span>
   );
 }

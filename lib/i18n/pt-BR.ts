@@ -14,6 +14,7 @@ export const ptBR = {
     profile: "Perfil",
     you: "Você",
     theme: "Alternar tema",
+    github: "Dê uma estrela no GitHub",
   },
   home: {
     round: "Rodada",
