@@ -34,6 +34,26 @@ export function evaluate(guess: string, answer: string): LetterMark[] {
   return marks;
 }
 
+/**
+ * Valida uma tentativa antes de comparar com qualquer resposta: tamanho, dicionário e repetição.
+ * Devolve a forma normalizada (para comparar) e a grafia com acento (para mostrar).
+ */
+export function checkWord(
+  input: string,
+  previousInputs: readonly string[],
+): { ok: true; guess: string; word: string } | { ok: false; error: string } {
+  const guess = normalize(input);
+  if (guess.length !== WORD_LENGTH) return { ok: false, error: "Só palavras com 5 letras" };
+  const word = dictionary.get(guess);
+  if (!word) return { ok: false, error: "Essa palavra não está no dicionário" };
+  if (previousInputs.some((p) => normalize(p) === guess)) {
+    return { ok: false, error: "Você já tentou essa palavra" };
+  }
+  return { ok: true, guess, word };
+}
+
+export { answers };
+
 export const engine: GameEngine<PalavraPuzzle, string, PalavraFeedback> = {
   createChallenge(dateKey) {
     const answer = pickDaily(answers, { slug: "palavra", dateKey });
@@ -41,13 +61,9 @@ export const engine: GameEngine<PalavraPuzzle, string, PalavraFeedback> = {
   },
 
   checkGuess(input, answer, previous) {
-    const guess = normalize(input);
-    if (guess.length !== WORD_LENGTH) return { ok: false, error: "Só palavras com 5 letras" };
-    const word = dictionary.get(guess);
-    if (!word) return { ok: false, error: "Essa palavra não está no dicionário" };
-    if (previous.some((g) => normalize(g.input) === guess)) {
-      return { ok: false, error: "Você já tentou essa palavra" };
-    }
+    const checked = checkWord(input, previous.map((g) => g.input));
+    if (!checked.ok) return checked;
+    const { guess, word } = checked;
     const marks = evaluate(guess, normalize(answer));
     return {
       ok: true,
