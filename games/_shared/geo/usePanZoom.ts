@@ -12,10 +12,39 @@ export interface View {
 const MIN_W = 24;
 const easeOut = (t: number) => 1 - (1 - t) ** 3;
 
+/** Zoom por pixel de roda do mouse: um "clique" da roda (~100 px) amplia uns 8%. */
+const WHEEL_ZOOM = 0.0008;
+/** A pinça do trackpad chega como roda com Ctrl e deltas bem menores: precisa de mais ganho. */
+const PINCH_ZOOM = 0.01;
+/** Teto por evento, para um giro rápido da roda não dar um salto. */
+const MAX_WHEEL_PX = 120;
+
+/** Deltas em linhas ou páginas (Firefox com mouse) viram pixels. */
+const wheelPx = (e: WheelEvent, delta: number) => delta * (e.deltaMode === 1 ? 33 : e.deltaMode === 2 ? 800 : 1);
+
 /**
- * Mover e dar zoom num SVG mexendo no viewBox: arrastar move, roda do mouse e pinça dão zoom no
- * ponto do cursor/dos dedos, e há zoomIn/zoomOut/reset animados para os botões.
- * `limits` é o tamanho do mundo (o mapa não sai da tela nem dá zoom além dele).
+ * A rolagem veio de dois dedos no trackpad, e não da roda de um mouse? Não há API para isso, então
+ * vai a heurística de sempre: o trackpad também rola na horizontal, e no Chrome/Safari reporta o
+ * `wheelDeltaY` legado como exatamente −3× o `deltaY`; no Firefox, o mouse rola em linhas inteiras.
+ */
+function fromTrackpad(e: WheelEvent): boolean {
+  if (e.deltaX !== 0) return true;
+  const legacy = (e as WheelEvent & { wheelDeltaY?: number }).wheelDeltaY;
+  if (legacy) return legacy === -3 * e.deltaY;
+  return e.deltaMode === 0 && !Number.isInteger(e.deltaY);
+}
+
+/** Pinça no trackpad do Safari: vem como GestureEvent, não como roda com Ctrl. */
+type GestureEvent = UIEvent & { scale: number; clientX: number; clientY: number };
+
+/**
+ * Mover e dar zoom num SVG mexendo no viewBox. Arrastar (ou rolar com dois dedos no trackpad) move;
+ * roda do mouse e pinça (na tela ou no trackpad) dão zoom no ponto do cursor/dos dedos; e há
+ * zoomIn/zoomOut/reset animados para os botões.
+ *
+ * A vista nunca sai da área do mapa: o mundo (`limits`) mais o enquadramento inicial, se ele passar
+ * da borda. Por isso também não afasta além do que cabe nessa área: com o mapa inteiro à vista,
+ * não há o que arrastar.
  */
 export function usePanZoom(initial: View, limits: { width: number; height: number }) {
   const [view, setView] = useState(initial);
@@ -24,18 +53,21 @@ export function usePanZoom(initial: View, limits: { width: number; height: numbe
   const pointers = useRef(new Map<number, { x: number; y: number }>());
   const tween = useRef<number | null>(null);
   const aspect = initial.w / initial.h;
-  const maxW = limits.width * 1.1;
+  const x0 = Math.min(0, initial.x);
+  const y0 = Math.min(0, initial.y);
+  const x1 = Math.max(limits.width, initial.x + initial.w);
+  const y1 = Math.max(limits.height, initial.y + initial.h);
+  const maxW = Math.min(x1 - x0, (y1 - y0) * aspect);
 
   const clamp = useCallback(
     (v: View): View => {
       const w = Math.min(maxW, Math.max(MIN_W, v.w));
       const h = w / aspect;
-      // O centro da vista não sai do mundo.
-      const x = Math.min(limits.width - w / 2, Math.max(-w / 2, v.x));
-      const y = Math.min(limits.height - h / 2, Math.max(-h / 2, v.y));
+      const x = Math.min(x1 - w, Math.max(x0, v.x));
+      const y = Math.min(y1 - h, Math.max(y0, v.y));
       return { x, y, w, h };
     },
-    [aspect, maxW, limits.width, limits.height],
+    [aspect, maxW, x0, y0, x1, y1],
   );
 
   const apply = useCallback(
@@ -92,18 +124,54 @@ export function usePanZoom(initial: View, limits: { width: number; height: numbe
     animateTo({ x: cx - (w * factor) / 2, y: cy - (h * factor) / 2, w: w * factor, h: h * factor });
   };
 
-  // Roda do mouse: precisa ser um listener não passivo para impedir a página de rolar.
+  /** Move a vista em pixels de tela. */
+  const panBy = useCallback(
+    (dx: number, dy: number) => {
+      const rect = svgRef.current!.getBoundingClientRect();
+      const { x, y, w, h } = current.current;
+      apply({ x: x + (dx / rect.width) * w, y: y + (dy / rect.height) * h, w, h });
+    },
+    [apply],
+  );
+
+  // Listeners não passivos: impedem a página de rolar (roda) e o Safari de ampliar a página (gesto).
   useEffect(() => {
     const svg = svgRef.current;
     if (!svg) return;
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
       if (tween.current) cancelAnimationFrame(tween.current);
-      zoomAt(Math.exp(e.deltaY * 0.0015), e.clientX, e.clientY);
+      if (e.ctrlKey) {
+        // Pinça no trackpad (Chrome, Edge, Firefox).
+        zoomAt(Math.exp(wheelPx(e, e.deltaY) * PINCH_ZOOM), e.clientX, e.clientY);
+      } else if (fromTrackpad(e)) {
+        // Dois dedos no trackpad: move, como arrastar.
+        panBy(wheelPx(e, e.deltaX), wheelPx(e, e.deltaY));
+      } else {
+        const px = Math.max(-MAX_WHEEL_PX, Math.min(MAX_WHEEL_PX, wheelPx(e, e.deltaY)));
+        zoomAt(Math.exp(px * WHEEL_ZOOM), e.clientX, e.clientY);
+      }
+    };
+    let lastScale = 1;
+    const onGestureStart = (e: Event) => {
+      e.preventDefault();
+      lastScale = 1;
+    };
+    const onGestureChange = (e: Event) => {
+      e.preventDefault();
+      const g = e as GestureEvent;
+      zoomAt(lastScale / g.scale, g.clientX, g.clientY);
+      lastScale = g.scale;
     };
     svg.addEventListener("wheel", onWheel, { passive: false });
-    return () => svg.removeEventListener("wheel", onWheel);
-  }, [zoomAt]);
+    svg.addEventListener("gesturestart", onGestureStart);
+    svg.addEventListener("gesturechange", onGestureChange);
+    return () => {
+      svg.removeEventListener("wheel", onWheel);
+      svg.removeEventListener("gesturestart", onGestureStart);
+      svg.removeEventListener("gesturechange", onGestureChange);
+    };
+  }, [zoomAt, panBy]);
 
   const handlers = {
     onPointerDown(e: ReactPointerEvent<SVGSVGElement>) {
@@ -124,9 +192,7 @@ export function usePanZoom(initial: View, limits: { width: number; height: numbe
         const after = Math.hypot(e.clientX - other.x, e.clientY - other.y);
         if (before > 0 && after > 0) zoomAt(before / after, (e.clientX + other.x) / 2, (e.clientY + other.y) / 2);
       } else {
-        const rect = e.currentTarget.getBoundingClientRect();
-        const { x, y, w, h } = current.current;
-        apply({ x: x - ((e.clientX - prev.x) / rect.width) * w, y: y - ((e.clientY - prev.y) / rect.height) * h, w, h });
+        panBy(prev.x - e.clientX, prev.y - e.clientY);
       }
       pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
     },
@@ -143,6 +209,8 @@ export function usePanZoom(initial: View, limits: { width: number; height: numbe
     viewBox: `${view.x} ${view.y} ${view.w} ${view.h}`,
     /** Quanto a vista está ampliada em relação à inicial (1 = enquadramento inicial). */
     zoom: initial.w / view.w,
+    /** Há o que arrastar: a vista não mostra a área inteira do mapa. */
+    canPan: view.w < maxW - 0.5,
     handlers,
     zoomIn: () => zoomBy(1 / 1.6),
     zoomOut: () => zoomBy(1.6),
