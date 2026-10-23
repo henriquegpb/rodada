@@ -16,6 +16,7 @@ import type { LucideIcon } from "lucide-react";
  * - attempts: termina em "won" (acertou) ou "lost" (acabaram as tentativas).
  * - unlimited: termina em "won" (acertou) ou "lost" (desistiu).
  * - timed: termina em "won" (completou tudo) ou "done" (o tempo acabou ou desistiu).
+ * - quiz: termina em "won" (acertou todas) ou "done" (respondeu todas, errando alguma).
  */
 export type PlayStatus = "playing" | "won" | "lost" | "done";
 
@@ -26,11 +27,17 @@ export type GameRules =
   /** Chutes sem limite até acertar (ou desistir). Resultado: quantos chutes levou. */
   | { type: "unlimited" }
   /** Achar o máximo de itens antes do tempo acabar. Resultado: itens achados de `total`. */
-  | { type: "timed"; seconds: number; total: number };
+  | { type: "timed"; seconds: number; total: number }
+  /**
+   * `total` perguntas seguidas, uma resposta cada. Resultado: acertos de `total`. Cada tentativa
+   * responde a pergunta da vez, e o feedback diz se acertou em `correct` (é o que o placar conta).
+   */
+  | { type: "quiz"; total: number };
 
 export type AttemptRules = Extract<GameRules, { type: "attempts" }>;
 export type TimedRules = Extract<GameRules, { type: "timed" }>;
 export type UnlimitedRules = Extract<GameRules, { type: "unlimited" }>;
+export type QuizRules = Extract<GameRules, { type: "quiz" }>;
 
 export interface Guess<F = unknown> {
   input: string;
@@ -69,6 +76,8 @@ export interface GameMeta<R extends GameRules = GameRules> {
   parent?: string;
   /** O tabuleiro já mostra a resposta no fim; o resultado não repete o "Era …". */
   hideAnswer?: boolean;
+  /** Dia em que o jogo entrou no site (YYYY-MM-DD). Sem ele, a estreia do Rodada (EPOCH_DATE). */
+  launchedOn?: string;
   howToPlay: string[];
   /**
    * Título e descrição para buscadores e prévias de link, com as palavras que as pessoas buscam

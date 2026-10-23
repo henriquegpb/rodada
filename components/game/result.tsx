@@ -9,7 +9,7 @@ import { Countdown } from "@/components/countdown";
 import { modesOf } from "@/games";
 import type { GameDefinition, PlayView } from "@/games/types";
 import { useRound } from "@/lib/plays/hooks";
-import { formatResult } from "@/lib/plays/result";
+import { formatResult, playCount } from "@/lib/plays/result";
 import { isDone, statusOf } from "@/lib/plays/status";
 import { playKey, usePlays } from "@/lib/plays/store";
 import { buildShareText, shareText } from "@/lib/share";
@@ -29,18 +29,21 @@ function useResult(game: GameDefinition, play: PlayView) {
   const next =
     (won && modeOpen ? nextMode : undefined) ??
     round.find((r) => r.meta.slug !== game.meta.slug && !isDone(r.status))?.meta;
+  const scored = rules.type === "timed" || rules.type === "quiz";
   const headline = won
     ? rules.type === "timed"
       ? t.game.completed
-      : t.game.won
-    : rules.type === "timed"
+      : rules.type === "quiz"
+        ? t.game.perfect
+        : t.game.won
+    : scored
       ? t.game.timeUp
       : t.game.lost;
   return {
     won,
     next,
     headline,
-    score: formatResult(rules, play.status, play.guesses.length),
+    score: formatResult(rules, play.status, playCount(rules, play.guesses)),
     /** Jogos por tentativas revelam a resposta; os com tempo não têm uma. */
     answer: game.meta.hideAnswer ? null : play.answerLabel || null,
     async share() {

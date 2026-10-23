@@ -36,8 +36,10 @@ export interface BranchedMenuProps {
   active?: string;
   onSelect?: (value: string, item: BranchedMenuChild | BranchedMenuItem) => void;
   onToggle?: (index: number, open: boolean) => void;
-  /** Rodada: mouse em cima de um item (para pré-carregar o destino). */
-  onHover?: (value: string) => void;
+  /** Rodada: mouse em cima de um item (para pré-carregar o destino e mostrar a prévia ao lado dele). */
+  onHover?: (value: string, row: HTMLElement) => void;
+  /** Rodada: o mouse saiu do item. */
+  onHoverEnd?: (value: string) => void;
   color?: string;
   accentColor?: string;
   lineColor?: string;
@@ -88,6 +90,7 @@ const BranchedMenu: React.FC<BranchedMenuProps> = ({
   onSelect,
   onToggle,
   onHover,
+  onHoverEnd,
   color = '#f5f5f5',
   accentColor = '#f5f5f5',
   lineColor = '#3f3f46',
@@ -272,7 +275,8 @@ const BranchedMenu: React.FC<BranchedMenuProps> = ({
                         data-active={kid.value === active ? '' : undefined}
                         tabIndex={isOpen ? 0 : -1}
                         onClick={() => select(kid.value, kid)}
-                        onPointerEnter={() => onHover?.(kid.value)}
+                        onPointerEnter={e => onHover?.(kid.value, e.currentTarget)}
+                        onPointerLeave={() => onHoverEnd?.(kid.value)}
                       >
                         {kid.icon ? (
                           <span className="inline-flex flex-none" aria-hidden="true">

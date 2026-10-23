@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { addDays, EPOCH_DATE } from "./date";
-import { createRng, pickDaily, shuffle } from "./seed";
+import { createRng, pickDaily, pickDailyMany, shuffle } from "./seed";
 
 const pool = Array.from({ length: 50 }, (_, i) => `item-${i}`);
 const days = (n: number, from = EPOCH_DATE) => Array.from({ length: n }, (_, i) => addDays(from, i));
@@ -60,5 +60,19 @@ describe("pickDaily", () => {
 
   it("funciona antes do dia #1", () => {
     expect(pool).toContain(pickDaily(pool, opts(addDays(EPOCH_DATE, -3))));
+  });
+});
+
+describe("pickDailyMany", () => {
+  it("é determinístico e não repete itens dentro do ciclo", () => {
+    const run = days(10).map((dateKey) => pickDailyMany(pool, 5, { slug: "t", dateKey }));
+    expect(run).toEqual(days(10).map((dateKey) => pickDailyMany(pool, 5, { slug: "t", dateKey })));
+    const all = run.flat();
+    expect(run.every((r) => r.length === 5)).toBe(true);
+    expect(new Set(all).size).toBe(all.length);
+  });
+
+  it("funciona antes da estreia (datas do treino)", () => {
+    expect(pickDailyMany(pool, 5, { slug: "t", dateKey: "2001-03-04" })).toHaveLength(5);
   });
 });

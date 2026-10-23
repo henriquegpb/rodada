@@ -12,6 +12,7 @@ const loaders: Record<string, () => Promise<{ engine: GameEngine }>> = {
   quadra: () => import("./quadra/engine"),
   bandeira: () => import("./bandeira/engine"),
   pais: () => import("./pais/engine"),
+  capital: () => import("./capital/engine"),
   mosaico: () => import("./mosaico/engine"),
   rota: () => import("./rota/engine"),
   calor: () => import("./calor/engine"),

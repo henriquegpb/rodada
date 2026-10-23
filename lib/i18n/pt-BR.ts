@@ -37,6 +37,7 @@ export const ptBR = {
     won: "Acertou",
     lost: "Não foi dessa vez",
     completed: "Mundo completo!",
+    perfect: "Gabaritou!",
     timeUp: "Fim de jogo",
     answerWas: "Era",
     points: (n: number) => `+${n} pts`,

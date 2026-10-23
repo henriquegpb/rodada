@@ -1,12 +1,12 @@
 import type { GameDefinition, PlayView } from "@/games/types";
-import { formatResult } from "@/lib/plays/result";
+import { formatResult, playCount } from "@/lib/plays/result";
 import { t } from "@/lib/i18n";
 
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 /** Texto completo para colar no WhatsApp: cabeçalho, grade do jogo e link. */
 export function buildShareText(game: GameDefinition, play: PlayView): string {
-  const score = formatResult(game.meta.rules, play.status, play.guesses.length);
+  const score = formatResult(game.meta.rules, play.status, playCount(game.meta.rules, play.guesses));
   const header = `${t.brand.name} · ${game.meta.name} #${play.number} · ${score}`;
   const url = `${SITE_URL.replace(/^https?:\/\//, "")}/${game.meta.slug}`;
   return `${header}\n\n${game.shareGrid(play)}\n\n${url}`;
