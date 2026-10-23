@@ -42,10 +42,9 @@ export function HomeScreen() {
         </div>
 
         <HoverGlideGroup label={t.nav.games} className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {round.map(({ meta, status }, i) => (
+          {round.map(({ meta, status }) => (
             <GameTile
               key={meta.slug}
-              index={i}
               meta={meta}
               status={status}
               streak={today ? gameStats(records, meta.slug, meta.rules, today).streak : NO_STREAK}
@@ -66,12 +65,10 @@ export function HomeScreen() {
 
 /** Capa do jogo: chapada na cor do jogo, com a ilustração, o status de hoje e a sequência do jogo. */
 function GameTile({
-  index,
   meta,
   status,
   streak,
 }: {
-  index: number;
   meta: GameMeta;
   status: DayStatus;
   streak: Streak;
@@ -86,16 +83,13 @@ function GameTile({
       style={{ background: meta.color }}
     >
       <div className="flex items-start justify-between gap-2">
-        <span className="flex items-center gap-2.5">
-          <span className="font-display text-sm">0{index + 1}</span>
-          {/* Pílula escura: a chama na cor do jogo sumiria sobre a capa da mesma cor. */}
-          <span
-            className="flex h-6 items-center gap-1 rounded-full bg-ink pl-1.5 pr-2 text-xs font-bold tabular-nums text-white"
-            title={`${t.home.streak}: ${streak.current}`}
-          >
-            <FlameArt lit={streak.doneToday} color={meta.color} className="h-4 w-2.5" />
-            {streak.current}
-          </span>
+        {/* Pílula escura: a chama na cor do jogo sumiria sobre a capa da mesma cor. */}
+        <span
+          className="flex h-6 items-center gap-1 rounded-full bg-ink pl-1.5 pr-2 text-xs font-bold tabular-nums text-white"
+          title={`${t.home.streak}: ${streak.current}`}
+        >
+          <FlameArt lit={streak.doneToday} color={meta.color} className="h-4 w-2.5" />
+          {streak.current}
         </span>
         <Stamp status={status} meta={meta} />
       </div>
