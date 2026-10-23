@@ -6,7 +6,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { usePlayRecords, useRound } from "@/lib/plays/hooks";
 import { formatResult } from "@/lib/plays/result";
 import { isDone } from "@/lib/plays/status";
-import { gameStats, overallStreak } from "@/lib/stats";
+import { NO_STREAK, gameStats, overallStreak } from "@/lib/stats";
 import { cn } from "@/lib/utils";
 import fireAnimation from "./fire-streak.json";
 import { t } from "@/lib/i18n";
@@ -92,12 +92,13 @@ export function StreakFlame() {
   const [open, setOpen] = useState(false);
   const closeTimer = useRef<number | undefined>(undefined);
   const pointer = useRef<string>("mouse");
-  const streak = today ? overallStreak(records, today).current : 0;
+  const overall = today ? overallStreak(records, today) : NO_STREAK;
+  const streak = overall.current;
   const completed = round
     .filter((r) => isDone(r.status))
     .map((r) => ({
       ...r,
-      streak: today ? gameStats(records, r.meta.slug, r.meta.rules, today).streak.current : 0,
+      streak: today ? gameStats(records, r.meta.slug, r.meta.rules, today).streak : NO_STREAK,
     }));
 
   // Popover em vez de hover card: abre com o mouse em cima e também com toque no celular.
@@ -121,7 +122,8 @@ export function StreakFlame() {
           className="flex items-end gap-2 rounded-lg px-2 py-1 outline-none transition-colors hover:bg-secondary/50 focus-visible:ring-2 focus-visible:ring-ring"
           aria-label={`${t.home.streak}: ${streak} ${t.home.streakDays(streak)}`}
         >
-          <FlameArt lit={streak > 0} className="h-14 w-9" />
+          {/* Sem jogar hoje o número de ontem continua, mas a chama só acende quando hoje conta. */}
+          <FlameArt lit={overall.doneToday} className="h-14 w-9" />
           <span className="font-display text-5xl leading-none tabular-nums">{streak}</span>
           <span className="pb-1 text-sm text-muted-foreground">{t.home.streakDays(streak)}</span>
         </button>
@@ -144,16 +146,16 @@ export function StreakFlame() {
           <ul className="py-1.5">
             {completed.map(({ meta, status, streak: s }) => (
               <li key={meta.slug} className="flex items-center gap-3 px-4 py-2">
-                <FlameArt lit={s > 0} color={meta.color} className="h-6 w-4" />
+                <FlameArt lit={s.doneToday} color={meta.color} className="h-6 w-4" />
                 <span className="text-sm font-medium">{meta.name}</span>
                 <span className="text-xs tabular-nums text-muted-foreground">
                   {status.kind !== "new" && formatResult(meta.rules, status.kind, status.count)}
                 </span>
                 <span
-                  className={cn("ml-auto text-sm font-semibold tabular-nums", !s && "text-muted-foreground")}
-                  style={s ? { color: meta.color } : undefined}
+                  className={cn("ml-auto text-sm font-semibold tabular-nums", !s.current && "text-muted-foreground")}
+                  style={s.current ? { color: meta.color } : undefined}
                 >
-                  {t.stats.days(s)}
+                  {t.stats.days(s.current)}
                 </span>
               </li>
             ))}

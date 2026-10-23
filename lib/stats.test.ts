@@ -74,15 +74,15 @@ describe("computeStreak", () => {
       ["2026-10-21", true],
       ["2026-10-22", true],
     ]);
-    expect(computeStreak(d, "2026-10-22")).toEqual({ current: 3, max: 3 });
+    expect(computeStreak(d, "2026-10-22")).toEqual({ current: 3, max: 3, doneToday: true });
   });
 
-  it("quem jogou ontem e ainda não jogou hoje mantém a sequência", () => {
+  it("quem jogou ontem e ainda não jogou hoje mantém a sequência, com a chama apagada", () => {
     const d = days([
       ["2026-10-20", true],
       ["2026-10-21", true],
     ]);
-    expect(computeStreak(d, "2026-10-22").current).toBe(2);
+    expect(computeStreak(d, "2026-10-22")).toEqual({ current: 2, max: 2, doneToday: false });
   });
 
   it("um dia sem jogar zera a atual mas mantém o recorde", () => {
@@ -92,7 +92,7 @@ describe("computeStreak", () => {
       ["2026-10-17", true],
       ["2026-10-21", true],
     ]);
-    expect(computeStreak(d, "2026-10-23")).toEqual({ current: 0, max: 3 });
+    expect(computeStreak(d, "2026-10-23")).toEqual({ current: 0, max: 3, doneToday: false });
   });
 
   it("um dia que não conta (derrota) quebra a sequência", () => {
@@ -101,7 +101,7 @@ describe("computeStreak", () => {
       ["2026-10-21", false],
       ["2026-10-22", true],
     ]);
-    expect(computeStreak(d, "2026-10-22")).toEqual({ current: 1, max: 1 });
+    expect(computeStreak(d, "2026-10-22")).toEqual({ current: 1, max: 1, doneToday: true });
   });
 });
 
@@ -118,13 +118,13 @@ describe("gameStats", () => {
   it("tentativas: vitórias, distribuição e sequência", () => {
     const s = gameStats(plays, "palavra", SIX, "2026-10-22");
     expect(s).toMatchObject({ played: 4, winRate: 75, distribution: [0, 1, 0, 2, 0, 0] });
-    expect(s.streak).toEqual({ current: 1, max: 2 });
+    expect(s.streak).toEqual({ current: 1, max: 2, doneToday: true });
   });
 
   it("tempo: melhor, média e sequência de dias jogados", () => {
     const s = gameStats(plays, "mundo", TIMED, "2026-10-22");
     expect(s).toMatchObject({ played: 2, best: 150, average: 135, distribution: [] });
-    expect(s.streak).toEqual({ current: 2, max: 2 });
+    expect(s.streak).toEqual({ current: 2, max: 2, doneToday: true });
   });
 
   it("partida em andamento não conta", () => {
@@ -132,6 +132,6 @@ describe("gameStats", () => {
   });
 
   it("sequência geral conta qualquer jogo terminado, mesmo perdido", () => {
-    expect(overallStreak(plays, "2026-10-22")).toEqual({ current: 4, max: 4 });
+    expect(overallStreak(plays, "2026-10-22")).toEqual({ current: 4, max: 4, doneToday: true });
   });
 });

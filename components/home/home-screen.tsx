@@ -12,7 +12,7 @@ import { challengeNumber } from "@/lib/daily/date";
 import { usePlayRecords, useRound } from "@/lib/plays/hooks";
 import { formatResult } from "@/lib/plays/result";
 import type { DayStatus } from "@/lib/plays/status";
-import { gameStats } from "@/lib/stats";
+import { NO_STREAK, gameStats, type Streak } from "@/lib/stats";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 
@@ -48,7 +48,7 @@ export function HomeScreen() {
               index={i}
               meta={meta}
               status={status}
-              streak={today ? gameStats(records, meta.slug, meta.rules, today).streak.current : 0}
+              streak={today ? gameStats(records, meta.slug, meta.rules, today).streak : NO_STREAK}
             />
           ))}
         </HoverGlideGroup>
@@ -74,7 +74,7 @@ function GameTile({
   index: number;
   meta: GameMeta;
   status: DayStatus;
-  streak: number;
+  streak: Streak;
 }) {
   const Cover = getGame(meta.slug)!.Cover;
   return (
@@ -91,10 +91,10 @@ function GameTile({
           {/* Pílula escura: a chama na cor do jogo sumiria sobre a capa da mesma cor. */}
           <span
             className="flex h-6 items-center gap-1 rounded-full bg-ink pl-1.5 pr-2 text-xs font-bold tabular-nums text-white"
-            title={`${t.home.streak}: ${streak}`}
+            title={`${t.home.streak}: ${streak.current}`}
           >
-            <FlameArt lit={streak > 0} color={meta.color} className="h-4 w-2.5" />
-            {streak}
+            <FlameArt lit={streak.doneToday} color={meta.color} className="h-4 w-2.5" />
+            {streak.current}
           </span>
         </span>
         <Stamp status={status} meta={meta} />
