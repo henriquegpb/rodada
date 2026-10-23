@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Check, Flame, Gamepad2, LayoutGrid, Star, UserRound, X } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
-import { games, rootGame } from "@/games";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { games, getGame, rootGame } from "@/games";
 import { preloadEngine } from "@/games/engines";
 import type { GameMeta } from "@/games/types";
 import { Countdown } from "@/components/countdown";
+import { SidebarPreview } from "@/components/game/game-preview";
 import { Logo, LogoMark } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SpotlightNav } from "@/components/microkit/spotlight-indicator";
@@ -41,6 +42,21 @@ export function AppShell({ children }: { children: ReactNode }) {
   useEffect(() => {
     for (const g of games) router.prefetch(`/${g.meta.slug}`);
   }, [router]);
+
+  // Prévia em vídeo ao lado do jogo em que o mouse está. Sair de um item só fecha depois de um
+  // instante: passando direto para o vizinho, o card desliza em vez de piscar.
+  const [preview, setPreview] = useState<{ slug: string; anchor: DOMRect; open: boolean } | null>(null);
+  const hideTimer = useRef<number | undefined>(undefined);
+  function showPreview(slug: string, row: HTMLElement) {
+    preloadEngine(slug);
+    window.clearTimeout(hideTimer.current);
+    setPreview({ slug, anchor: row.getBoundingClientRect(), open: true });
+  }
+  function hidePreview() {
+    window.clearTimeout(hideTimer.current);
+    hideTimer.current = window.setTimeout(() => setPreview((p) => p && { ...p, open: false }), 120);
+  }
+  const previewMeta = preview ? getGame(preview.slug)?.meta : undefined;
 
   const homeItem = { href: "/", label: t.nav.home, leading: <LayoutGrid size={17} strokeWidth={2} /> };
   const profileItem = {
@@ -77,7 +93,8 @@ export function AppShell({ children }: { children: ReactNode }) {
               // Nos modos (Dupla, Quadra) o galho aceso continua sendo o do Palavra.
               active={rootGame(pathname.slice(1))?.meta.slug ?? ""}
               onSelect={(slug) => router.push(`/${slug}`)}
-              onHover={preloadEngine}
+              onHover={showPreview}
+              onHoverEnd={hidePreview}
               color="var(--sidebar-foreground)"
               accentColor="#ff6a1a"
               lineColor="var(--border)"
@@ -98,6 +115,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </div>
       </aside>
+      {preview && previewMeta && <SidebarPreview meta={previewMeta} anchor={preview.anchor} open={preview.open} />}
 
       <div className="flex h-dvh min-w-0 flex-col overflow-y-auto overflow-x-hidden overscroll-none">
         <header className="sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur-md lg:hidden">

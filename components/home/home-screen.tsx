@@ -1,10 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Check, X } from "lucide-react";
 import { getGame } from "@/games";
 import { preloadEngine } from "@/games/engines";
 import type { GameMeta } from "@/games/types";
+import { GameVideo } from "@/components/game/game-preview";
 import { HoverGlideGroup } from "@/components/microkit/hover-glide-cards";
 import { HistoryGrid } from "@/components/stats/history-grid";
 import { FlameArt, StreakFlame } from "@/components/streak/streak-flame";
@@ -63,7 +65,11 @@ export function HomeScreen() {
   );
 }
 
-/** Capa do jogo: chapada na cor do jogo, com a ilustração, o status de hoje e a sequência do jogo. */
+/**
+ * Capa do jogo: chapada na cor do jogo, com a ilustração, o status de hoje e a sequência do jogo.
+ * Com o mouse em cima, a ilustração dá lugar a um vídeo do jogo sendo jogado (só com mouse: no
+ * toque o card já abre o jogo). O vídeo só entra na página no primeiro hover.
+ */
 function GameTile({
   meta,
   status,
@@ -74,10 +80,18 @@ function GameTile({
   streak: Streak;
 }) {
   const Cover = getGame(meta.slug)!.Cover;
+  const [hovered, setHovered] = useState(false);
+  const [seen, setSeen] = useState(false);
   return (
     <Link
       href={`/${meta.slug}`}
-      onPointerEnter={() => preloadEngine(meta.slug)}
+      onPointerEnter={(e) => {
+        preloadEngine(meta.slug);
+        if (e.pointerType !== "mouse") return;
+        setHovered(true);
+        setSeen(true);
+      }}
+      onPointerLeave={() => setHovered(false)}
       data-glide-card=""
       className="group relative flex aspect-[5/4] flex-col overflow-hidden rounded-xl p-5 text-ink lg:aspect-[4/5] lg:p-4 outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       style={{ background: meta.color }}
@@ -93,7 +107,24 @@ function GameTile({
         </span>
         <Stamp status={status} meta={meta} />
       </div>
-      <Cover className="mx-auto my-auto w-[62%] max-w-[220px] lg:w-[84%] transition-transform duration-500 ease-[cubic-bezier(.22,1,.36,1)] group-hover:-rotate-2 group-hover:scale-[1.05]" />
+      <div className="relative my-auto grid place-items-center">
+        <Cover
+          className={cn(
+            "mx-auto w-[62%] max-w-[220px] lg:w-[84%] transition-[transform,opacity] duration-500 ease-[cubic-bezier(.22,1,.36,1)] group-hover:-rotate-2 group-hover:scale-[1.05]",
+            hovered && "opacity-0",
+          )}
+        />
+        {seen && (
+          <GameVideo
+            slug={meta.slug}
+            playing={hovered}
+            className={cn(
+              "absolute inset-x-0 top-1/2 -translate-y-1/2 rounded-lg shadow-xl shadow-black/30 ring-2 ring-ink transition-opacity duration-300",
+              hovered ? "opacity-100" : "opacity-0",
+            )}
+          />
+        )}
+      </div>
       <div className="flex items-end justify-between gap-3">
         <div className="min-w-0">
           <h3 className="font-display text-[26px] leading-none lg:text-[22px]">{meta.name}</h3>
