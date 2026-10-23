@@ -14,7 +14,12 @@ export interface PlayRecord {
 export interface Streak {
   current: number;
   max: number;
+  /** Hoje já conta. Sem isso a atual ainda vale (vem de ontem), mas a chama fica apagada. */
+  doneToday: boolean;
 }
+
+/** Antes de saber o dia de hoje (primeiro render no navegador). */
+export const NO_STREAK: Streak = { current: 0, max: 0, doneToday: false };
 
 export interface GameStats {
   played: number;
@@ -52,7 +57,7 @@ export function computeStreak(days: Map<string, boolean>, today: string): Streak
     }
     previous = date;
   }
-  return { current, max };
+  return { current, max, doneToday: days.get(today) === true };
 }
 
 export function gameStats(plays: PlayRecord[], slug: string, rules: GameRules, today: string): GameStats {

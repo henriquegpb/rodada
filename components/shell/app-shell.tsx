@@ -18,7 +18,7 @@ import { useToday } from "@/lib/daily/hooks";
 import { usePlayRecords, useRound } from "@/lib/plays/hooks";
 import type { DayStatus } from "@/lib/plays/status";
 import { formatResult } from "@/lib/plays/result";
-import { overallStreak } from "@/lib/stats";
+import { NO_STREAK, overallStreak } from "@/lib/stats";
 import { trackEvent } from "@/lib/analytics";
 import { notePath } from "@/lib/nav-history";
 import { cn } from "@/lib/utils";
@@ -218,14 +218,15 @@ function GitHubStar() {
 function StreakLine() {
   const today = useToday();
   const records = usePlayRecords();
-  const streak = today ? overallStreak(records, today).current : 0;
+  const streak = today ? overallStreak(records, today) : NO_STREAK;
   return (
     <span
       className="flex items-center gap-1.5 text-sm text-muted-foreground"
       title={t.stats.overallStreakHint}
     >
-      <Flame size={16} className={streak > 0 ? "fill-primary text-primary" : ""} />
-      <span className="font-semibold tabular-nums text-foreground">{streak}</span>
+      {/* Acesa só quando hoje já conta; o número de ontem continua até o fim do dia. */}
+      <Flame size={16} className={streak.doneToday ? "fill-primary text-primary" : ""} />
+      <span className="font-semibold tabular-nums text-foreground">{streak.current}</span>
     </span>
   );
 }
