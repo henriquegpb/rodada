@@ -8,6 +8,7 @@ Jogos diários curtos num lugar só. Todo dia sai um desafio novo de cada jogo, 
 | **Palavra · Dupla e Quadra** | Modos dentro do Palavra: 2 palavras em 7 tentativas ou 4 em 9, com o teclado colorido por tabuleiro. Cada modo tem desafio e estatísticas próprios. |
 | **Bandeira** | Descobrir o país pela bandeira. Cada erro mostra a distância e a direção até o país certo.  |
 | **País**     | A mesma mecânica, mas o jogador vê a silhueta do país.                                       |
+| **Capital**  | Quiz de 10 países seguidos, do mais conhecido ao mais difícil: diga a capital de cada um (digitando ou escolhendo entre 4). O resultado é quantas acertou. |
 | **Mosaico**  | A bandeira escondida em 6 peças: começa com uma à mostra e cada erro revela mais uma. Mesmo feedback de distância e direção. |
 | **Rota**     | Dois países e um caminho por terra entre eles: diga os países do meio até ligar um ao outro. Verde/amarelo/vermelho mostram quão perto do caminho mais curto cada chute ficou; há 3 dicas. |
 | **Calor**    | Ache o país secreto: cada chute aparece num globo que gira, colorido pela distância entre as fronteiras (mais quente = mais perto). Sem limite de chutes; dá para desistir. |
@@ -61,11 +62,11 @@ scripts/build-data.ts gera os dados dos jogos a partir das fontes abertas
 
 **Engine e UI separadas.** Cada jogo tem uma `engine.ts`, que gera o desafio e valida as tentativas, e um `index.ts` com a interface. A UI nunca importa a engine: ela fala com `lib/plays/service.ts`. Hoje esse serviço chama a engine no próprio navegador. Na fase de backend ele vira chamadas a route handlers, e a resposta deixa de chegar ao cliente antes do fim do jogo. **Até lá, quem abrir o DevTools consegue achar a resposta.** Isso é aceitável enquanto não há ranking.
 
-**Dois tipos de jogo.** Cada jogo declara suas regras (`meta.rules`): **por tentativas** (Palavra, Bandeira, País, Mosaico, Rota: acertar em até N chutes) **sem limite** (Calor e Elo: chutar até acertar, ou desistir) ou **por tempo** (Mundo: achar o máximo antes do relógio zerar). No jogo por tempo, o relógio começa ao clicar em "Começar" e continua correndo mesmo se a pessoa fechar a página.
+**Tipos de jogo.** Cada jogo declara suas regras (`meta.rules`): **por tentativas** (Palavra, Bandeira, País, Mosaico, Rota: acertar em até N chutes), **sem limite** (Calor e Elo: chutar até acertar, ou desistir), **por tempo** (Mundo: achar o máximo antes do relógio zerar) ou **quiz** (Capital: 10 perguntas seguidas, uma resposta cada). No jogo por tempo, o relógio começa ao clicar em "Começar" e continua correndo mesmo se a pessoa fechar a página.
 
-**Pontuação** (para o ranking dos grupos, que ainda não existe): nos jogos por tentativas, `tentativas máximas + 1 − tentativas usadas`, e derrota vale 0. No jogo por tempo, um ponto por item achado. A interface ainda não mostra pontos.
+**Pontuação** (para o ranking dos grupos, que ainda não existe): nos jogos por tentativas, `tentativas máximas + 1 − tentativas usadas`, e derrota vale 0. No jogo por tempo, um ponto por item achado, e no quiz, um por acerto. A interface ainda não mostra pontos.
 
-**Sequências.** A sequência de cada jogo por tentativas conta vitórias seguidas, e perder zera. No jogo por tempo, conta dias jogados. A sequência geral conta dias seguidos com pelo menos um jogo terminado. As duas continuam vivas até o fim do dia seguinte.
+**Sequências.** A sequência de cada jogo por tentativas conta vitórias seguidas, e perder zera. No jogo por tempo e no quiz, conta dias jogados. A sequência geral conta dias seguidos com pelo menos um jogo terminado. As duas continuam vivas até o fim do dia seguinte.
 
 ## Fontes dos dados e licenças
 
@@ -74,6 +75,7 @@ scripts/build-data.ts gera os dados dos jogos a partir das fontes abertas
 | Palavras válidas (léxico, conjugações, frequência) | [fserb/pt-br](https://github.com/fserb/pt-br)                                          | MIT               |
 | Respostas do Palavra                   | Curadoria própria sobre a lista acima (`games/palavra/data/answers.json`)                          | MIT               |
 | Grupos do Elo                          | Curadoria própria (`games/elo/data/puzzles.json`)                                                  | MIT               |
+| Capitais e grafias aceitas (Capital)   | Curadoria própria (`games/capital/data/capitals.json`)                                             | MIT               |
 | Grupos do Elo traduzidos               | [Only Connect Wall](https://github.com/TaatiTeam/OCW) (Alavi et al., NeurIPS 2023): grupos traduzidos e adaptados ao português, recombinados em desafios novos. Os ids originais ficam no campo `source` | MIT               |
 | Geometria e centroides dos países      | [Natural Earth](https://www.naturalearthdata.com/) 1:50m Admin 0                                  | Domínio público   |
 | Distância entre fronteiras (Calor)     | Calculada dos contornos do Natural Earth 1:110m (1:50m para microestados) em `scripts/build-data.ts` | Domínio público   |

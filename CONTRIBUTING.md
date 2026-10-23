@@ -17,7 +17,7 @@ Um jogo é uma pasta em `games/<slug>/` com duas metades:
 
 A separação é o que vai impedir trapaça quando o backend existir: a `engine` passa a rodar só no servidor. Por isso, **`index.ts` e o tabuleiro nunca importam `engine.ts` nem os dados de resposta.**
 
-O passo a passo usa um jogo hipotético `capital` (adivinhar a capital de um país) como exemplo.
+O passo a passo usa como exemplo uma versão simplificada do jogo `capital/` (uma capital por dia, em até 6 tentativas). O jogo de verdade é um quiz de 10 perguntas; veja `games/capital/` para a versão completa.
 
 ### 1. Tipos
 
@@ -132,12 +132,17 @@ export const capital: GameDefinition<CapitalPuzzle, CapitalFeedback, AttemptRule
 - `{ type: "attempts", maxAttempts }`: acertar em até N tentativas. A partida acaba em `won` ou `lost`, e a plataforma mostra "3/6" ou "X/6".
 - `{ type: "unlimited" }`: chutes sem limite até acertar. O tabuleiro pode chamar `finish()` para desistir, e a partida acaba em `lost`. A plataforma mostra "8 chutes" ou "X". O jogo `calor/` é o modelo.
 - `{ type: "timed", seconds, total }`: achar o máximo de itens antes do relógio zerar. O tabuleiro recebe `begin()` (começa o relógio) e `finish()` (tempo esgotado ou desistência). Cada tentativa aceita é um item achado, e `solved: true` encerra com vitória quando acha todos. A plataforma mostra "142/197". O jogo `mundo/` é o modelo.
+- `{ type: "quiz", total }`: `total` perguntas seguidas, uma resposta cada. Cada tentativa responde a pergunta da vez e o feedback diz se acertou em `correct`, que é o que o placar conta. A partida acaba depois da última resposta: em `won` se acertou todas, senão em `done`. A plataforma mostra "7/10". O jogo `capital/` é o modelo.
 
 Placar, estatísticas, sequências e compartilhamento se adaptam sozinhos às regras.
 
 **SEO.** `seo.title` é o título da aba e do Google (ganha " · Rodada" no fim) e deve usar as palavras que as pessoas buscam, como "do dia" e o tipo de jogo; `seo.description` é o resumo que aparece no resultado da busca. A página do jogo já sai com as regras (`howToPlay`) em texto no fim, com a imagem de prévia na cor do jogo e no sitemap, sem configurar nada.
 
 **Modos.** Um jogo pode ser modo de outro com `parent: "<slug do pai>"` no meta (Dupla e Quadra são modos do Palavra). Ele tem desafio, partida e estatísticas próprios, mas não entra na rodada: aparece como aba na página do jogo pai, que mantém o título e o lugar na sidebar.
+
+**Estreia.** Um jogo que entra depois do lançamento do site leva `launchedOn: "AAAA-MM-DD"` no meta. Na grade de histórico, os dias antes disso aparecem pontilhados e o dia da estreia ganha uma marca.
+
+**Vídeo de prévia.** `public/previews/<slug>.mp4` (800×500, sem áudio, alguns segundos) e `<slug>.jpg` (o primeiro quadro) tocam no hover do card da home e do item da sidebar. Grave com o site rodando com outra `NEXT_PUBLIC_DAILY_SEED`, para o vídeo nunca mostrar a resposta de um dia de verdade.
 
 A **capa** (`Cover.tsx`) é a ilustração do card na home e no cabeçalho do "como jogar". É um SVG próprio, `viewBox="0 0 240 200"`, desenhado com `currentColor` (a tinta escura) e branco sobre a cor do jogo. Veja as capas de `palavra/`, `bandeira/` e `pais/`. Não use ícone pronto como capa.
 
