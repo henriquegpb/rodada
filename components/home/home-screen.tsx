@@ -118,8 +118,9 @@ function GameTile({
           <GameVideo
             slug={meta.slug}
             playing={hovered}
+            // z-[2]: à frente do destaque do HoverGlideGroup (z-[1]), que clareia o card e apagaria o vídeo.
             className={cn(
-              "absolute inset-x-0 top-1/2 -translate-y-1/2 rounded-lg shadow-xl shadow-black/30 ring-2 ring-ink transition-opacity duration-300",
+              "absolute inset-x-0 top-1/2 z-[2] -translate-y-1/2 rounded-lg shadow-xl shadow-black/30 ring-2 ring-ink transition-opacity duration-300",
               hovered ? "opacity-100" : "opacity-0",
             )}
           />
