@@ -5,7 +5,7 @@ import { roundGames } from "@/games";
 import type { GameMeta } from "@/games/types";
 import { useToday } from "@/lib/daily/hooks";
 import type { PlayRecord } from "@/lib/stats";
-import { statusOf, type DayStatus } from "./status";
+import { scoreOf, statusOf, type DayStatus } from "./status";
 import { playKey, usePlays } from "./store";
 
 /** Partidas no formato que as estatísticas usam. */
@@ -17,7 +17,7 @@ export function usePlayRecords(): PlayRecord[] {
         slug: p.slug,
         dateKey: p.dateKey,
         status: p.status,
-        count: p.guesses.length,
+        count: scoreOf(p),
       })),
     [plays],
   );

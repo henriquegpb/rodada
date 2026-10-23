@@ -58,3 +58,22 @@ export function pickDaily<T>(
   const order = shuffle(pool, createRng(`${seed}:${slug}:${cycle}`));
   return order[((day % pool.length) + pool.length) % pool.length];
 }
+
+/**
+ * Como `pickDaily`, mas `count` itens por dia: cada ciclo embaralha a lista e vai tirando fatias
+ * de `count`, então nenhum item repete até o ciclo acabar (a sobra que não fecha uma fatia espera
+ * o ciclo seguinte).
+ */
+export function pickDailyMany<T>(
+  pool: readonly T[],
+  count: number,
+  { slug, dateKey, seed = DAILY_SEED }: { slug: string; dateKey: string; seed?: string },
+): T[] {
+  if (pool.length < count) throw new Error(`pool pequeno demais para ${slug}`);
+  const perCycle = Math.floor(pool.length / count);
+  const day = challengeNumber(dateKey) - 1;
+  const cycle = Math.floor(day / perCycle);
+  const slot = ((day % perCycle) + perCycle) % perCycle;
+  const order = shuffle(pool, createRng(`${seed}:${slug}:${cycle}`));
+  return order.slice(slot * count, slot * count + count);
+}
