@@ -43,16 +43,22 @@ export function AppShell({ children }: { children: ReactNode }) {
     for (const g of games) router.prefetch(`/${g.meta.slug}`);
   }, [router]);
 
-  // Prévia em vídeo ao lado do jogo em que o mouse está. Sair de um item só fecha depois de um
-  // instante: passando direto para o vizinho, o card desliza em vez de piscar.
+  // Prévia em vídeo ao lado do jogo em que o mouse está. Só abre se o mouse parar no item (quem
+  // passa a caminho de outro lugar não vê o vídeo pular na frente); já aberta, troca na hora.
+  // Sair de um item só fecha depois de um instante: indo direto para o vizinho, o card desliza.
   const [preview, setPreview] = useState<{ slug: string; anchor: DOMRect; open: boolean } | null>(null);
+  const showTimer = useRef<number | undefined>(undefined);
   const hideTimer = useRef<number | undefined>(undefined);
   function showPreview(slug: string, row: HTMLElement) {
     preloadEngine(slug);
     window.clearTimeout(hideTimer.current);
-    setPreview({ slug, anchor: row.getBoundingClientRect(), open: true });
+    window.clearTimeout(showTimer.current);
+    const next = { slug, anchor: row.getBoundingClientRect(), open: true };
+    if (preview?.open) setPreview(next);
+    else showTimer.current = window.setTimeout(() => setPreview(next), 800);
   }
   function hidePreview() {
+    window.clearTimeout(showTimer.current);
     window.clearTimeout(hideTimer.current);
     hideTimer.current = window.setTimeout(() => setPreview((p) => p && { ...p, open: false }), 120);
   }
