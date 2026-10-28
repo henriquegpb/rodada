@@ -46,6 +46,7 @@ export default function MundoBoard({
   finish,
 }: BoardProps<MundoPuzzle, MundoFeedback, TimedRules>) {
   const [query, setQuery] = useState("");
+  const [autocompleteEnabled, setAutocompleteEnabled] = useState(true);
   const [hint, setHint] = useState<string | null>(null);
   const [lastFound, setLastFound] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -80,7 +81,9 @@ export default function MundoBoard({
       setHint(error);
       return;
     }
-    tail.current = { names: [country.name, ...country.aliases].map(nameKey), typed };
+    tail.current = autocompleteEnabled
+      ? { names: [country.name, ...country.aliases].map(nameKey), typed }
+      : null;
     playSound(tink).catch(() => {});
     setQuery("");
     setHint(null);
@@ -88,6 +91,11 @@ export default function MundoBoard({
   }
 
   function onType(value: string) {
+    if (!autocompleteEnabled) {
+      setQuery(value);
+      setHint(null);
+      return;
+    }
     // "bra" já virou Brasil: o "sil" que vem em seguida é o resto do nome, não um chute novo.
     if (tail.current) {
       // Guarda o texto cru: o espaço de "Nova Zelândia" não pode se perder entre uma tecla e outra.
@@ -120,7 +128,9 @@ export default function MundoBoard({
   }
 
   function onEnter() {
-    const { match, exact } = readPrefix(query, left);
+    const { match, exact } = autocompleteEnabled
+      ? readPrefix(query, left)
+      : { match: findCountry(query, { byCode: false }), exact: undefined };
     const country = match ?? exact;
     if (country) accept(country, query);
     else if (normalize(query)) setHint("Esse não está na lista");
@@ -131,19 +141,51 @@ export default function MundoBoard({
       {/* Depois do fim, a faixa de resultado da plataforma já mostra o placar. */}
       {!finished && (
         <div className="sticky top-0 z-10 -mx-1 flex flex-wrap items-center gap-3 bg-background/95 px-1 py-3 backdrop-blur">
-          <div className="relative min-w-[220px] flex-1">
-            <FocusInput
-              ref={inputRef}
-              value={query}
-              disabled={!running}
-              placeholder={running ? "Digite um país" : "Clique em começar"}
-              autoComplete="off"
-              spellCheck={false}
-              className="h-14 rounded-md text-[17px]"
-              onChange={(e) => onType(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && onEnter()}
-            />
-            {hint && <p className="absolute left-1 top-full mt-1 text-xs text-muted-foreground">{hint}</p>}
+          <div className="flex min-w-0 flex-1 basis-80 items-center gap-3">
+            <button
+              type="button"
+              role="switch"
+              aria-checked={autocompleteEnabled}
+              aria-label="Autocompletar países"
+              title={autocompleteEnabled ? "Desligar autocompletar: digite o nome completo e aperte Enter" : "Ligar autocompletar"}
+              onClick={() => {
+                setAutocompleteEnabled((enabled) => !enabled);
+                tail.current = null;
+                setHint(null);
+                if (running) inputRef.current?.focus();
+              }}
+              className="flex h-14 shrink-0 flex-col items-center justify-center gap-1 rounded-md px-1 text-[10px] font-medium text-muted-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            >
+              <span>Autocompletar</span>
+              <span
+                aria-hidden="true"
+                className={cn(
+                  "relative h-7 w-14 rounded-full border transition-colors",
+                  autocompleteEnabled ? "border-transparent text-ink" : "border-input bg-secondary text-muted-foreground",
+                )}
+                style={autocompleteEnabled ? { background: COLOR } : undefined}
+              >
+                <span className={cn("absolute top-1/2 -translate-y-1/2 text-[10px] font-bold", autocompleteEnabled ? "left-1.5" : "right-1.5")}>
+                  {autocompleteEnabled ? "ON" : "OFF"}
+                </span>
+                <span className={cn("absolute left-0.5 top-0.5 size-5 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none", autocompleteEnabled && "translate-x-7")} />
+              </span>
+            </button>
+            <div className="relative min-w-0 flex-1">
+              <FocusInput
+                ref={inputRef}
+                value={query}
+                disabled={!running}
+                placeholder={running ? (autocompleteEnabled ? "Digite um país" : "País + Enter") : "Clique em começar"}
+                aria-label="Nome do país"
+                autoComplete="off"
+                spellCheck={false}
+                className="h-14 rounded-md text-[17px]"
+                onChange={(e) => onType(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && onEnter()}
+              />
+              {hint && <p className="absolute left-1 top-full mt-1 text-xs text-muted-foreground">{hint}</p>}
+            </div>
           </div>
           <div className="flex items-center gap-5">
             <Readout label="Países" value={`${found.size}/${rules.total}`} />
