@@ -24,8 +24,8 @@ export const mundo: GameDefinition<MundoPuzzle, MundoFeedback, TimedRules> = {
     howToPlay: [
       `Escreva o nome de todos os ${countries.length} países que conseguir em 15 minutos.`,
       "Com Autocompletar ligado, não precisa apertar Enter: o país entra quando faltam até 2 letras e não pode ser outro (\"Bras\" já vira Brasil). Nomes longos entram com 8 letras.",
-      "Desligue Autocompletar no botão à esquerda do campo para digitar o nome completo ou um apelido e confirmar com Enter.",
-      "Com Autocompletar ligado, quando um nome é o começo de outro (Níger e Nigéria, Irã e Iraque), continue digitando ou aperte Enter.",
+      "Com Autocompletar desligado, o país entra automaticamente quando você termina de digitar o nome completo ou um apelido válido, sem precisar de Enter.",
+      "Quando um nome é o começo de outro (Níger e Nigéria, Irã e Iraque), continue digitando ou aperte Enter.",
       "Acentos são opcionais. Valem apelidos (EUA, Holanda) e nomes em inglês e espanhol.",
       "Cada acerto pinta o país no mapa. No fim, os que faltaram aparecem em vermelho.",
       "O relógio continua correndo mesmo se você sair da página.",

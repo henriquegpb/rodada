@@ -91,13 +91,8 @@ export default function MundoBoard({
   }
 
   function onType(value: string) {
-    if (!autocompleteEnabled) {
-      setQuery(value);
-      setHint(null);
-      return;
-    }
     // "bra" já virou Brasil: o "sil" que vem em seguida é o resto do nome, não um chute novo.
-    if (tail.current) {
+    if (autocompleteEnabled && tail.current) {
       // Guarda o texto cru: o espaço de "Nova Zelândia" não pode se perder entre uma tecla e outra.
       const typed = tail.current.typed + value;
       if (value && tail.current.names.some((n) => n.startsWith(nameKey(typed)))) {
@@ -111,7 +106,9 @@ export default function MundoBoard({
     setHint(null);
     // Aceita assim que o texto só pode ser um país que ainda falta, sem precisar de Enter.
     const { match, exact, open } = readPrefix(value, left);
-    if (match) {
+    const country = findCountry(value, { byCode: false });
+    // Sem autocompletar, só aceita o nome ou apelido inteiro, nunca apenas um prefixo.
+    if (match && (autocompleteEnabled || match.code === country?.code)) {
       accept(match, value);
       return;
     }
@@ -119,9 +116,8 @@ export default function MundoBoard({
       setHint(`Enter para ${exact.name}, ou continue digitando`);
       return;
     }
-    const already = findCountry(value, { byCode: false });
-    if (already && found.has(already.code)) {
-      setHint(`${already.name} já está na lista`);
+    if (country && found.has(country.code)) {
+      setHint(`${country.name} já está na lista`);
       // Repetido e não é começo de nenhum outro: limpa para o próximo nome não grudar.
       if (!open) setQuery("");
     }
@@ -147,7 +143,7 @@ export default function MundoBoard({
               role="switch"
               aria-checked={autocompleteEnabled}
               aria-label="Autocompletar países"
-              title={autocompleteEnabled ? "Desligar autocompletar: digite o nome completo e aperte Enter" : "Ligar autocompletar"}
+              title={autocompleteEnabled ? "Desligar autocompletar: enviar apenas nomes completos" : "Ligar autocompletar"}
               onClick={() => {
                 setAutocompleteEnabled((enabled) => !enabled);
                 tail.current = null;
@@ -176,7 +172,7 @@ export default function MundoBoard({
                 ref={inputRef}
                 value={query}
                 disabled={!running}
-                placeholder={running ? (autocompleteEnabled ? "Digite um país" : "País + Enter") : "Clique em começar"}
+                placeholder={running ? (autocompleteEnabled ? "Digite um país" : "Nome completo do país") : "Clique em começar"}
                 aria-label="Nome do país"
                 autoComplete="off"
                 spellCheck={false}
