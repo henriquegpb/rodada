@@ -1,5 +1,6 @@
 import { Landmark } from "lucide-react";
 import type { GameDefinition, QuizRules } from "../types";
+import { quizShareGrid } from "../_shared/geo/quiz";
 import { Answers, CapitalBoard } from "./Board";
 import { CapitalCover } from "./Cover";
 import type { CapitalFeedback, CapitalPuzzle } from "./types";
@@ -31,9 +32,5 @@ export const capital: GameDefinition<CapitalPuzzle, CapitalFeedback, QuizRules> 
   Board: CapitalBoard,
   Cover: CapitalCover,
   Recap: ({ play }) => <Answers play={play} compact />,
-  // Duas linhas de 5, como um cartão de respostas.
-  shareGrid: (play) => {
-    const marks = play.guesses.map((g) => (g.feedback.correct ? "🟩" : "🟥"));
-    return [marks.slice(0, 5).join(""), marks.slice(5).join("")].filter(Boolean).join("\n");
-  },
+  shareGrid: quizShareGrid,
 };

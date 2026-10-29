@@ -1,53 +1,34 @@
 import { Flag } from "lucide-react";
-import type { AttemptRules, BoardProps, GameDefinition } from "../types";
-import { CountryBoard } from "../_shared/geo/CountryBoard";
-import { CountryRecap } from "../_shared/geo/CountryRecap";
-import { proximityEmoji } from "../_shared/geo";
-import type { CountryFeedback } from "../_shared/geo/types";
-import type { BandeiraPuzzle } from "./types";
+import type { GameDefinition, QuizRules } from "../types";
+import { quizShareGrid } from "../_shared/geo/quiz";
+import { Answers, BandeiraBoard } from "./Board";
 import { BandeiraCover } from "./Cover";
+import type { BandeiraFeedback, BandeiraPuzzle } from "./types";
 
-const COLOR = "#2f7cf6";
-
-function BandeiraBoard(props: BoardProps<BandeiraPuzzle, CountryFeedback, AttemptRules>) {
-  return (
-    <CountryBoard
-      {...props}
-      visual={
-        // eslint-disable-next-line @next/next/no-img-element -- SVG local, sem ganho com next/image
-        <img
-          src={props.play.puzzle.image}
-          alt="Bandeira do dia"
-          className="aspect-[4/3] w-full max-w-[340px] rounded-[4px] object-cover shadow-[0_16px_40px_rgba(0,0,0,.4)] ring-1 ring-black/10"
-          draggable={false}
-        />
-      }
-    />
-  );
-}
-
-export const bandeira: GameDefinition<BandeiraPuzzle, CountryFeedback, AttemptRules> = {
+export const bandeira: GameDefinition<BandeiraPuzzle, BandeiraFeedback, QuizRules> = {
   meta: {
     slug: "bandeira",
     name: "Bandeira",
-    tagline: "De quem é essa bandeira?",
-    description: "Descubra o país pela bandeira em até 6 tentativas.",
+    tagline: "10 bandeiras, 10 países",
+    description: "Diga de que país são 10 bandeiras seguidas e veja quantas acerta.",
     icon: Flag,
-    rules: { type: "attempts", maxAttempts: 6 },
-    color: COLOR,
+    rules: { type: "quiz", total: 10 },
+    color: "#2f7cf6",
+    hideAnswer: true,
     howToPlay: [
-      "Descubra de qual país é a bandeira em até 6 tentativas.",
-      "Digite um país e escolha na lista.",
-      "A cada erro você vê a distância até o país certo, a direção para onde ele fica e quão perto chegou.",
+      "São 10 bandeiras seguidas, da mais conhecida à mais difícil. Diga de que país é cada uma.",
+      "Digite o país e escolha na lista, ou toque em \"Ver 4 alternativas\" para escolher entre quatro.",
+      "Só vale uma resposta por bandeira: errou ou pulou, o país certo aparece e o jogo segue.",
+      "O resultado é quantas você acertou das 10.",
     ],
     seo: {
-      title: "Bandeira do dia: adivinhe o país pela bandeira",
+      title: "Bandeira do dia: quantas bandeiras do mundo você conhece?",
       description:
-        "Jogo diário de bandeiras: descubra de que país é a bandeira em até 6 tentativas. Quiz de geografia grátis, em português.",
+        "Quiz diário de bandeiras em português: diga de que país são 10 bandeiras seguidas, da mais fácil à mais difícil, e veja quantas acerta.",
     },
   },
   Board: BandeiraBoard,
   Cover: BandeiraCover,
-  Recap: ({ play }) => <CountryRecap play={play} color={COLOR} />,
-  shareGrid: (play) => play.guesses.map((g) => proximityEmoji(g.feedback)).join("\n"),
+  Recap: ({ play }) => <Answers play={play} compact />,
+  shareGrid: quizShareGrid,
 };

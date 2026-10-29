@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import { addDays, EPOCH_DATE } from "@/lib/daily/date";
-import { engine as bandeira } from "../../bandeira/engine";
 import { engine as pais } from "../../pais/engine";
 import { engine as mosaico } from "../../mosaico/engine";
 import shapes from "../../pais/data/shapes.json";
@@ -66,7 +65,6 @@ describe("distância e direção", () => {
 });
 
 describe.each([
-  ["bandeira", bandeira],
   ["pais", pais],
   ["mosaico", mosaico],
 ])("engine %s", (_, engine) => {
