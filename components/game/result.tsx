@@ -132,7 +132,7 @@ export function ResultDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="gap-0 overflow-hidden p-0 sm:max-w-[400px]"
+        className="flex max-h-[calc(100dvh-2rem)] flex-col gap-0 overflow-hidden p-0 sm:max-w-[400px]"
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <div className="px-6 pb-5 pt-7 text-ink" style={{ background: game.meta.color }}>
@@ -150,8 +150,11 @@ export function ResultDialog({
             )}
           </DialogDescription>
         </div>
-        <div className="flex flex-col gap-5 p-6">
-          <game.Recap play={play} />
+        <div className="flex min-h-0 flex-col gap-5 p-6">
+          {/* Com muitos chutes o resumo rola sozinho, para o modal caber na tela. */}
+          <div className="min-h-0 overflow-y-auto">
+            <game.Recap play={play} />
+          </div>
           {play.practice ? (
             // Treino não se compartilha: o principal é emendar outra.
             <button
