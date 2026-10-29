@@ -10,7 +10,8 @@
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "data:build": "tsx scripts/build-data.ts"
+    "data:build": "tsx scripts/build-data.ts",
+    "data:sentido": "tsx scripts/build-sentido.ts"
   },
   "dependencies": {
     "@hugeicons/core-free-icons": "^4.3.5",
