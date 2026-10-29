@@ -88,7 +88,7 @@ export function CapitalBoard({ play, rules, submitGuess }: BoardProps<CapitalPuz
 
 O tabuleiro não cuida de cabeçalho, resultado, compartilhamento, estatísticas nem "como jogar". Isso tudo é da plataforma (`components/game/game-screen.tsx`).
 
-Para um jogo de "adivinhe o país", reaproveite `games/_shared/geo`. Os jogos `bandeira/` e `pais/` são só uma engine com `createCountryEngine` e um `CountryBoard` com um `visual` diferente.
+Para um jogo de "adivinhe o país", reaproveite `games/_shared/geo`. Os jogos `pais/` e `mosaico/` são só uma engine com `createCountryEngine` e um `CountryBoard` com um `visual` diferente. Para um quiz de 10 perguntas, veja `capital/` e `bandeira/`, que usam o `QuizBoard`.
 
 ### 4. Definição do jogo
 
