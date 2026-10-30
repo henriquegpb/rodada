@@ -1,0 +1,17 @@
+.mundo-map {
+  /* Todos os estados de terra contrastam pelo menos 3:1 com a água. */
+  --map-ocean: #386888;
+  --map-land: #e2e7eb;
+  --map-context: #bbc5ce;
+  --map-border: #283f54;
+  --map-missing: #f5a5aa;
+
+  background-color: var(--map-ocean);
+}
+
+.dark .mundo-map {
+  --map-ocean: #102c46;
+  --map-land: #7b8996;
+  --map-context: #6f7e8c;
+  --map-missing: #ef8b93;
+}
