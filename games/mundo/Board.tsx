@@ -16,6 +16,7 @@ import { usePanZoom } from "../_shared/geo/usePanZoom";
 import { countriesByContinent } from "./continents";
 import map from "../_shared/geo/world-map.json";
 import type { MundoFeedback, MundoPuzzle } from "./types";
+import "./Board.css";
 
 const COLOR = "#ffc21a";
 const paths: Record<string, string> = map.paths;
@@ -216,7 +217,7 @@ export default function MundoBoard({
         </div>
       )}
 
-      <div className="relative overflow-hidden rounded-lg bg-card p-3 sm:p-5">
+      <div className="mundo-map relative overflow-hidden rounded-lg p-3 sm:p-5">
         <WorldMap found={found} finished={finished} lastFound={lastFound} />
         {!started && !finished && (
           <div className="absolute inset-0 grid place-items-center bg-card/70 backdrop-blur-[2px]">
@@ -287,7 +288,7 @@ function Readout({ label, value, className }: { label: string; value: string; cl
 function WorldMap({ found, finished, lastFound }: { found: Set<string>; finished: boolean; lastFound: string | null }) {
   const { svgRef, viewBox, zoom, canPan, handlers, zoomIn, zoomOut, reset } = usePanZoom(WHOLE_MAP, WORLD);
   const fill = (code: string) =>
-    found.has(code) ? COLOR : finished ? "color-mix(in oklab, var(--destructive) 45%, var(--secondary))" : "var(--secondary)";
+    found.has(code) ? COLOR : finished ? "var(--map-missing)" : "var(--map-land)";
   return (
     <>
       <svg
@@ -299,14 +300,20 @@ function WorldMap({ found, finished, lastFound }: { found: Set<string>; finished
         aria-label="Mapa-múndi"
         {...handlers}
       >
-        <path d={map.background} fill="var(--secondary)" opacity={0.5} />
+        <path
+          d={map.background}
+          fill="var(--map-context)"
+          stroke="var(--map-border)"
+          strokeWidth={0.8}
+          vectorEffect="non-scaling-stroke"
+        />
         {Object.entries(paths).map(([code, d]) => (
           <path
             key={code}
             d={d}
             fill={fill(code)}
-            stroke="var(--card)"
-            strokeWidth={0.6}
+            stroke="var(--map-border)"
+            strokeWidth={0.8}
             vectorEffect="non-scaling-stroke"
             className={cn("transition-[fill] duration-500", code === lastFound && "animate-pop [transform-box:fill-box] [transform-origin:center]")}
           />
@@ -318,8 +325,8 @@ function WorldMap({ found, finished, lastFound }: { found: Set<string>; finished
             cx={x}
             cy={y}
             r={3.2 / zoom}
-            fill={found.has(code) || finished ? fill(code) : "var(--input)"}
-            stroke="var(--card)"
+            fill={fill(code)}
+            stroke="var(--map-border)"
             strokeWidth={1}
             vectorEffect="non-scaling-stroke"
           />
