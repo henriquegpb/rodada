@@ -11,12 +11,13 @@ import { calor } from "./calor";
 import { mundo } from "./mundo";
 import { elo } from "./elo";
 import { sentido } from "./sentido";
+import { colmeia } from "./colmeia";
 
 /**
  * Registro dos jogos (e modos), na ordem em que aparecem no site.
  * Ao adicionar um jogo, registre também a engine em ./engines.ts.
  */
-export const games: GameDefinition[] = [palavra, dupla, quadra, bandeira, pais, capital, mosaico, rota, calor, mundo, elo, sentido] as GameDefinition[];
+export const games: GameDefinition[] = [palavra, dupla, quadra, bandeira, pais, capital, mosaico, rota, calor, mundo, elo, sentido, colmeia] as GameDefinition[];
 
 /** Os jogos da rodada do dia: tudo que não é modo de outro jogo. */
 export const roundGames = games.filter((g) => !g.meta.parent);

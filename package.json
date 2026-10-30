@@ -11,7 +11,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "data:build": "tsx scripts/build-data.ts",
-    "data:sentido": "tsx scripts/build-sentido.ts"
+    "data:sentido": "tsx scripts/build-sentido.ts",
+    "data:colmeia": "tsx scripts/build-colmeia.ts"
   },
   "dependencies": {
     "@hugeicons/core-free-icons": "^4.3.5",
