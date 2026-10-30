@@ -27,7 +27,7 @@ export function statItems(stats: GameStats, rules: GameRules) {
       { label: t.stats.currentStreak, value: stats.streak.current },
     ];
   }
-  return rules.type === "timed" || rules.type === "quiz"
+  return rules.type === "timed" || rules.type === "quiz" || rules.type === "points"
     ? [
         { label: t.stats.played, value: stats.played },
         { label: t.stats.best, value: stats.best },

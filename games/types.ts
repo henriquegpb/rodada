@@ -17,6 +17,7 @@ import type { LucideIcon } from "lucide-react";
  * - unlimited: termina em "won" (acertou) ou "lost" (desistiu).
  * - timed: termina em "won" (completou tudo) ou "done" (o tempo acabou ou desistiu).
  * - quiz: termina em "won" (acertou todas) ou "done" (respondeu todas, errando alguma).
+ * - points: termina em "won" (achou tudo) ou "done" (a pessoa encerrou com os pontos que tinha).
  */
 export type PlayStatus = "playing" | "won" | "lost" | "done";
 
@@ -32,12 +33,18 @@ export type GameRules =
    * `total` perguntas seguidas, uma resposta cada. Resultado: acertos de `total`. Cada tentativa
    * responde a pergunta da vez, e o feedback diz se acertou em `correct` (é o que o placar conta).
    */
-  | { type: "quiz"; total: number };
+  | { type: "quiz"; total: number }
+  /**
+   * Achar itens que valem pontos, sem errar nem tempo, até achar tudo ou encerrar. Resultado: a soma
+   * de `points` no feedback de cada tentativa.
+   */
+  | { type: "points" };
 
 export type AttemptRules = Extract<GameRules, { type: "attempts" }>;
 export type TimedRules = Extract<GameRules, { type: "timed" }>;
 export type UnlimitedRules = Extract<GameRules, { type: "unlimited" }>;
 export type QuizRules = Extract<GameRules, { type: "quiz" }>;
+export type PointsRules = Extract<GameRules, { type: "points" }>;
 
 export interface Guess<F = unknown> {
   input: string;

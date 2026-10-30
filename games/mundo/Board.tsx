@@ -138,6 +138,21 @@ export default function MundoBoard({
       {!finished && (
         <div className="sticky top-0 z-10 -mx-1 flex flex-wrap items-center gap-3 bg-background/95 px-1 py-3 backdrop-blur">
           <div className="flex min-w-0 flex-1 basis-80 items-center gap-3">
+            <div className="relative min-w-0 flex-1">
+              <FocusInput
+                ref={inputRef}
+                value={query}
+                disabled={!running}
+                placeholder={running ? (autocompleteEnabled ? "Digite um país" : "Nome completo do país") : "Clique em começar"}
+                aria-label="Nome do país"
+                autoComplete="off"
+                spellCheck={false}
+                className="h-14 rounded-md text-[17px]"
+                onChange={(e) => onType(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && onEnter()}
+              />
+              {hint && <p className="absolute left-1 top-full mt-1 text-xs text-muted-foreground">{hint}</p>}
+            </div>
             <button
               type="button"
               role="switch"
@@ -167,21 +182,6 @@ export default function MundoBoard({
                 <span className={cn("absolute left-0.5 top-0.5 size-5 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none", autocompleteEnabled && "translate-x-7")} />
               </span>
             </button>
-            <div className="relative min-w-0 flex-1">
-              <FocusInput
-                ref={inputRef}
-                value={query}
-                disabled={!running}
-                placeholder={running ? (autocompleteEnabled ? "Digite um país" : "Nome completo do país") : "Clique em começar"}
-                aria-label="Nome do país"
-                autoComplete="off"
-                spellCheck={false}
-                className="h-14 rounded-md text-[17px]"
-                onChange={(e) => onType(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && onEnter()}
-              />
-              {hint && <p className="absolute left-1 top-full mt-1 text-xs text-muted-foreground">{hint}</p>}
-            </div>
           </div>
           <div className="flex items-center gap-5">
             <Readout label="Países" value={`${found.size}/${rules.total}`} />

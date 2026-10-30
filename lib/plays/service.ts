@@ -139,14 +139,16 @@ export async function beginPlay(slug: string, dateKey: string, practice = false)
   return toView(slug, dateKey, puzzle, practice, stored);
 }
 
-/** Encerra a partida antes da hora: tempo esgotado (jogos com tempo) ou desistência. */
+/** Encerra a partida antes da hora: tempo esgotado (jogos com tempo), parar de jogar (pontos) ou desistência. */
 export async function finishPlay(slug: string, dateKey: string, practice = false): Promise<PlayView> {
   const store = storeFor(practice);
   const engine = await loadEngine(slug);
   const { puzzle, answer } = engine.createChallenge(dateKey);
-  // Com tempo, terminar é só o fim do relógio ("done"); nos outros, desistir é perder.
-  const status: PlayStatus = rulesOf(slug).type === "timed" ? "done" : "lost";
-  let stored = store.getPlay(slug, dateKey) ?? (rulesOf(slug).type === "timed" ? undefined : fresh(slug, dateKey));
+  // Com tempo, terminar é só o fim do relógio; por pontos, ficar com os que tem ("done").
+  // Nos outros, desistir é perder.
+  const type = rulesOf(slug).type;
+  const status: PlayStatus = type === "timed" || type === "points" ? "done" : "lost";
+  let stored = store.getPlay(slug, dateKey) ?? (type === "timed" ? undefined : fresh(slug, dateKey));
   if (stored?.status === "playing") stored = close(store, stored, status, engine.describeAnswer(answer));
   return toView(slug, dateKey, puzzle, practice, stored);
 }

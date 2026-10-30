@@ -68,7 +68,6 @@ export function AppShell({ children }: { children: ReactNode }) {
   const profileItem = {
     href: "/perfil",
     label: t.nav.profile,
-    heading: t.nav.you,
     leading: <UserRound size={17} strokeWidth={2} />,
   };
   // Os jogos da rodada como galhos de uma árvore (React Bits · Branched Menu).
@@ -90,8 +89,10 @@ export function AppShell({ children }: { children: ReactNode }) {
     // Assim a sidebar nunca sai do lugar nem aparece o "elástico" do scroll em volta dela.
     <div className="h-dvh overflow-hidden lg:grid lg:grid-cols-[248px_1fr]">
       <aside className="hidden h-dvh flex-col border-r border-sidebar-border bg-sidebar px-4 py-6 lg:flex">
-        <Logo className="px-3" />
-        <div className="mt-8">
+        <Logo className="shrink-0 px-3" />
+        {/* Só a navegação rola: com muitos jogos, logo e rodapé (estrela, relógio, tema) ficam parados. */}
+        <div className="-mx-4 mt-8 min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-4">
+          <SpotlightNav items={[profileItem]} activeHref={pathname} label={t.nav.profile} />
           <SpotlightNav items={[homeItem]} activeHref={pathname} label={t.nav.home} />
           <div className="mt-3 pl-2">
             <BranchedMenu
@@ -111,9 +112,8 @@ export function AppShell({ children }: { children: ReactNode }) {
               className="!w-full"
             />
           </div>
-          <SpotlightNav items={[profileItem]} activeHref={pathname} label={t.nav.profile} />
         </div>
-        <div className="mt-auto border-t border-sidebar-border px-3 pt-5">
+        <div className="shrink-0 border-t border-sidebar-border px-3 pt-5">
           <GitHubStar />
           <div className="flex items-center justify-between">
             <Countdown />
