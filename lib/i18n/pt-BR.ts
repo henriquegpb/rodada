@@ -12,7 +12,6 @@ export const ptBR = {
     games: "Rodada de hoje",
     gamesShort: "Jogos",
     profile: "Perfil",
-    you: "Você",
     theme: "Alternar tema",
     github: "Dê uma estrela no GitHub",
   },
