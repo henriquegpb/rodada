@@ -37,7 +37,9 @@ function useResult(game: GameDefinition, play: PlayView) {
         ? t.game.perfect
         : rules.type === "points"
           ? t.game.foundAll
-          : t.game.won
+          : rules.type === "lives"
+            ? t.game.solved
+            : t.game.won
     : scored
       ? t.game.timeUp
       : t.game.lost;
