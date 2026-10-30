@@ -20,6 +20,9 @@ const loaders: Record<string, () => Promise<{ engine: GameEngine }>> = {
   elo: () => import("./elo/engine"),
   sentido: () => import("./sentido/engine"),
   colmeia: () => import("./colmeia/engine"),
+  rainhas: () => import("./rainhas/engine"),
+  "rainhas-9": () => import("./rainhas-9/engine"),
+  "rainhas-10": () => import("./rainhas-10/engine"),
 };
 
 export const engineSlugs = Object.keys(loaders);

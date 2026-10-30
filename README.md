@@ -15,6 +15,7 @@ Jogos diários curtos num lugar só. Todo dia sai um desafio novo de cada jogo, 
 | **Mundo**    | Nomear os 197 países em 15 minutos. O mapa pinta cada acerto e a tabela mostra o progresso por continente. |
 | **Elo**      | Separar 16 palavras em 4 grupos de 4 com algo em comum, do grupo mais óbvio ao trocadilho. Sem limite de chutes; dá para desistir. |
 | **Colmeia**  | Spelling Bee em português: formar palavras com as 7 letras da colmeia, sempre com a do meio. Cada palavra vale pontos, que levam de Iniciante a Gênio; há dicas por letra e tamanho. Sem erro nem relógio: encerra quando quiser. |
+| **Rainhas**  | O Queens do LinkedIn: uma rainha por linha, coluna e cor, sem nenhuma encostar na outra. Tabuleiros de 8×8 (o da rodada), 9×9 e 10×10, cada um com seu desafio do dia; todos têm solução única e saem por dedução. Rainha errada custa uma das 3 vidas; há 3 dicas. |
 | **Sentido**  | Achar a palavra secreta pelo sentido: cada chute ganha uma posição numa lista de proximidade (1 é a resposta), como no Contexto. Tem dicas; sem limite de chutes; dá para desistir. |
 
 O foco do produto é a camada social: grupos, ranking diário e sequências. Esta primeira fase é **só o frontend**: as partidas ficam salvas no navegador. Backend, login e grupos são as próximas fases (veja o [roadmap](#roadmap)).
@@ -37,6 +38,7 @@ pnpm typecheck    # tipos das rotas + tsc
 pnpm data:build   # regenera palavras, países, silhuetas e bandeiras a partir das fontes
 pnpm data:sentido # regenera vocabulário e vetores do Sentido (baixa ~240 MB para data-raw/)
 pnpm data:colmeia # regenera as colmeias do dia
+pnpm data:rainhas # regenera os tabuleiros das Rainhas (alguns minutos)
 ```
 
 O `.env.example` lista as variáveis. Nenhuma é obrigatória para desenvolver.
@@ -66,11 +68,11 @@ scripts/build-data.ts gera os dados dos jogos a partir das fontes abertas
 
 **Engine e UI separadas.** Cada jogo tem uma `engine.ts`, que gera o desafio e valida as tentativas, e um `index.ts` com a interface. A UI nunca importa a engine: ela fala com `lib/plays/service.ts`. Hoje esse serviço chama a engine no próprio navegador. Na fase de backend ele vira chamadas a route handlers, e a resposta deixa de chegar ao cliente antes do fim do jogo. **Até lá, quem abrir o DevTools consegue achar a resposta.** Isso é aceitável enquanto não há ranking.
 
-**Tipos de jogo.** Cada jogo declara suas regras (`meta.rules`): **por tentativas** (Palavra, País, Mosaico, Rota: acertar em até N chutes), **sem limite** (Calor, Elo e Sentido: chutar até acertar, ou desistir), **por tempo** (Mundo: achar o máximo antes do relógio zerar) **quiz** (Capital e Bandeira: 10 perguntas seguidas, uma resposta cada) ou **por pontos** (Colmeia: cada achado vale pontos, até achar tudo ou encerrar). No jogo por tempo, o relógio começa ao clicar em "Começar" e continua correndo mesmo se a pessoa fechar a página.
+**Tipos de jogo.** Cada jogo declara suas regras (`meta.rules`): **por tentativas** (Palavra, País, Mosaico, Rota: acertar em até N chutes), **sem limite** (Calor, Elo e Sentido: chutar até acertar, ou desistir), **por tempo** (Mundo: achar o máximo antes do relógio zerar) **quiz** (Capital e Bandeira: 10 perguntas seguidas, uma resposta cada) ou **por pontos** (Colmeia: cada achado vale pontos, até achar tudo ou encerrar) ou **por vidas** (Rainhas: montar a solução peça por peça; cada peça errada custa uma vida). No jogo por tempo, o relógio começa ao clicar em "Começar" e continua correndo mesmo se a pessoa fechar a página.
 
-**Pontuação** (para o ranking dos grupos, que ainda não existe): nos jogos por tentativas, `tentativas máximas + 1 − tentativas usadas`, e derrota vale 0. No jogo por tempo, um ponto por item achado; no quiz, um por acerto; por pontos, os do próprio jogo. A interface ainda não mostra pontos.
+**Pontuação** (para o ranking dos grupos, que ainda não existe): nos jogos por tentativas, `tentativas máximas + 1 − tentativas usadas`, e derrota vale 0. No jogo por tempo, um ponto por item achado; no quiz, um por acerto; por pontos, os do próprio jogo; por vidas, um por vida que sobrou. A interface ainda não mostra pontos.
 
-**Sequências.** A sequência de cada jogo por tentativas conta vitórias seguidas, e perder zera. No jogo por tempo, no quiz e por pontos, conta dias jogados. A sequência geral conta dias seguidos com pelo menos um jogo terminado. As duas continuam vivas até o fim do dia seguinte.
+**Sequências.** A sequência de cada jogo por tentativas ou por vidas conta vitórias seguidas, e perder zera. No jogo por tempo, no quiz e por pontos, conta dias jogados. A sequência geral conta dias seguidos com pelo menos um jogo terminado. As duas continuam vivas até o fim do dia seguinte.
 
 ## Fontes dos dados e licenças
 

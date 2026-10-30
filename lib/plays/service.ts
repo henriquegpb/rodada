@@ -4,6 +4,7 @@ import { loadEngine, peekEngine } from "@/games/engines";
 import { getGame } from "@/games";
 import type { GameEngine, GameRules, Guess, PlayStatus, PlayView } from "@/games/types";
 import { addDays, challengeNumber } from "@/lib/daily/date";
+import { playCount } from "./result";
 import { dailyStore, practiceStore, type PlayStore, type StoredPlay } from "./store";
 
 /**
@@ -176,7 +177,9 @@ export async function submitGuess(
   if (!result.ok) return { error: result.error };
 
   const guesses = [...stored.guesses, { input, feedback: result.feedback }];
-  const outOfAttempts = rules.type === "attempts" && guesses.length >= rules.maxAttempts;
+  const outOfAttempts =
+    (rules.type === "attempts" && guesses.length >= rules.maxAttempts) ||
+    (rules.type === "lives" && playCount(rules, guesses) >= rules.lives);
   // No quiz a última resposta encerra; a engine marca `solved` quando acertou todas.
   const quizOver = rules.type === "quiz" && guesses.length >= rules.total;
   const status: PlayStatus = result.solved ? "won" : outOfAttempts ? "lost" : quizOver ? "done" : "playing";
