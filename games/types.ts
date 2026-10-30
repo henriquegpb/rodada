@@ -88,6 +88,8 @@ export interface GameMeta<R extends GameRules = GameRules> {
    * desafio, partida e estatísticas próprios, mas não aparecem na rodada: ficam numa aba do jogo pai.
    */
   parent?: string;
+  /** Nome curto na aba de modos ("9×9"); sem ele, a aba usa `name`. */
+  modeLabel?: string;
   /** O tabuleiro já mostra a resposta no fim; o resultado não repete o "Era …". */
   hideAnswer?: boolean;
   /** Dia em que o jogo entrou no site (YYYY-MM-DD). Sem ele, a estreia do Rodada (EPOCH_DATE). */

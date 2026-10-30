@@ -64,15 +64,15 @@ export function ModeTabs({ slug, className }: { slug: string; className?: string
             i === index ? "text-foreground" : "text-muted-foreground hover:text-foreground",
           )}
         >
-          <meta.icon size={16} strokeWidth={2} className={i === index ? "text-primary" : ""} />
-          {meta.name}
+          <meta.icon size={16} strokeWidth={2} style={i === index ? { color: meta.color } : undefined} />
+          {meta.modeLabel ?? meta.name}
         </Link>
       ))}
       <span
         ref={barRef}
         aria-hidden="true"
-        className="pointer-events-none absolute bottom-[-2px] left-1 h-[3px] rounded-full bg-[#ff6a1a] transition-transform duration-[450ms] ease-[cubic-bezier(.22,1,.36,1)]"
-        style={{ width: `calc(${100 / n}% - 8px)`, transform: at(index) }}
+        className="pointer-events-none absolute bottom-[-2px] left-1 h-[3px] rounded-full transition-transform duration-[450ms] ease-[cubic-bezier(.22,1,.36,1)]"
+        style={{ width: `calc(${100 / n}% - 8px)`, transform: at(index), background: modes[index]?.meta.color }}
       />
     </nav>
   );
