@@ -27,6 +27,7 @@ import { join } from "node:path";
 import { createInterface } from "node:readline";
 import { createGunzip } from "node:zlib";
 import { lemmaCandidates } from "../games/sentido/forms";
+import { type Entry, isCurrentBrazilian } from "./wiktionary";
 
 const ROOT = join(import.meta.dirname, "..");
 const RAW = join(ROOT, "data-raw", "sentido");
@@ -50,17 +51,19 @@ const WORD = /^[a-zà-úç]+(-[a-zà-úç]+)*$/;
 const KINDS = new Set(["noun", "adj", "verb", "adv"]);
 
 /**
- * Lemas (com algum sentido próprio) e, para cada forma flexionada, de que lemas ela vem.
- * Grafia alternativa ("sector", "controle") conta como lema, não como forma.
+ * Lemas (com algum sentido próprio no Brasil de hoje) e, para cada forma flexionada, de que lemas
+ * ela vem. Grafia alternativa atual ("controle") conta como lema; grafia anterior ao acordo
+ * ("projecção") e uso só de Portugal ("ecrã") ficam de fora, para nunca virem como dica.
  */
 async function readWiktionary(path: string) {
   const lemmas = new Set<string>();
   const formOf = new Map<string, Set<string>>();
   const lines = createInterface({ input: createReadStream(path).pipe(createGunzip()) });
   for await (const line of lines) {
-    const entry: { word: string; pos?: string; senses?: { form_of?: { word: string }[] }[] } = JSON.parse(line);
+    const entry: Entry = JSON.parse(line);
     if (!entry.pos || !KINDS.has(entry.pos)) continue;
     for (const sense of entry.senses ?? []) {
+      if (!isCurrentBrazilian(sense)) continue;
       if (!sense.form_of) lemmas.add(entry.word);
       for (const { word } of sense.form_of ?? []) {
         if (!formOf.has(entry.word)) formOf.set(entry.word, new Set());
@@ -141,7 +144,8 @@ async function main() {
     MATRIX_OFFSET,
     MATRIX_OFFSET + TOP_WORDS * DIMS * 4 - 1,
   ]);
-  const wikiPath = await download("wiktionary-pt.jsonl.gz", WIKTIONARY);
+  // Fica em data-raw/, fora da pasta do Sentido: o build da Colmeia usa o mesmo arquivo.
+  const wikiPath = await download("../wiktionary-pt.jsonl.gz", WIKTIONARY);
 
   const tok: { vocab: string[]; stop_words: string[] } = JSON.parse(readFileSync(tokPath, "utf8"));
   const matrix = new Float32Array(readFileSync(matPath).buffer.slice(0));

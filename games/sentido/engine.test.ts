@@ -101,6 +101,11 @@ describe("dados do Sentido", () => {
     expect(new Set(ANSWERS).size).toBe(ANSWERS.length);
   });
 
+  it("sem grafia anterior ao acordo nem uso só de Portugal, que poderiam virar dica", () => {
+    for (const w of ["projecção", "acção", "tecto", "ecrã"]) expect(index.has(w), w).toBe(false);
+    expect(index.has("mapa")).toBe(true);
+  });
+
   it("vetores e vocabulário têm o mesmo tamanho", () => {
     expect(atob(data.vectors).length).toBe(data.words.length * data.dims);
     expect(data.words.length).toBeLessThan(65_536);
