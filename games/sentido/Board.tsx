@@ -32,33 +32,44 @@ export function SentidoBoard({ play, submitGuess, finish }: BoardProps<SentidoPu
   return (
     <div className="flex flex-col gap-5">
       {playing ? (
-        <form
-          className="relative"
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (query.trim()) send(query);
-          }}
-        >
-          <FocusInput
-            ref={inputRef}
-            value={query}
-            placeholder="Digite uma palavra"
-            aria-label="Palavra"
-            autoComplete="off"
-            autoCapitalize="none"
-            spellCheck={false}
-            className="h-14 rounded-md pr-14 text-[17px]"
-            onChange={(e) => setQuery(e.target.value)}
-          />
-          <button
-            type="submit"
-            disabled={busy || !query.trim()}
-            className="absolute right-2 top-2 grid size-10 place-items-center rounded-[5px] bg-primary text-primary-foreground transition-[opacity,transform] active:scale-95 disabled:opacity-30"
-            aria-label="Chutar"
+        <div className="flex gap-2">
+          <form
+            className="relative min-w-0 flex-1"
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (query.trim()) send(query);
+            }}
           >
-            <CornerDownLeft size={18} strokeWidth={2.5} />
+            <FocusInput
+              ref={inputRef}
+              value={query}
+              placeholder="Digite uma palavra"
+              aria-label="Palavra"
+              autoComplete="off"
+              autoCapitalize="none"
+              spellCheck={false}
+              className="h-14 rounded-md pr-14 text-[17px]"
+              onChange={(e) => setQuery(e.target.value)}
+            />
+            <button
+              type="submit"
+              disabled={busy || !query.trim()}
+              className="absolute right-2 top-2 grid size-10 place-items-center rounded-[5px] bg-primary text-primary-foreground transition-[opacity,transform] active:scale-95 disabled:opacity-30"
+              aria-label="Chutar"
+            >
+              <CornerDownLeft size={18} strokeWidth={2.5} />
+            </button>
+          </form>
+          {/* A dica fica junto do campo: é o que se pede quando trava, sem rolar a lista. */}
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => send(HINT)}
+            className="flex h-14 shrink-0 items-center gap-1.5 rounded-md border border-border px-4 text-sm font-semibold transition-colors hover:bg-secondary"
+          >
+            <Lightbulb size={16} /> Dica
           </button>
-        </form>
+        </div>
       ) : (
         <p className="text-center text-[15px]">
           {play.status === "won" ? (
@@ -95,26 +106,14 @@ export function SentidoBoard({ play, submitGuess, finish }: BoardProps<SentidoPu
         </section>
       )}
 
-      {playing && (
-        <div className="flex flex-wrap items-center justify-center gap-2">
-          <button
-            type="button"
-            disabled={busy}
-            onClick={() => send(HINT)}
-            className="flex h-10 items-center gap-1.5 rounded-md px-3 text-sm font-semibold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-          >
-            <Lightbulb size={15} /> Dica
-          </button>
-          {guesses.length > 0 && (
-            <button
-              type="button"
-              onClick={() => finish()}
-              className="flex h-10 items-center gap-1.5 rounded-md px-3 text-sm font-semibold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-            >
-              <Flag size={15} /> Desistir e ver a resposta
-            </button>
-          )}
-        </div>
+      {playing && guesses.length > 0 && (
+        <button
+          type="button"
+          onClick={() => finish()}
+          className="mx-auto flex h-10 items-center gap-1.5 rounded-md px-3 text-sm font-semibold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+        >
+          <Flag size={15} /> Desistir e ver a resposta
+        </button>
       )}
     </div>
   );
