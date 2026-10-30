@@ -89,8 +89,8 @@ export function GameScreen({ slug }: { slug: string }) {
     const ended = await finishPlay(slug, play.dateKey, practice);
     setPlay(ended);
     if (ended.status === "playing") return;
-    // Sem tempo, encerrar antes da hora é desistir.
-    if (rules.type !== "timed") trackEvent("game_given_up", { game: slug, practice, attempts: ended.guesses.length });
+    // Sem tempo e sem pontos, encerrar antes da hora é desistir.
+    if (rules.type !== "timed" && rules.type !== "points") trackEvent("game_given_up", { game: slug, practice, attempts: ended.guesses.length });
     trackFinished(ended);
     setDialog("result");
   }

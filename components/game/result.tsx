@@ -29,13 +29,15 @@ function useResult(game: GameDefinition, play: PlayView) {
   const next =
     (won && modeOpen ? nextMode : undefined) ??
     round.find((r) => r.meta.slug !== game.meta.slug && !isDone(r.status))?.meta;
-  const scored = rules.type === "timed" || rules.type === "quiz";
+  const scored = rules.type === "timed" || rules.type === "quiz" || rules.type === "points";
   const headline = won
     ? rules.type === "timed"
       ? t.game.completed
       : rules.type === "quiz"
         ? t.game.perfect
-        : t.game.won
+        : rules.type === "points"
+          ? t.game.foundAll
+          : t.game.won
     : scored
       ? t.game.timeUp
       : t.game.lost;
