@@ -70,6 +70,8 @@ export interface GameEngine<P = unknown, A = unknown, F = unknown> {
   checkGuess(input: string, answer: A, previous: readonly Guess<F>[]): GuessCheck<F>;
   /** Texto da resposta revelado no fim da partida; vazio quando não há resposta secreta. */
   describeAnswer(answer: A): string;
+  /** Jogos por pontos: o total que o desafio vale, base da Nota (veja `gradePlay`). */
+  maxPoints?(puzzle: P): number;
 }
 
 export interface GameMeta<R extends GameRules = GameRules> {

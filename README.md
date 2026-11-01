@@ -18,7 +18,7 @@ Jogos diários curtos num lugar só. Todo dia sai um desafio novo de cada jogo, 
 | **Rainhas**  | O Queens do LinkedIn: uma rainha por linha, coluna e cor, sem nenhuma encostar na outra. Tabuleiros de 8×8 (o da rodada), 9×9 e 10×10, cada um com seu desafio do dia; todos têm solução única e saem por dedução. Rainha errada custa uma das 3 vidas; há 3 dicas. |
 | **Sentido**  | Achar a palavra secreta pelo sentido: cada chute ganha uma posição numa lista de proximidade (1 é a resposta), como no Contexto. Tem dicas; sem limite de chutes; dá para desistir. |
 
-O foco do produto é a camada social: grupos, ranking diário e sequências. Esta primeira fase é **só o frontend**: as partidas ficam salvas no navegador. Backend, login e grupos são as próximas fases (veja o [roadmap](#roadmap)).
+O foco do produto é a camada social: grupos, ranking diário e sequências. As partidas ficam salvas no navegador e, com login, também no servidor, que mantém Contas, Grupos, Rankings e Conquistas. Veja [docs/backend.md](docs/backend.md) para subir o backend e usar a API; o vocabulário está no [GLOSSARY.md](GLOSSARY.md).
 
 ## Rodando localmente
 
@@ -39,9 +39,11 @@ pnpm data:build   # regenera palavras, países, silhuetas e bandeiras a partir d
 pnpm data:sentido # regenera vocabulário e vetores do Sentido (baixa ~240 MB para data-raw/)
 pnpm data:colmeia # regenera as colmeias do dia
 pnpm data:rainhas # regenera os tabuleiros das Rainhas (alguns minutos)
+pnpm db:migrate   # aplica as migrações do banco no DATABASE_URL
+pnpm db:generate  # gera uma migração depois de mudar server/db/schema.ts
 ```
 
-O `.env.example` lista as variáveis. Nenhuma é obrigatória para desenvolver.
+O `.env.example` lista as variáveis. Para jogar, nenhuma é obrigatória; o login e os Rankings precisam de um Postgres (veja [docs/backend.md](docs/backend.md)).
 
 ## Como funciona
 
@@ -56,21 +58,24 @@ games/                um módulo por jogo + registro (veja CONTRIBUTING.md)
 lib/
   daily/              data em America/Sao_Paulo, seed, sorteio do dia
   plays/              partidas salvas no navegador + serviço que fala com a engine
-  stats.ts scoring.ts estatísticas, sequências e pontuação
+  stats.ts scoring.ts estatísticas, sequências, pontuação e Nota
+  achievements.ts     registro das Conquistas e seus Níveis
   i18n/               todos os textos da plataforma (PT-BR)
 components/
   microkit/           microinterações do Microkit, adaptadas
   ui/                 shadcn/ui
+server/               backend: banco, login, partidas, Rankings, Grupos e Perfis (veja docs/backend.md)
+app/api/              rotas HTTP do backend
 scripts/build-data.ts gera os dados dos jogos a partir das fontes abertas
 ```
 
 **Desafio do dia.** `pickDaily` percorre uma permutação da lista de respostas, embaralhada com uma seed. Assim não há repetição até a lista acabar. O resultado é determinístico para a mesma data e o mesmo segredo (`NEXT_PUBLIC_DAILY_SEED`). O segredo existe porque o código e as listas são abertos: sem ele, qualquer pessoa calcularia a resposta de amanhã.
 
-**Engine e UI separadas.** Cada jogo tem uma `engine.ts`, que gera o desafio e valida as tentativas, e um `index.ts` com a interface. A UI nunca importa a engine: ela fala com `lib/plays/service.ts`. Hoje esse serviço chama a engine no próprio navegador. Na fase de backend ele vira chamadas a route handlers, e a resposta deixa de chegar ao cliente antes do fim do jogo. **Até lá, quem abrir o DevTools consegue achar a resposta.** Isso é aceitável enquanto não há ranking.
+**Engine e UI separadas.** Cada jogo tem uma `engine.ts`, que gera o desafio e valida as tentativas, e um `index.ts` com a interface. A UI nunca importa a engine: ela fala com `lib/plays/service.ts`, que chama a engine no próprio navegador. Ao terminar, a partida do dia vai para o servidor, que refaz cada chute com a mesma engine antes de dar a Nota ([ADR 0001](docs/adr/0001-servidor-refaz-a-partida.md)). **A resposta ainda chega ao navegador, então quem abrir o DevTools consegue achá-la.** O próximo passo é gerar o desafio só no servidor.
 
 **Tipos de jogo.** Cada jogo declara suas regras (`meta.rules`): **por tentativas** (Palavra, País, Mosaico, Rota: acertar em até N chutes), **sem limite** (Calor, Elo e Sentido: chutar até acertar, ou desistir), **por tempo** (Mundo: achar o máximo antes do relógio zerar) **quiz** (Capital e Bandeira: 10 perguntas seguidas, uma resposta cada) ou **por pontos** (Colmeia: cada achado vale pontos, até achar tudo ou encerrar) ou **por vidas** (Rainhas: montar a solução peça por peça; cada peça errada custa uma vida). No jogo por tempo, o relógio começa ao clicar em "Começar" e continua correndo mesmo se a pessoa fechar a página.
 
-**Pontuação** (para o ranking dos grupos, que ainda não existe): nos jogos por tentativas, `tentativas máximas + 1 − tentativas usadas`, e derrota vale 0. No jogo por tempo, um ponto por item achado; no quiz, um por acerto; por pontos, os do próprio jogo; por vidas, um por vida que sobrou. A interface ainda não mostra pontos.
+**Pontuação**: nos jogos por tentativas, `tentativas máximas + 1 − tentativas usadas`, e derrota vale 0. No jogo por tempo, um ponto por item achado; no quiz, um por acerto; por pontos, os do próprio jogo; por vidas, um por vida que sobrou. Para os Rankings, esse Score bruto vira a **Nota** (0–100 do máximo possível no desafio), e o **Score diário** é a soma das Notas dos jogos da Rodada ([ADR 0002](docs/adr/0002-nota-absoluta-e-media-de-30-dias.md)).
 
 **Sequências.** A sequência de cada jogo por tentativas ou por vidas conta vitórias seguidas, e perder zera. No jogo por tempo, no quiz e por pontos, conta dias jogados. A sequência geral conta dias seguidos com pelo menos um jogo terminado. As duas continuam vivas até o fim do dia seguinte.
 

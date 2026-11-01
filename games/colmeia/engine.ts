@@ -64,4 +64,6 @@ export const engine: GameEngine<ColmeiaPuzzle, ColmeiaEntry, ColmeiaFeedback> = 
 
   // O tabuleiro mostra no fim as palavras que faltaram.
   describeAnswer: (entry) => entry.words.join(", "),
+
+  maxPoints: (puzzle) => puzzle.maxPoints,
 };

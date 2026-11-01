@@ -43,3 +43,5 @@ next-env.d.ts
 
 # fontes brutas baixadas por `pnpm data:build`
 /data-raw/
+docs/
+GLOSSARY.md

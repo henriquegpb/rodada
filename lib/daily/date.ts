@@ -6,6 +6,9 @@ export const EPOCH_DATE = "2026-10-22";
 
 const DAY_MS = 86_400_000;
 
+/** É uma data no formato YYYY-MM-DD (o `dateKey`)? */
+export const isDateKey = (value: unknown): value is string => typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value);
+
 /** Data atual (YYYY-MM-DD) no fuso do desafio. */
 export function getDateKey(now: Date = new Date()): string {
   return new Intl.DateTimeFormat("en-CA", {
