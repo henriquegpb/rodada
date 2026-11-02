@@ -64,7 +64,7 @@ export function SpotlightNav({
     <nav ref={navRef} aria-label={label} className="relative flex flex-col gap-px">
       <span
         ref={barRef}
-        className="pointer-events-none absolute -left-4 w-[3px] rounded-r-sm bg-[#ff6a1a] opacity-0 shadow-[2px_0_5px_rgba(255,106,26,.7),4px_0_11px_rgba(255,106,26,.35)] transition-[top,height,opacity] duration-300 ease-[cubic-bezier(.4,0,.2,1)]"
+        className="pointer-events-none absolute -left-2.5 w-[3px] rounded-full bg-[#ff6a1a] opacity-0 shadow-[2px_0_5px_rgba(255,106,26,.7),4px_0_11px_rgba(255,106,26,.35)] transition-[top,height,opacity] duration-300 ease-[cubic-bezier(.4,0,.2,1)]"
       />
       {items.map(({ href, label, leading, trailing, heading, action, children }, index) => (
         <Fragment key={href}>
@@ -81,13 +81,22 @@ export function SpotlightNav({
               }}
               aria-current={active === index ? "page" : undefined}
               className={cn(
-                "flex h-10 items-center gap-3 rounded-md px-3 text-[15px] font-medium transition-colors duration-200",
-                active === index
-                  ? "bg-sidebar-accent text-sidebar-foreground"
-                  : "text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground",
+                "group flex h-10 items-center gap-3 rounded-md px-3 text-[15px] font-medium transition-colors duration-200",
+                // Sem caixa: o ativo se marca pelo trilho, pelo texto e pelo ícone acesos.
+                active === index ? "text-sidebar-foreground" : "text-muted-foreground hover:text-sidebar-foreground",
               )}
             >
-              {leading}
+              {leading && (
+                // Ícone aceso só no item ativo; os outros ficam apagados até o hover.
+                <span
+                  className={cn(
+                    "grid shrink-0 place-items-center transition-colors duration-200",
+                    active === index ? "text-sidebar-foreground" : "text-muted-foreground/50 group-hover:text-sidebar-foreground",
+                  )}
+                >
+                  {leading}
+                </span>
+              )}
               <span className="truncate">{label}</span>
               {trailing && <span className="ml-auto shrink-0">{trailing}</span>}
             </Link>
