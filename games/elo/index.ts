@@ -13,7 +13,8 @@ export const elo: GameDefinition<EloPuzzle, EloFeedback, UnlimitedRules> = {
     tagline: "16 palavras, 4 grupos",
     description: "Separe as 16 palavras em 4 grupos de 4 que têm algo em comum.",
     icon: Link2,
-    rules: { type: "unlimited", minGuesses: 4 },
+    // 4 chutes (um por grupo) é o mínimo. Cai devagar até 8 chutes, depois rápido até 12.
+    rules: { type: "unlimited", curve: [[4, 100], [8, 80], [12, 25], [15, 10]] },
     color: "#12b5c9",
     hideAnswer: true,
     howToPlay: [

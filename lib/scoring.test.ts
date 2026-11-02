@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { getGame } from "@/games";
 import type { GameRules } from "@/games/types";
 import { gradePlay, maxScore } from "./scoring";
 
@@ -30,13 +31,18 @@ describe("Nota", () => {
     expect(gradePlay(lives, "won", 1)).toBe(67);
   });
 
-  it("sem limite, o mínimo de chutes do jogo vale 100", () => {
-    const elo: GameRules = { type: "unlimited", minGuesses: 4 };
-    expect(gradePlay(elo, "won", 4)).toBe(100);
-    expect(gradePlay(elo, "won", 5)).toBe(90);
-    expect(gradePlay(elo, "won", 8)).toBe(60);
-    expect(gradePlay(elo, "won", 40)).toBe(10);
+  it("sem limite, segue a curva do jogo entre os pontos e fica no último depois dele", () => {
+    const elo: GameRules = { type: "unlimited", curve: [[4, 100], [8, 80], [12, 25], [15, 10]] };
+    const notas = [4, 6, 8, 9, 10, 11, 12, 13, 15, 40].map((n) => gradePlay(elo, "won", n));
+    expect(notas).toEqual([100, 90, 80, 66, 53, 39, 25, 20, 10, 10]);
+    expect(gradePlay(elo, "won", 3)).toBe(100);
     expect(gradePlay(elo, "lost", 7)).toBe(0);
+  });
+
+  it("Calor cai 5 por chute até 6 chutes e chega a 10 com 12", () => {
+    const { rules } = getGame("calor")!.meta;
+    const notas = [1, 2, 6, 7, 8, 9, 10, 11, 12, 18].map((n) => gradePlay(rules, "won", n));
+    expect(notas).toEqual([100, 95, 75, 64, 53, 43, 32, 21, 10, 10]);
   });
 
   it("derrota e desistência valem zero onde é preciso acertar", () => {

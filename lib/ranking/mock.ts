@@ -2,7 +2,7 @@ import { games } from "@/games";
 import type { GameRules, PlayStatus } from "@/games/types";
 import { createRng, type Rng } from "@/lib/daily/seed";
 import { normalize } from "@/lib/normalize";
-import { gradePlay } from "@/lib/scoring";
+import { gradePlay, UNLIMITED_CURVE } from "@/lib/scoring";
 import type { GroupDetail, GroupSummary } from "@/server/groups";
 import type { Ranking, RankingRow } from "@/server/rankings";
 
@@ -49,7 +49,7 @@ function fakePlay(rules: GameRules, rng: Rng): { status: Exclude<PlayStatus, "pl
     case "attempts":
       return win ? { status: "won", count: int(rng, 1, rules.maxAttempts) } : { status: "lost", count: rules.maxAttempts };
     case "unlimited":
-      return win ? { status: "won", count: int(rng, rules.minGuesses ?? 1, 25) } : { status: "lost", count: int(rng, 3, 40) };
+      return win ? { status: "won", count: int(rng, (rules.curve ?? UNLIMITED_CURVE)[0][0], 25) } : { status: "lost", count: int(rng, 3, 40) };
     case "lives":
       return win ? { status: "won", count: int(rng, 0, rules.lives - 1) } : { status: "lost", count: rules.lives };
     case "points":
