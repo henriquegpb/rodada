@@ -13,7 +13,7 @@ export const elo: GameDefinition<EloPuzzle, EloFeedback, UnlimitedRules> = {
     tagline: "16 palavras, 4 grupos",
     description: "Separe as 16 palavras em 4 grupos de 4 que têm algo em comum.",
     icon: Link2,
-    rules: { type: "unlimited" },
+    rules: { type: "unlimited", minGuesses: 4 },
     color: "#12b5c9",
     hideAnswer: true,
     howToPlay: [

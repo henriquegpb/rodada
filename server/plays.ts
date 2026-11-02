@@ -1,4 +1,4 @@
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, sql, TransactionRollbackError, type SQL } from "drizzle-orm";
 import { getGame, roundGames } from "@/games";
 import { loadEngine } from "@/games/engines";
 import type { GameDefinition, PlayStatus } from "@/games/types";
@@ -17,7 +17,7 @@ import { AppError } from "./errors";
  * Conquistas, numa transação só.
  */
 
-/** Os jogos que somam no Score diário; os Modos ficam de fora. */
+/** Os jogos da Rodada, que contam para a Rodada completa; o Score diário soma também os Modos. */
 export const ROUND_SLUGS = roundGames.map((g) => g.meta.slug);
 
 /** Quem termina às 23:59 ainda consegue enviar a partida de ontem por alguns minutos. */
@@ -103,22 +103,31 @@ const inRound = (column: typeof plays.slug) =>
   )})`;
 
 /**
- * Refaz o Score diário de um dia a partir das partidas gravadas. `updated_at` é a última partida da
- * Rodada (desempate de quem chegou primeiro); um Modo jogado depois não empurra ninguém para trás.
+ * Refaz o Score diário dos dias com partidas que passam em `where`: a soma das Notas de todos os
+ * jogos, Modos inclusive. `updated_at` é a última partida (desempate de quem chegou primeiro).
+ * Devolve quantos dias mudaram.
  */
-async function refreshDay(db: Db, accountId: string, dateKey: string) {
-  await db.execute(sql`
+async function refreshDays(db: Db, where: SQL): Promise<number> {
+  const result = (await db.execute(sql`
     insert into ${dailyScores} (account_id, date_key, score, round_finished, updated_at)
-    select ${accountId}, ${dateKey},
-      coalesce(sum(${plays.nota}) filter (where ${inRound(plays.slug)}), 0)::int,
+    select ${plays.accountId}, ${plays.dateKey},
+      coalesce(sum(${plays.nota}), 0)::int,
       (count(*) filter (where ${inRound(plays.slug)}))::int,
-      coalesce(max(${plays.finishedAt}) filter (where ${inRound(plays.slug)}), max(${plays.finishedAt}))
+      max(${plays.finishedAt})
     from ${plays}
-    where ${plays.accountId} = ${accountId} and ${plays.dateKey} = ${dateKey}
+    where ${where}
+    group by ${plays.accountId}, ${plays.dateKey}
     on conflict (account_id, date_key) do update
       set score = excluded.score, round_finished = excluded.round_finished, updated_at = excluded.updated_at
-  `);
+      where (${dailyScores.score}, ${dailyScores.roundFinished}, ${dailyScores.updatedAt})
+        is distinct from (excluded.score, excluded.round_finished, excluded.updated_at)
+    returning 1
+  `)) as unknown as { rows: unknown[] };
+  return result.rows.length;
 }
+
+const refreshDay = (db: Db, accountId: string, dateKey: string) =>
+  refreshDays(db, sql`${plays.accountId} = ${accountId} and ${plays.dateKey} = ${dateKey}`);
 
 export async function readCounters(db: Db, accountId: string): Promise<Counters> {
   const [row] = await db.select().from(accountCounters).where(eq(accountCounters.accountId, accountId));
@@ -293,4 +302,81 @@ export async function importPlays(db: Db, accountId: string, input: unknown, now
     if (dates.size) await refreshCounters(tx, accountId, now);
     return { accepted, rejected: items.length - accepted };
   });
+}
+
+export interface Recompute {
+  /** Partidas cuja Nota (ou Score bruto) mudou, por jogo. */
+  plays: Record<string, number>;
+  /** Dias de alguma Conta cujo Score diário mudou. */
+  days: number;
+  /** Contas com os contadores das Conquistas refeitos. */
+  accounts: number;
+}
+
+/**
+ * Depois de mudar as regras de pontuação: recalcula Score bruto e Nota de todas as partidas a
+ * partir do placar gravado (sem refazer os chutes), o Score diário de todos os dias e os contadores
+ * das Conquistas de quem teve partida mudada. Sem `apply`, desfaz tudo no fim e só conta.
+ */
+export async function recomputeScores(db: Db, { apply = false, now = new Date() } = {}): Promise<Recompute> {
+  let report: Recompute = { plays: {}, days: 0, accounts: 0 };
+  try {
+    await db.transaction(async (tx) => {
+      const rows = await tx
+        .select({
+          accountId: plays.accountId,
+          slug: plays.slug,
+          dateKey: plays.dateKey,
+          status: plays.status,
+          count: plays.count,
+          score: plays.score,
+          nota: plays.nota,
+        })
+        .from(plays);
+      const changed: (typeof rows)[number][] = [];
+      for (const row of rows) {
+        const game = getGame(row.slug);
+        if (!game) continue;
+        const { rules } = game.meta;
+        const pointsMax = rules.type === "points" ? await pointsMaxOf(row.slug, row.dateKey) : undefined;
+        const score = scorePlay(rules, row.status, row.count);
+        const nota = gradePlay(rules, row.status, row.count, pointsMax);
+        if (score !== row.score || nota !== row.nota) changed.push({ ...row, score, nota });
+      }
+
+      for (let i = 0; i < changed.length; i += 500) {
+        const values = changed
+          .slice(i, i + 500)
+          .map((p) => sql`(${p.accountId}, ${p.slug}, ${p.dateKey}, ${p.score}::int, ${p.nota}::int)`);
+        await tx.execute(sql`
+          update ${plays} set score = v.score, nota = v.nota
+          from (values ${sql.join(values, sql`, `)}) as v(account_id, slug, date_key, score, nota)
+          where ${plays.accountId} = v.account_id and ${plays.slug} = v.slug and ${plays.dateKey} = v.date_key
+        `);
+      }
+      const days = await refreshDays(tx, sql`true`);
+      const accounts = [...new Set(changed.map((p) => p.accountId))];
+      for (const accountId of accounts) await refreshCounters(tx, accountId, now);
+
+      const bySlug: Record<string, number> = {};
+      for (const p of changed) bySlug[p.slug] = (bySlug[p.slug] ?? 0) + 1;
+      report = { plays: bySlug, days, accounts: accounts.length };
+      if (!apply) tx.rollback();
+    });
+  } catch (error) {
+    if (!(error instanceof TransactionRollbackError)) throw error;
+  }
+  return report;
+}
+
+const pointsMaxCache = new Map<string, number | undefined>();
+
+/** O máximo de pontos do desafio de um dia (jogos por pontos), lembrado entre as partidas. */
+async function pointsMaxOf(slug: string, dateKey: string) {
+  const key = `${slug}:${dateKey}`;
+  if (!pointsMaxCache.has(key)) {
+    const engine = await loadEngine(slug);
+    pointsMaxCache.set(key, engine.maxPoints?.(engine.createChallenge(dateKey).puzzle));
+  }
+  return pointsMaxCache.get(key);
 }

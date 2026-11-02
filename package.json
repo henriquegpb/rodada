@@ -15,7 +15,8 @@
     "data:colmeia": "tsx scripts/build-colmeia.ts",
     "data:rainhas": "tsx scripts/build-rainhas.ts",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate"
+    "db:migrate": "drizzle-kit migrate",
+    "db:recompute": "tsx scripts/recompute-scores.ts"
   },
   "dependencies": {
     "@hugeicons/core-free-icons": "^4.3.5",

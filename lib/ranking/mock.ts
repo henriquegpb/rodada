@@ -1,4 +1,4 @@
-import { games, roundGames } from "@/games";
+import { games } from "@/games";
 import type { GameRules, PlayStatus } from "@/games/types";
 import { createRng, type Rng } from "@/lib/daily/seed";
 import { normalize } from "@/lib/normalize";
@@ -49,7 +49,7 @@ function fakePlay(rules: GameRules, rng: Rng): { status: Exclude<PlayStatus, "pl
     case "attempts":
       return win ? { status: "won", count: int(rng, 1, rules.maxAttempts) } : { status: "lost", count: rules.maxAttempts };
     case "unlimited":
-      return win ? { status: "won", count: int(rng, 1, 25) } : { status: "lost", count: int(rng, 3, 40) };
+      return win ? { status: "won", count: int(rng, rules.minGuesses ?? 1, 25) } : { status: "lost", count: int(rng, 3, 40) };
     case "lives":
       return win ? { status: "won", count: int(rng, 0, rules.lives - 1) } : { status: "lost", count: rules.lives };
     case "points":
@@ -97,9 +97,9 @@ export function mockBoard(dateKey: string, slug?: string, groupId?: string): Ran
       const play = plays[slug]?.get(i);
       return { i, total: play?.nota ?? 0, played: Boolean(play), count: play?.count ?? null, status: play?.status ?? null };
     }
-    const round = roundGames.map((g) => plays[g.meta.slug].get(i)).filter((p) => p !== undefined);
-    const total = round.reduce((sum, p) => sum + p.nota, 0);
-    return { i, total, played: round.length > 0, count: round.length || null, status: null };
+    const day = games.map((g) => plays[g.meta.slug].get(i)).filter((p) => p !== undefined);
+    const total = day.reduce((sum, p) => sum + p.nota, 0);
+    return { i, total, played: day.length > 0, count: day.length || null, status: null };
   });
   // Fora de um Grupo só aparece quem jogou; no Grupo, todos os membros.
   if (!group) lines = lines.filter((l) => l.played);

@@ -1,9 +1,11 @@
+import { and, eq } from "drizzle-orm";
 import { beforeEach, describe, expect, it } from "vitest";
 import { engine as palavra } from "@/games/palavra/engine";
 import { engine as dupla } from "@/games/dupla/engine";
 import type { Db } from "./db";
+import { dailyScores, plays } from "./db/schema";
 import { createAccount, createTestDb } from "./db/testing";
-import { importPlays, readCounters, registerPlay, startTimedPlay } from "./plays";
+import { importPlays, readCounters, recomputeScores, registerPlay, startTimedPlay } from "./plays";
 
 const DAY = "2026-10-22";
 /** Meio-dia em Brasília no DAY. */
@@ -64,12 +66,12 @@ describe("registerPlay", () => {
     await expect(registerPlay(db, ana, play, at("2026-10-23T03:02:00Z"))).resolves.toMatchObject({ play: { nota: 100 } });
   });
 
-  it("Modo tem Nota mas não soma no Score diário", async () => {
+  it("Modo soma no Score diário, mas não conta para a Rodada completa", async () => {
     const { answer } = dupla.createChallenge(DAY);
     const receipt = await registerPlay(db, ana, { slug: "dupla", dateKey: DAY, guesses: answer as string[] }, NOON);
     expect(receipt.play.status).toBe("won");
     expect(receipt.play.nota).toBeGreaterThan(0);
-    expect(receipt.daily).toEqual({ score: 0, roundFinished: 0 });
+    expect(receipt.daily).toEqual({ score: receipt.play.nota, roundFinished: 0 });
   });
 
   it("avisa as Conquistas que subiram de Nível", async () => {
@@ -148,5 +150,37 @@ describe("importPlays", () => {
     const result = await importPlays(db, ana, { plays: [{ slug: "palavra", dateKey: D1, guesses: [miss(D1)] }] }, later);
     expect(result).toEqual({ accepted: 0, rejected: 1 });
     expect((await readCounters(db, ana)).byGame.palavra.perfect).toBe(1);
+  });
+});
+
+describe("recomputeScores", () => {
+  /** O que a regra antiga deixou gravado: Elo em 4 chutes valendo 70 e o Modo fora do Score diário. */
+  async function oldRules() {
+    const { answer } = dupla.createChallenge(DAY);
+    const { play } = await registerPlay(db, ana, { slug: "dupla", dateKey: DAY, guesses: answer as string[] }, NOON);
+    await db
+      .insert(plays)
+      .values({ accountId: ana, slug: "elo", dateKey: DAY, status: "won", count: 4, score: 7, nota: 70, guesses: [], finishedAt: NOON });
+    await db.update(dailyScores).set({ score: 0 }).where(and(eq(dailyScores.accountId, ana), eq(dailyScores.dateKey, DAY)));
+    return play.nota;
+  }
+  const scoreOfDay = async () =>
+    (await db.select().from(dailyScores).where(and(eq(dailyScores.accountId, ana), eq(dailyScores.dateKey, DAY))))[0].score;
+  const eloNota = async () => (await db.select().from(plays).where(eq(plays.slug, "elo")))[0].nota;
+
+  it("sem apply só conta o que mudaria", async () => {
+    await oldRules();
+    expect(await recomputeScores(db, { now: NOON })).toEqual({ plays: { elo: 1 }, days: 1, accounts: 1 });
+    expect(await eloNota()).toBe(70);
+    expect(await scoreOfDay()).toBe(0);
+  });
+
+  it("com apply grava a Nota nova, o Score diário e as Conquistas", async () => {
+    const duplaNota = await oldRules();
+    await recomputeScores(db, { apply: true, now: NOON });
+    expect(await eloNota()).toBe(100);
+    expect(await scoreOfDay()).toBe(duplaNota + 100);
+    expect((await readCounters(db, ana)).byGame.elo).toEqual({ plays: 1, perfect: 1 });
+    expect(await recomputeScores(db, { now: NOON })).toEqual({ plays: {}, days: 0, accounts: 0 });
   });
 });
