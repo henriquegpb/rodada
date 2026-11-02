@@ -103,6 +103,13 @@ export function mockBoard(dateKey: string, slug?: string, groupId?: string): Ran
   });
   // Fora de um Grupo só aparece quem jogou; no Grupo, todos os membros.
   if (!group) lines = lines.filter((l) => l.played);
+  // `?mock=1st`: o "você" passa à frente em todo ranking, para ver a tela do 1º lugar.
+  if (new URLSearchParams(window.location.search).get("mock") === "1st") {
+    const best = Math.max(0, ...lines.map((l) => l.total));
+    const won = slug ? ("won" as const) : null;
+    lines = lines.filter((l) => l.i !== 0);
+    lines.push({ i: 0, total: best + 1, played: true, count: 1, status: won });
+  }
   lines.sort((a, b) => b.total - a.total || a.i - b.i);
 
   const totals = [...new Set(lines.map((l) => l.total))];

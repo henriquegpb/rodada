@@ -9,6 +9,8 @@ import type { GameMeta } from "@/games/types";
 import { formatResult } from "@/lib/plays/result";
 import { useBoard } from "@/lib/ranking/client";
 import type { Ranking, RankingRow } from "@/server/rankings";
+import { ProfileLink } from "@/components/profile/profile-link";
+import { Champion } from "./champion";
 import { GlideSwap } from "@/components/ui/glide-swap";
 import { PillTabs } from "@/components/ui/pill-tabs";
 import { cn } from "@/lib/utils";
@@ -39,9 +41,11 @@ export function Boards({ dateKey, group }: { dateKey: string; group?: string }) 
     setShown({ view, board, error });
   }
   const [direction, setDirection] = useState<1 | -1>(1);
+  const champion = shown?.board?.me?.played && shown.board.me.position === 1;
 
   return (
     <section>
+      {champion && <Champion key={shown.view} />}
       <PillTabs
         label={t.ranking.title}
         value={view}
@@ -113,7 +117,6 @@ function GameBoard({ meta, board }: { meta: GameMeta; board: Ranking }) {
     <Rows
       board={board}
       empty={t.ranking.empty}
-      accent={meta.color}
       value={(row) =>
         row.played && row.status && row.count !== null ? (
           <>
@@ -151,12 +154,10 @@ function NotPlayed() {
 function Rows({
   board,
   empty,
-  accent = "var(--primary)",
   value,
 }: {
   board: Ranking;
   empty: string;
-  accent?: string;
   value: (row: RankingRow) => ReactNode;
 }) {
   const [page, setPage] = useState(0);
@@ -170,7 +171,7 @@ function Rows({
   const myPage = myIndex < 0 ? null : Math.floor(myIndex / PAGE_SIZE);
   const away = board.me !== null && myPage !== current;
   const row = (r: RankingRow) => (
-    <Row key={r.account.id} row={r} me={r.account.id === meId} accent={accent} value={value(r)} />
+    <Row key={r.account.id} row={r} me={r.account.id === meId} value={value(r)} />
   );
 
   return (
@@ -191,27 +192,36 @@ function Rows({
   );
 }
 
-function Row({ row, me, accent, value }: { row: RankingRow; me: boolean; accent: string; value: ReactNode }) {
+/** Ouro, prata e bronze. */
+const MEDALS = ["#E8B931", "#C4CAD3", "#C98552"];
+
+function Row({ row, me, value }: { row: RankingRow; me: boolean; value: ReactNode }) {
   const podium = row.played && row.position <= 3;
   return (
-    <li
-      className={cn(
-        "grid h-11 grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-3 rounded-lg px-3 text-sm tabular-nums",
-        me ? "bg-secondary" : "odd:bg-card/60",
-      )}
-      style={me ? { boxShadow: `inset 3px 0 0 ${accent}` } : undefined}
-    >
+    <li className="group flex items-center gap-2 text-sm tabular-nums">
       <span
-        className={cn("font-display text-base", !podium && "text-muted-foreground")}
-        style={podium ? { color: accent } : undefined}
+        className={cn(
+          "grid size-7 shrink-0 place-items-center rounded-full font-display text-sm",
+          podium ? "text-black/80" : "bg-card text-muted-foreground",
+        )}
+        style={podium ? { background: MEDALS[row.position - 1] } : undefined}
       >
         {row.played ? row.position : "–"}
       </span>
-      <span className="flex min-w-0 items-center gap-2">
-        <span className="truncate font-medium">{row.account.name}</span>
-        {me && <YouTag />}
-      </span>
-      <span className="flex items-center gap-4">{value}</span>
+      <div
+        className={cn(
+          "grid h-11 min-w-0 flex-1 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-lg px-3",
+          me ? "bg-secondary" : "group-odd:bg-card/60",
+        )}
+      >
+        <span className="flex min-w-0 items-center gap-2">
+          <ProfileLink handle={row.account.handle} className="truncate font-medium hover:underline">
+            {row.account.name}
+          </ProfileLink>
+          {me && <YouTag />}
+        </span>
+        <span className="flex items-center gap-4">{value}</span>
+      </div>
     </li>
   );
 }
