@@ -109,7 +109,6 @@ export function AppShell({ children }: { children: ReactNode }) {
                 label: t.nav.home,
                 leading: <LayoutGrid size={17} strokeWidth={2} />,
               },
-              { href: "/ranking", label: t.nav.ranking, leading: <Trophy size={17} strokeWidth={2} /> },
               {
                 href: "/grupos",
                 label: t.nav.groups,
@@ -143,6 +142,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                   </div>
                 ) : undefined,
               },
+              { href: "/ranking", label: t.nav.ranking, leading: <Trophy size={17} strokeWidth={2} /> },
             ]}
           />
           <div className="mt-1 pl-2">
