@@ -84,6 +84,12 @@ export const ptBR = {
   profile: {
     title: "Perfil",
     subtitle: "Suas partidas ficam salvas neste navegador.",
+    since: (date: string) => `Joga desde ${date}`,
+    rolling: "No ranking (30 dias)",
+    achievements: "Conquistas",
+    progress: (value: number, next: number) => `${value} de ${next} para o próximo nível`,
+    maxed: (value: number) => `${value}: nível máximo`,
+    loading: "Carregando o perfil…",
   },
   ranking: {
     title: "Ranking",

@@ -6,6 +6,7 @@ import { trackEvent } from "@/lib/analytics";
 import { sendLoginLink, signInWithGoogle, signOut, type Me } from "@/lib/ranking/client";
 import { t } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
+import { ProfileLink } from "@/components/profile/profile-link";
 import { InlineForm } from "./inline-form";
 
 /** O endereço desta tela, para o login voltar para cá. */
@@ -72,7 +73,10 @@ export function SignInButtons({ from, className }: { from: string; className?: s
 export function AccountLine({ me }: { me: Me }) {
   return (
     <p className="flex flex-wrap items-center gap-x-2 text-sm text-muted-foreground">
-      {t.login.signedInAs} <span className="font-medium text-foreground">{me.name}</span>
+      {t.login.signedInAs}{" "}
+      <ProfileLink handle={me.handle} className="font-medium text-foreground hover:underline">
+        {me.name}
+      </ProfileLink>
       {me.handle && <span>@{me.handle}</span>}
       <button
         type="button"

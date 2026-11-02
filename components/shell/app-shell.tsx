@@ -26,6 +26,7 @@ import { trackEvent } from "@/lib/analytics";
 import { notePath } from "@/lib/nav-history";
 import { pickGroup, useGroups, useMe, type Me } from "@/lib/ranking/client";
 import type { GroupSummary } from "@/server/groups";
+import { Avatar } from "@/components/profile/avatar";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 
@@ -202,13 +203,8 @@ function ProfileButton({ me, active }: { me: Me | null | undefined; active: bool
         active && "text-sidebar-foreground ring-[#ff6a1a]",
       )}
     >
-      {me?.image ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={me.image} alt="" className="size-full object-cover" />
-      ) : me ? (
-        <span className="grid size-full place-items-center bg-secondary text-sm font-semibold uppercase text-sidebar-foreground">
-          {me.name.charAt(0)}
-        </span>
+      {me ? (
+        <Avatar name={me.name} seed={me.id} image={me.image} className="size-full text-xs" />
       ) : (
         <UserRound size={18} strokeWidth={2} />
       )}

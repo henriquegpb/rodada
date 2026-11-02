@@ -25,6 +25,8 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/compone
 import { GlideSwap } from "@/components/ui/glide-swap";
 import { PillTabs } from "@/components/ui/pill-tabs";
 import { Boards, SectionTitle, YouTag } from "./boards";
+import { Avatar } from "@/components/profile/avatar";
+import { ProfileLink } from "@/components/profile/profile-link";
 import { InlineForm } from "./inline-form";
 import { SignInButtons } from "./sign-in";
 
@@ -147,26 +149,23 @@ function Members({ detail, me }: { detail: GroupDetail; me: Me }) {
   return (
     <ul className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
       {detail.members.map((member) => (
-        <li key={member.id} className="flex items-center gap-3 rounded-lg bg-card/60 px-3 py-2.5">
-          {member.image ? (
-            // Foto do Google ou do Blob: sem otimização do Next, que pediria cada domínio na config.
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={member.image} alt="" className="size-8 shrink-0 rounded-full object-cover" />
-          ) : (
-            <span className="grid size-8 shrink-0 place-items-center rounded-full bg-secondary text-sm font-semibold uppercase">
-              {member.name.charAt(0)}
+        <li key={member.id}>
+          <ProfileLink
+            handle={member.handle}
+            className="flex items-center gap-3 rounded-lg bg-card/60 px-3 py-2.5 transition-colors hover:bg-card"
+          >
+            <Avatar name={member.name} seed={member.id} image={member.image} className="size-8 text-xs" />
+            <span className="min-w-0">
+              <span className="flex items-center gap-2">
+                <span className="truncate text-sm font-medium">{member.name}</span>
+                {member.id === me.id && <YouTag />}
+                {member.id === detail.ownerId && (
+                  <span className="shrink-0 text-[11px] font-semibold text-primary">{t.groups.owner}</span>
+                )}
+              </span>
+              <span className="block truncate text-xs text-muted-foreground">@{member.handle}</span>
             </span>
-          )}
-          <span className="min-w-0">
-            <span className="flex items-center gap-2">
-              <span className="truncate text-sm font-medium">{member.name}</span>
-              {member.id === me.id && <YouTag />}
-              {member.id === detail.ownerId && (
-                <span className="shrink-0 text-[11px] font-semibold text-primary">{t.groups.owner}</span>
-              )}
-            </span>
-            <span className="block truncate text-xs text-muted-foreground">@{member.handle}</span>
-          </span>
+          </ProfileLink>
         </li>
       ))}
     </ul>

@@ -5,6 +5,7 @@ import { authClient } from "@/lib/auth-client";
 import { importLocalPlays, onPlayReported } from "@/lib/plays/sync";
 import { t } from "@/lib/i18n";
 import type { GroupDetail, GroupSummary } from "@/server/groups";
+import type { Profile } from "@/server/profiles";
 import type { Ranking } from "@/server/rankings";
 import { MOCK_ME, mockBoard, mockGroup, mockGroups } from "./mock";
 
@@ -151,6 +152,12 @@ export function useGroup(id: string | null): GroupDetail | null {
   const mock = useMock();
   const { data } = useApi<GroupDetail>(id && !mock ? `/api/groups/${encodeURIComponent(id)}` : null);
   return mock && id ? mockGroup(id) : data;
+}
+
+/** O Perfil público de uma Conta pelo handle. */
+export function useProfile(handle: string): { profile: Profile | null; error: string | null } {
+  const { data, error } = useApi<Profile>(`/api/profiles/${encodeURIComponent(handle)}`);
+  return { profile: data, error };
 }
 
 /** O que o link de convite mostra antes de entrar. */
