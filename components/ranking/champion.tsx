@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { createPortal } from "react-dom";
 
 const COLORS = ["#FFD54A", "#F5B301", "#FFF1B8", "#E8B931", "#FF8A3D", "#7DD3FC", "#F472B6"];
 const PIECES = 48;
@@ -51,10 +52,13 @@ const AREA = "pointer-events-none fixed inset-y-0 right-0 left-0 overflow-hidden
 
 /**
  * Para quem está em 1º no ranking aberto: o topo do conteúdo fica dourado, atrás do texto, e cai
- * confete por cima.
+ * confete por cima. Vai direto no `body`: dentro de um painel com `transform` ou `filter` (a troca
+ * de Grupo, a de aba), o `fixed` passaria a valer para o painel, não para a tela.
  */
 export function Champion() {
-  return (
+  // Só aparece depois que o ranking chega, sempre no navegador.
+  if (typeof document === "undefined") return null;
+  return createPortal(
     <div aria-hidden="true">
       <style href="champion" precedence="default">
         {CSS}
@@ -73,6 +77,7 @@ export function Champion() {
           <span key={i} className="confetti absolute top-0" style={style} />
         ))}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
