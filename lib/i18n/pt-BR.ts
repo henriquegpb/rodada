@@ -104,8 +104,9 @@ export const ptBR = {
     saving: "Salvando…",
     saved: "Perfil atualizado",
     saveFailed: "Não deu para salvar. Tente de novo.",
-    progress: (value: number, next: number) => `${value} de ${next} para o próximo nível`,
-    maxed: (value: number) => `${value}: nível máximo`,
+    toNext: (level: string) => `Até o ${level}`,
+    maxLevel: "Nível máximo",
+    locked: "Ainda não conquistada",
     loading: "Carregando o perfil…",
   },
   ranking: {

@@ -9,6 +9,7 @@ import type { GameMeta } from "@/games/types";
 import { formatResult } from "@/lib/plays/result";
 import { useBoard } from "@/lib/ranking/client";
 import type { Ranking, RankingRow } from "@/server/rankings";
+import { RINGS } from "@/components/profile/achievement-badge";
 import { ProfileLink } from "@/components/profile/profile-link";
 import { Champion } from "./champion";
 import { GlideSwap } from "@/components/ui/glide-swap";
@@ -193,7 +194,7 @@ function Rows({
 }
 
 /** Ouro, prata e bronze. */
-const MEDALS = ["#E8B931", "#C4CAD3", "#C98552"];
+const MEDALS = [RINGS.ouro, RINGS.prata, RINGS.bronze];
 
 function Row({ row, me, value }: { row: RankingRow; me: boolean; value: ReactNode }) {
   const podium = row.played && row.position <= 3;

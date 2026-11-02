@@ -3,16 +3,25 @@
 import { useState } from "react";
 import { CalendarCheck, Flame, Sparkles, Trophy, type LucideIcon } from "lucide-react";
 import { getGame } from "@/games";
-import { LEVELS, LEVEL_NAMES, type AchievementProgress, type Level } from "@/lib/achievements";
+import { LEVELS, LEVEL_NAMES, achievements, type AchievementProgress, type Level } from "@/lib/achievements";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 
 /** O aro de cada Nível, do mais fosco ao mais brilhante. */
-const RINGS: Record<Level, string> = {
-  bronze: "linear-gradient(135deg, #F0B98A, #8C5530)",
-  prata: "linear-gradient(135deg, #F4F6FA, #8E97A3)",
-  ouro: "linear-gradient(135deg, #FFE48F, #B8860B)",
-  diamante: "linear-gradient(135deg, #E6FAFF, #38BDF8 50%, #A78BFA)",
+export const RINGS: Record<Level, string> = {
+  bronze: "linear-gradient(90deg, #885424, #AB7E4D, #EEB871, #F9C176, #9F5423, #DC702A, #733D19)",
+  prata: "linear-gradient(90deg, #3A3A3A, #A4A4A4, #606060, #CECECE, #8F8F8F, #464646, #696969)",
+  ouro: "linear-gradient(90deg, #8C421D, #FBE67B, #FCFBE7, #F7D14E, #D4A041)",
+  diamante: "linear-gradient(90deg, #CCE8FE, #CDA0FF, #8489F5, #CDF1FF, #B591E9)",
+};
+
+/** A barra de progresso, no degradê do Nível que se está buscando. */
+const BARS: Record<Level, string> = {
+  bronze: "linear-gradient(90deg, #885424 0%, #AB7E4D 25%, #EEB871 50%, #9F5423 75%, #9C511F 100%)",
+  prata: "linear-gradient(90deg, #3A3A3A 0%, #A4A4A4 20%, #CECECE 40%, #8F8F8F 60%, #464646 80%, #696969 100%)",
+  ouro: "linear-gradient(90deg, #8C421D 0%, #FBE67B 25%, #FCFBE7 50%, #F7D14E 75%, #D4A041 100%)",
+  diamante: "linear-gradient(90deg, #CCE8FE 0%, #CDA0FF 24%, #8489F5 40%, #CDF1FF 71%, #B591E9 100%)",
 };
 
 interface Art {
@@ -72,7 +81,10 @@ export function AchievementBadge({ achievement, className }: { achievement: Achi
   );
 }
 
-/** A grade de medalhas com o nome embaixo; tocar numa abre a descrição e o progresso. */
+/** A cor sólida de cada Nível, para a barra e os marcos. */
+const SOLID: Record<Level, string> = { bronze: "#DC702A", prata: "#CECECE", ouro: "#F7D14E", diamante: "#CDA0FF" };
+
+/** A grade de medalhas com o nome embaixo; tocar numa abre o modal com o progresso. */
 export function Achievements({ items }: { items: AchievementProgress[] }) {
   // Primeiro as conquistadas, do Nível mais alto para o mais baixo.
   const order = (a: AchievementProgress) => (a.level ? LEVELS.indexOf(a.level) : -1);
@@ -81,18 +93,14 @@ export function Achievements({ items }: { items: AchievementProgress[] }) {
   const open = sorted.find((a) => a.id === selected);
 
   return (
-    <div className="flex flex-col gap-5">
+    <>
       <ul className="grid grid-cols-[repeat(auto-fill,minmax(5.5rem,1fr))] gap-x-2 gap-y-4">
         {sorted.map((a) => (
           <li key={a.id}>
             <button
               type="button"
-              aria-pressed={a.id === selected}
-              onClick={() => setSelected(a.id === selected ? null : a.id)}
-              className={cn(
-                "group flex w-full flex-col items-center gap-2 rounded-xl px-1 py-2 transition-colors hover:bg-card/60",
-                a.id === selected && "bg-card",
-              )}
+              onClick={() => setSelected(a.id)}
+              className="group flex w-full flex-col items-center gap-2 rounded-xl px-1 py-2 transition-colors hover:bg-card/60"
             >
               <AchievementBadge achievement={a} className="transition-transform group-hover:scale-105" />
               <span
@@ -107,21 +115,62 @@ export function Achievements({ items }: { items: AchievementProgress[] }) {
           </li>
         ))}
       </ul>
-      {open && (
-        <div className="flex max-w-md items-center gap-4 rounded-xl bg-card p-4">
-          <AchievementBadge achievement={open} className="shrink-0" />
-          <div className="min-w-0">
-            <p className="font-semibold">
-              {open.name}
-              {open.level && <span className="ml-2 text-xs text-muted-foreground">{LEVEL_NAMES[open.level]}</span>}
-            </p>
-            <p className="text-sm text-muted-foreground">{open.description}</p>
-            <p className="mt-1 text-xs tabular-nums text-muted-foreground">
-              {open.next ? t.profile.progress(open.value, open.next) : t.profile.maxed(open.value)}
-            </p>
-          </div>
+      <Dialog open={Boolean(open)} onOpenChange={(next) => !next && setSelected(null)}>
+        <DialogContent className="sm:max-w-sm">{open && <AchievementDetail achievement={open} />}</DialogContent>
+      </Dialog>
+    </>
+  );
+}
+
+/** A medalha grande, o Nível, a barra até o próximo e os quatro marcos. */
+function AchievementDetail({ achievement }: { achievement: AchievementProgress }) {
+  const { level, value, next } = achievement;
+  const thresholds = achievements.find((a) => a.id === achievement.id)?.thresholds ?? [];
+  const tier = level ? LEVELS.indexOf(level) + 1 : 0;
+  // A barra vai do marco atual ao próximo; no Diamante, cheia.
+  const from = tier > 0 ? thresholds[tier - 1] : 0;
+  const pct = next === null ? 100 : Math.min(100, Math.max(0, ((value - from) / (next - from)) * 100));
+  const target = LEVELS[tier] ?? "diamante";
+
+  return (
+    <div className="flex flex-col items-center text-center">
+      <div className="my-6 scale-[1.75]">
+        <AchievementBadge achievement={achievement} />
+      </div>
+      <DialogTitle className="font-display text-xl">{achievement.name}</DialogTitle>
+      <p className="mt-1 text-sm font-semibold" style={{ color: level ? SOLID[level] : undefined }}>
+        {level ? LEVEL_NAMES[level] : t.profile.locked}
+      </p>
+      <DialogDescription className="mt-2">{achievement.description}</DialogDescription>
+
+      <div className="mt-6 w-full">
+        <div className="mb-1.5 flex justify-between text-xs tabular-nums text-muted-foreground">
+          <span>{next === null ? t.profile.maxLevel : t.profile.toNext(LEVEL_NAMES[target])}</span>
+          <span>{next === null ? value : `${value}/${next}`}</span>
         </div>
-      )}
+        <div className="h-2.5 w-full overflow-hidden rounded-full bg-secondary">
+          <div
+            className="h-full rounded-full transition-[width] duration-700 ease-out"
+            style={{ width: `${pct}%`, background: BARS[target] }}
+          />
+        </div>
+      </div>
+
+      <ol className="mt-5 grid w-full grid-cols-4 gap-2">
+        {LEVELS.map((l, i) => {
+          const reached = i < tier;
+          return (
+            <li key={l} className={cn("rounded-lg bg-secondary/60 px-1 py-2", !reached && "opacity-50")}>
+              <span
+                className="mx-auto block size-2.5 rounded-full"
+                style={{ background: reached ? SOLID[l] : "var(--muted-foreground)" }}
+              />
+              <span className="mt-1.5 block text-[11px] font-medium">{LEVEL_NAMES[l]}</span>
+              <span className="block text-[11px] tabular-nums text-muted-foreground">{thresholds[i]}</span>
+            </li>
+          );
+        })}
+      </ol>
     </div>
   );
 }
