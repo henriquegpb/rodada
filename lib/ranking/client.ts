@@ -187,6 +187,11 @@ export function lastGroup(): string | null {
   }
 }
 
+/** Qual Grupo abrir: o da URL (`?g=`), o último aberto ou o primeiro. Só no navegador. */
+export function pickGroup(groups: GroupSummary[], param: string | null): GroupSummary | undefined {
+  return groups.find((g) => g.id === param) ?? groups.find((g) => g.id === lastGroup()) ?? groups[0];
+}
+
 export function rememberGroup(id: string) {
   try {
     localStorage.setItem(GROUP_KEY, id);

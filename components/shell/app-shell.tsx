@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Check, Flame, Gamepad2, LayoutGrid, Star, Trophy, UserRound, Users, X } from "lucide-react";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Suspense, useEffect, useRef, useState, type ReactNode } from "react";
+import { ChevronDown as ChevronDownIcon, ChevronRight as ChevronRightIcon } from "lucide";
+import { MorphIcon } from "morphicons/react";
 import { games, getGame, rootGame } from "@/games";
 import { preloadEngine } from "@/games/engines";
 import type { GameMeta } from "@/games/types";
@@ -22,6 +24,8 @@ import { formatResult } from "@/lib/plays/result";
 import { NO_STREAK, overallStreak } from "@/lib/stats";
 import { trackEvent } from "@/lib/analytics";
 import { notePath } from "@/lib/nav-history";
+import { pickGroup, useGroups, useMe } from "@/lib/ranking/client";
+import type { GroupSummary } from "@/server/groups";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 
@@ -64,14 +68,11 @@ export function AppShell({ children }: { children: ReactNode }) {
   }
   const previewMeta = preview ? getGame(preview.slug)?.meta : undefined;
 
-  const homeItem = { href: "/", label: t.nav.home, leading: <LayoutGrid size={17} strokeWidth={2} /> };
-  const profileItem = {
-    href: "/perfil",
-    label: t.nav.profile,
-    leading: <UserRound size={17} strokeWidth={2} />,
-  };
-  const rankingItem = { href: "/ranking", label: t.nav.ranking, leading: <Trophy size={17} strokeWidth={2} /> };
-  const groupsItem = { href: "/grupos", label: t.nav.groups, leading: <Users size={17} strokeWidth={2} /> };
+  // Os Grupos da Conta embaixo de "Grupos", abertos pelo chevron; na tela de Grupos já vêm abertos.
+  const { groups } = useGroups(useMe());
+  const [groupsOpen, setGroupsOpen] = useState<boolean | null>(null);
+  const showGroups = groupsOpen ?? pathname.startsWith("/grupos");
+
   // Os jogos da rodada como galhos de uma árvore (React Bits · Branched Menu).
   const gamesMenu = [
     {
@@ -94,28 +95,66 @@ export function AppShell({ children }: { children: ReactNode }) {
         <Logo className="shrink-0 px-3" />
         {/* Só a navegação rola: com muitos jogos, logo e rodapé (estrela, relógio, tema) ficam parados. */}
         <div className="-mx-4 mt-8 min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-4">
-          <SpotlightNav items={[profileItem]} activeHref={pathname} label={t.nav.profile} />
-          <SpotlightNav items={[rankingItem]} activeHref={pathname} label={t.nav.ranking} />
-          <SpotlightNav items={[groupsItem]} activeHref={pathname} label={t.nav.groups} />
-          <SpotlightNav items={[homeItem]} activeHref={pathname} label={t.nav.home} />
-          <div className="mt-3 pl-2">
-            <BranchedMenu
-              items={gamesMenu}
-              // Nos modos (Dupla, Quadra) o galho aceso continua sendo o do Palavra.
-              active={rootGame(pathname.slice(1))?.meta.slug ?? ""}
-              onSelect={(slug) => router.push(`/${slug}`)}
-              onHover={showPreview}
-              onHoverEnd={hidePreview}
-              color="var(--sidebar-foreground)"
-              accentColor="#ff6a1a"
-              lineColor="var(--border)"
-              width={204}
-              rowHeight={38}
-              indent={36}
-              fontSize={15}
-              className="!w-full"
-            />
-          </div>
+          {/* Um trilho só: o indicador desliza de Hoje até Perfil, passando por cima dos jogos e dos grupos. */}
+          <SpotlightNav
+            label="Navegação"
+            activeHref={pathname}
+            items={[
+              {
+                href: "/",
+                label: t.nav.home,
+                leading: <LayoutGrid size={17} strokeWidth={2} />,
+                children: (
+                  <div className="mb-3 mt-3 pl-2">
+                    <BranchedMenu
+                      items={gamesMenu}
+                      // Nos modos (Dupla, Quadra) o galho aceso continua sendo o do Palavra.
+                      active={rootGame(pathname.slice(1))?.meta.slug ?? ""}
+                      onSelect={(slug) => router.push(`/${slug}`)}
+                      onHover={showPreview}
+                      onHoverEnd={hidePreview}
+                      {...TREE}
+                    />
+                  </div>
+                ),
+              },
+              { href: "/ranking", label: t.nav.ranking, leading: <Trophy size={17} strokeWidth={2} /> },
+              {
+                href: "/grupos",
+                label: t.nav.groups,
+                leading: <Users size={17} strokeWidth={2} />,
+                action: groups?.length ? (
+                  <button
+                    type="button"
+                    aria-expanded={showGroups}
+                    aria-label={t.nav.groups}
+                    onClick={() => setGroupsOpen(!showGroups)}
+                    className="grid size-7 place-items-center rounded-md text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                  >
+                    <MorphIcon icon={showGroups ? ChevronDownIcon : ChevronRightIcon} size={16} strokeWidth={2} />
+                  </button>
+                ) : undefined,
+                children: groups?.length ? (
+                  <div
+                    className={cn(
+                      "grid transition-[grid-template-rows] duration-300 ease-[cubic-bezier(.32,.72,0,1)]",
+                      showGroups ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
+                    )}
+                  >
+                    <div className="overflow-hidden" inert={!showGroups || undefined}>
+                      <div className="mb-2 mt-1 pl-2">
+                        {/* O grupo aceso vem da URL (?g=): fica atrás do Suspense para não segurar a página. */}
+                        <Suspense fallback={<GroupsTree groups={groups} selected="" />}>
+                          <ActiveGroupsTree groups={groups} onSelect={(id) => router.push(`/grupos?g=${encodeURIComponent(id)}`)} />
+                        </Suspense>
+                      </div>
+                    </div>
+                  </div>
+                ) : undefined,
+              },
+              { href: "/perfil", label: t.nav.profile, leading: <UserRound size={17} strokeWidth={2} /> },
+            ]}
+          />
         </div>
         <div className="shrink-0 border-t border-sidebar-border px-3 pt-5">
           <GitHubStar />
@@ -147,6 +186,59 @@ export function AppShell({ children }: { children: ReactNode }) {
         <MobileNav pathname={pathname} />
       </div>
     </div>
+  );
+}
+
+/** O jeito das árvores da sidebar (jogos e grupos). */
+const TREE = {
+  color: "var(--sidebar-foreground)",
+  accentColor: "#ff6a1a",
+  lineColor: "var(--border)",
+  width: 204,
+  rowHeight: 38,
+  indent: 36,
+  fontSize: 15,
+  className: "!w-full",
+};
+
+/** Os Grupos na sidebar, com o aberto na tela de Grupos aceso. */
+function ActiveGroupsTree({ groups, onSelect }: { groups: GroupSummary[]; onSelect: (id: string) => void }) {
+  const pathname = usePathname();
+  const param = useSearchParams().get("g");
+  const selected = pathname === "/grupos" ? (pickGroup(groups, param)?.id ?? "") : "";
+  return <GroupsTree groups={groups} selected={selected} onSelect={onSelect} />;
+}
+
+function GroupsTree({
+  groups,
+  selected,
+  onSelect,
+}: {
+  groups: GroupSummary[];
+  selected: string;
+  onSelect?: (id: string) => void;
+}) {
+  return (
+    <BranchedMenu
+      items={[
+        {
+          label: "",
+          children: groups.map((g) => ({
+            value: g.id,
+            label: g.name,
+            icon: (
+              <span className="grid size-4 place-items-center rounded-[4px] bg-secondary text-[10px] font-semibold uppercase">
+                {g.name.charAt(0)}
+              </span>
+            ),
+            trailing: <span className="text-xs tabular-nums text-muted-foreground">{g.memberCount}</span>,
+          })),
+        },
+      ]}
+      active={selected}
+      onSelect={(id) => onSelect?.(id)}
+      {...TREE}
+    />
   );
 }
 
