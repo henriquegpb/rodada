@@ -155,9 +155,43 @@ export function useGroup(id: string | null): GroupDetail | null {
 }
 
 /** O Perfil público de uma Conta pelo handle. */
-export function useProfile(handle: string): { profile: Profile | null; error: string | null } {
-  const { data, error } = useApi<Profile>(`/api/profiles/${encodeURIComponent(handle)}`);
+export function useProfile(handle: string | null): { profile: Profile | null; error: string | null } {
+  const { data, error } = useApi<Profile>(handle ? `/api/profiles/${encodeURIComponent(handle)}` : null);
   return { profile: data, error };
+}
+
+/**
+ * Depois de editar o Perfil: a sessão guarda nome, handle e foto num cookie de 5 minutos, então
+ * pede uma nova sem o cache e avisa quem usa `useSession`; o resto das telas busca de novo.
+ */
+async function refreshAccount() {
+  await authClient.getSession({ query: { disableCookieCache: true } });
+  authClient.$store.notify("$sessionSignal");
+  changed();
+}
+
+/** O handle é válido e está livre? (O próprio conta como livre.) */
+export function checkHandle(handle: string) {
+  return api<{ handle: string; valid: boolean; available: boolean }>(`/api/handles/${encodeURIComponent(handle)}`);
+}
+
+export async function saveProfile(changes: { name?: string; handle?: string; bio?: string }) {
+  await api("/api/me", "PATCH", changes);
+  await refreshAccount();
+}
+
+export async function uploadAvatar(file: File) {
+  const body = new FormData();
+  body.set("file", file);
+  let response: Response;
+  try {
+    response = await fetch("/api/me/avatar", { method: "POST", body });
+  } catch {
+    throw new Error(t.ranking.offline);
+  }
+  const json = (await response.json().catch(() => null)) as { error?: { message?: string } } | null;
+  if (!response.ok) throw new Error(json?.error?.message ?? t.profile.saveFailed);
+  await refreshAccount();
 }
 
 /** O que o link de convite mostra antes de entrar. */

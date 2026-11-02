@@ -1,7 +1,11 @@
+"use client";
+
+import { useState } from "react";
 import { CalendarCheck, Flame, Sparkles, Trophy, type LucideIcon } from "lucide-react";
 import { getGame } from "@/games";
-import { LEVELS, type AchievementProgress, type Level } from "@/lib/achievements";
+import { LEVELS, LEVEL_NAMES, type AchievementProgress, type Level } from "@/lib/achievements";
 import { cn } from "@/lib/utils";
+import { t } from "@/lib/i18n";
 
 /** O aro de cada Nível, do mais fosco ao mais brilhante. */
 const RINGS: Record<Level, string> = {
@@ -65,5 +69,59 @@ export function AchievementBadge({ achievement, className }: { achievement: Achi
         </span>
       )}
     </span>
+  );
+}
+
+/** A grade de medalhas com o nome embaixo; tocar numa abre a descrição e o progresso. */
+export function Achievements({ items }: { items: AchievementProgress[] }) {
+  // Primeiro as conquistadas, do Nível mais alto para o mais baixo.
+  const order = (a: AchievementProgress) => (a.level ? LEVELS.indexOf(a.level) : -1);
+  const sorted = [...items].sort((a, b) => order(b) - order(a));
+  const [selected, setSelected] = useState<string | null>(null);
+  const open = sorted.find((a) => a.id === selected);
+
+  return (
+    <div className="flex flex-col gap-5">
+      <ul className="grid grid-cols-[repeat(auto-fill,minmax(5.5rem,1fr))] gap-x-2 gap-y-4">
+        {sorted.map((a) => (
+          <li key={a.id}>
+            <button
+              type="button"
+              aria-pressed={a.id === selected}
+              onClick={() => setSelected(a.id === selected ? null : a.id)}
+              className={cn(
+                "group flex w-full flex-col items-center gap-2 rounded-xl px-1 py-2 transition-colors hover:bg-card/60",
+                a.id === selected && "bg-card",
+              )}
+            >
+              <AchievementBadge achievement={a} className="transition-transform group-hover:scale-105" />
+              <span
+                className={cn(
+                  "line-clamp-2 text-center text-xs leading-tight",
+                  a.level ? "font-medium" : "text-muted-foreground",
+                )}
+              >
+                {a.name}
+              </span>
+            </button>
+          </li>
+        ))}
+      </ul>
+      {open && (
+        <div className="flex max-w-md items-center gap-4 rounded-xl bg-card p-4">
+          <AchievementBadge achievement={open} className="shrink-0" />
+          <div className="min-w-0">
+            <p className="font-semibold">
+              {open.name}
+              {open.level && <span className="ml-2 text-xs text-muted-foreground">{LEVEL_NAMES[open.level]}</span>}
+            </p>
+            <p className="text-sm text-muted-foreground">{open.description}</p>
+            <p className="mt-1 text-xs tabular-nums text-muted-foreground">
+              {open.next ? t.profile.progress(open.value, open.next) : t.profile.maxed(open.value)}
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
