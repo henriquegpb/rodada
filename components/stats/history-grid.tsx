@@ -23,14 +23,18 @@ export function HistoryGrid({ records, today, days }: { records: PlayRecord[]; t
   const columns = { gridTemplateColumns: `7rem repeat(${days}, minmax(1.75rem, 2.75rem))` };
 
   return (
+    // A rolagem fica só para telas bem estreitas; o pr-1 dá espaço ao contorno do dia de hoje.
     <div className="overflow-x-auto">
-      <div className="grid min-w-[520px] gap-1" style={columns}>
+      <div className="grid min-w-[520px] gap-1 pr-1" style={columns}>
         <span />
-        {dates.map((d, i) => (
-          <span key={d} className="whitespace-nowrap pb-1 text-center text-[11px] text-muted-foreground">
-            {i === 0 || i === dates.length - 1 ? shortDate(d) : ""}
-          </span>
-        ))}
+        {/* Uma linha só para as datas das pontas: sozinha na coluna, a última passaria da borda. */}
+        <div
+          className="flex justify-between whitespace-nowrap pb-1 text-[11px] text-muted-foreground"
+          style={{ gridColumn: `span ${days}` }}
+        >
+          <span>{shortDate(dates[0])}</span>
+          <span>{shortDate(dates[dates.length - 1])}</span>
+        </div>
 
         {games.map(({ meta }) => {
           const launch = meta.launchedOn ?? EPOCH_DATE;
