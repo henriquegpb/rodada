@@ -27,10 +27,10 @@ export type GameRules =
   /** Acertar uma resposta em até N tentativas. Resultado: tentativas usadas. */
   | { type: "attempts"; maxAttempts: number }
   /**
-   * Chutes sem limite até acertar (ou desistir). Resultado: quantos chutes levou. `minGuesses`: o
-   * menor número de chutes que resolve (no Elo, um por grupo); padrão 1.
+   * Chutes sem limite até acertar (ou desistir). Resultado: quantos chutes levou. `curve`: a Nota
+   * por número de chutes (veja `UNLIMITED_CURVE`).
    */
-  | { type: "unlimited"; minGuesses?: number }
+  | { type: "unlimited"; curve?: GuessCurve }
   /** Achar o máximo de itens antes do tempo acabar. Resultado: itens achados de `total`. */
   | { type: "timed"; seconds: number; total: number }
   /**
@@ -48,6 +48,12 @@ export type GameRules =
    * `correct` se a peça estava certa. Resultado: quantos erros.
    */
   | { type: "lives"; lives: number };
+
+/**
+ * Pontos (chutes, Nota) em ordem de chutes, ligados por retas. Antes do primeiro ponto vale a Nota
+ * dele, e depois do último, a do último.
+ */
+export type GuessCurve = readonly (readonly [guesses: number, nota: number])[];
 
 export type AttemptRules = Extract<GameRules, { type: "attempts" }>;
 export type TimedRules = Extract<GameRules, { type: "timed" }>;

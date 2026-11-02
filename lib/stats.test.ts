@@ -32,8 +32,8 @@ describe("regras sem limite", () => {
     expect(formatResult(OPEN, "won", 8)).toBe("8 chutes");
     expect(formatResult(OPEN, "won", 1)).toBe("1 chute");
     expect(formatResult(OPEN, "lost", 12)).toBe("X");
-    expect(scorePlay(OPEN, "won", 1)).toBe(10);
-    expect(scorePlay(OPEN, "won", 30)).toBe(1);
+    expect(scorePlay(OPEN, "won", 1)).toBe(100);
+    expect(scorePlay(OPEN, "won", 30)).toBe(10);
     expect(scorePlay(OPEN, "lost", 5)).toBe(0);
     expect(countsForStreak(OPEN, "lost")).toBe(false);
   });
