@@ -16,7 +16,8 @@ export const calor: GameDefinition<CalorPuzzle, CalorFeedback, UnlimitedRules> =
     tagline: "Quente ou frio, até achar",
     description: "Ache o país secreto: cada chute aparece no globo, mais quente quanto mais perto.",
     icon: Thermometer,
-    rules: { type: "unlimited" },
+    // Cai devagar até 6 chutes, depois rápido até 12.
+    rules: { type: "unlimited", curve: [[1, 100], [6, 75], [12, 10]] },
     color: "#ef4444",
     howToPlay: [
       "Todo dia há um país secreto. Chute quantos países quiser até achar.",

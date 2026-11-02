@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { getGame } from "@/games";
 import type { GameRules } from "@/games/types";
 import { gradePlay, maxScore } from "./scoring";
 
@@ -36,6 +37,12 @@ describe("Nota", () => {
     expect(notas).toEqual([100, 90, 80, 66, 53, 39, 25, 20, 10, 10]);
     expect(gradePlay(elo, "won", 3)).toBe(100);
     expect(gradePlay(elo, "lost", 7)).toBe(0);
+  });
+
+  it("Calor cai 5 por chute até 6 chutes e chega a 10 com 12", () => {
+    const { rules } = getGame("calor")!.meta;
+    const notas = [1, 2, 6, 7, 8, 9, 10, 11, 12, 18].map((n) => gradePlay(rules, "won", n));
+    expect(notas).toEqual([100, 95, 75, 64, 53, 43, 32, 21, 10, 10]);
   });
 
   it("derrota e desistência valem zero onde é preciso acertar", () => {
