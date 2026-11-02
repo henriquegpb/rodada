@@ -61,7 +61,7 @@ export function ProfileScreen() {
   );
 }
 
-function GameTab({ meta, records, today }: { meta: GameMeta; records: PlayRecord[]; today: string }) {
+export function GameTab({ meta, records, today }: { meta: GameMeta; records: PlayRecord[]; today: string }) {
   const stats = gameStats(records, meta.slug, meta.rules, today);
   return (
     <div className="grid gap-10 md:grid-cols-2">
