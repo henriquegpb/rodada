@@ -12,12 +12,15 @@ export function InlineForm({
   label,
   submit,
   onSubmit,
+  compact = false,
   className,
   ...input
 }: {
   label: string;
   submit: string;
   onSubmit: (value: string) => Promise<string | void>;
+  /** Mais baixo (h-9), para caber numa faixa. */
+  compact?: boolean;
   className?: string;
 } & Omit<ComponentProps<"input">, "onSubmit" | "value" | "onChange" | "className">) {
   const id = useId();
@@ -49,13 +52,13 @@ export function InlineForm({
             setError(null);
           }}
           aria-invalid={Boolean(error)}
-          className="h-11 py-0"
+          className={compact ? "h-9 rounded-full px-4 py-0 text-sm" : "h-11 py-0"}
           {...input}
         />
         <button
           type="submit"
           disabled={busy}
-          className="h-11 shrink-0 rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground transition-[filter,transform,opacity] hover:brightness-110 active:scale-[0.98] disabled:opacity-60"
+          className={cn(compact ? "h-9 px-4" : "h-11 px-5", "shrink-0 rounded-full bg-primary text-sm font-semibold text-primary-foreground transition-[filter,transform,opacity] hover:brightness-110 active:scale-[0.98] disabled:opacity-60")}
         >
           {submit}
         </button>
