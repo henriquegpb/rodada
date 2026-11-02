@@ -17,7 +17,7 @@ const MAX_NAME = 50;
 const MAX_BIO = 160;
 
 export interface Profile {
-  account: { id: string; handle: string; name: string; bio: string; image: string | null; createdAt: Date };
+  account: { id: string; handle: string; name: string; bio: string; image: string | null; dev: boolean; createdAt: Date };
   streak: Streak;
   daysPlayed: number;
   /** Média de 30 dias e posição no Ranking geral; null se não jogou na janela. */
@@ -101,7 +101,15 @@ export async function getMe(db: Db, accountId: string, now = new Date()) {
 
 export async function getProfile(db: Db, handle: string, now = new Date()): Promise<Profile> {
   const [account] = await db
-    .select({ id: user.id, handle: user.handle, name: user.name, bio: user.bio, image: user.image, createdAt: user.createdAt })
+    .select({
+      id: user.id,
+      handle: user.handle,
+      name: user.name,
+      bio: user.bio,
+      image: user.image,
+      dev: user.dev,
+      createdAt: user.createdAt,
+    })
     .from(user)
     .where(eq(user.handle, handle.toLowerCase()));
   if (!account) throw new AppError(404, "not_found", "Perfil não encontrado");

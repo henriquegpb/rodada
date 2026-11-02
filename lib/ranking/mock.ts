@@ -1,9 +1,13 @@
-import { games } from "@/games";
+import { games, roundGames } from "@/games";
 import type { GameRules, PlayStatus } from "@/games/types";
+import { achievementProgress, type Counters } from "@/lib/achievements";
+import { EPOCH_DATE, addDays } from "@/lib/daily/date";
 import { createRng, type Rng } from "@/lib/daily/seed";
 import { normalize } from "@/lib/normalize";
 import { gradePlay, UNLIMITED_CURVE } from "@/lib/scoring";
+import { overallStreak, type PlayRecord } from "@/lib/stats";
 import type { GroupDetail, GroupSummary } from "@/server/groups";
+import type { Profile } from "@/server/profiles";
 import type { Ranking, RankingRow } from "@/server/rankings";
 
 /**
@@ -27,6 +31,8 @@ const accounts = NAMES.map((name, i) => ({
   handle: normalize(name).replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "") || `jogador_${i}`,
   name,
   image: null,
+  // O "você" e mais uma pessoa com a pílula Dev, para ver como fica.
+  dev: i === 0 || i === 4,
 }));
 
 /** O "você" do mock: joga poucos jogos (fica lá embaixo no geral) e manda bem no Palavra. */
@@ -143,5 +149,47 @@ export function mockGroup(id: string): GroupDetail | null {
     ...summary,
     ownerId: summary.isOwner ? MOCK_ME.id : accounts[group.members[1]].id,
     members: group.members.map((i) => ({ ...accounts[i], joinedAt: new Date("2026-10-22T12:00:00Z") })),
+  };
+}
+
+/**
+ * Um Perfil cheio, para desenhar a tela: bio, 14 dias de partidas em quase todos os jogos e
+ * contadores altos o bastante para ter Conquista em todo Nível (de nenhum a Diamante).
+ */
+export function mockProfile(handle: string, dateKey: string): Profile & { mock: true } {
+  const rng = createRng(`mock-profile:${handle}`);
+  const account = accounts.find((a) => a.handle === handle) ?? MOCK_ME;
+  const records: PlayRecord[] = [];
+  for (let back = 0; back < 14; back++) {
+    const day = addDays(dateKey, -back);
+    for (const { meta } of roundGames) {
+      if (day < (meta.launchedOn ?? EPOCH_DATE) || rng() < 0.12) continue;
+      records.push({ slug: meta.slug, dateKey: day, ...fakePlay(meta.rules, rng) });
+    }
+  }
+  const counters: Counters = {
+    daysPlayed: 142,
+    maxStreak: 61,
+    fullRounds: 37,
+    byGame: Object.fromEntries(
+      roundGames.map(({ meta }, i) => [meta.slug, { plays: [520, 230, 80, 12, 3][i % 5], perfect: [160, 55, 12, 1, 0][i % 5] }]),
+    ),
+  };
+  return {
+    mock: true,
+    account: {
+      id: account.id,
+      handle: account.handle,
+      name: account.name,
+      bio: "Palavra antes do café, Mosaico no ônibus e Rainhas pra fechar o dia. Sequência é coisa séria.",
+      image: account.image,
+      dev: account.dev,
+      createdAt: new Date("2026-06-03T12:00:00Z"),
+    },
+    streak: overallStreak(records, dateKey),
+    daysPlayed: counters.daysPlayed,
+    rolling: { value: 612, position: 3, participants: 63 },
+    achievements: achievementProgress(counters),
+    records,
   };
 }

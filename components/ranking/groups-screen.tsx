@@ -23,9 +23,11 @@ import type { GroupDetail, GroupSummary } from "@/server/groups";
 import { t } from "@/lib/i18n";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { GlideSwap } from "@/components/ui/glide-swap";
+import { Skeleton } from "@/components/ui/skeleton";
 import { PillTabs } from "@/components/ui/pill-tabs";
-import { Boards, SectionTitle, YouTag } from "./boards";
+import { Boards, RankingSkeleton, SectionTitle, YouTag } from "./boards";
 import { Avatar } from "@/components/profile/avatar";
+import { DevBadge } from "@/components/profile/dev-badge";
 import { ProfileLink } from "@/components/profile/profile-link";
 import { InlineForm } from "./inline-form";
 import { SignInButtons } from "./sign-in";
@@ -53,7 +55,7 @@ export function GroupsScreen() {
     setPrevious(selected.id);
   }
 
-  if (!today || me === undefined) return null;
+  if (!today) return null;
 
   const select = (id: string) => {
     rememberGroup(id);
@@ -95,8 +97,12 @@ export function GroupsScreen() {
 
       {me === null ? (
         <p className="text-muted-foreground">{t.login.groupsText}</p>
-      ) : !groups ? (
-        <p className="text-muted-foreground">{error ?? t.groups.loading}</p>
+      ) : !me || !groups ? (
+        error ? (
+          <p className="text-muted-foreground">{error}</p>
+        ) : (
+          <GroupsSkeleton />
+        )
       ) : selected ? (
         <GlideSwap id={selected.id} direction={direction}>
           <div role="tabpanel" className="flex flex-col gap-14">
@@ -138,10 +144,48 @@ function GroupPanel({ summary, me, onLeft }: { summary: GroupSummary; me: Me; on
     <section className="flex flex-col gap-6">
       <div>
         <SectionTitle players={summary.memberCount}>{t.groups.members}</SectionTitle>
-        {detail ? <Members detail={detail} me={me} /> : <p className="text-sm text-muted-foreground">{t.groups.loading}</p>}
+        {detail ? <Members detail={detail} me={me} /> : <MembersSkeleton count={summary.memberCount} />}
       </div>
       <Invite summary={summary} onLeft={onLeft} />
     </section>
+  );
+}
+
+/** Enquanto a sessão e os Grupos chegam: os membros, o convite e o ranking, só a forma. */
+function GroupsSkeleton() {
+  return (
+    <div role="status" aria-label={t.groups.loading} className="flex flex-col gap-14">
+      <section className="flex flex-col gap-6">
+        <div>
+          <Skeleton className="mb-2 h-6 w-32" />
+          <MembersSkeleton count={4} />
+        </div>
+        <Skeleton className="h-[72px] w-full rounded-xl" />
+      </section>
+      <section>
+        <Skeleton className="h-10 w-full max-w-2xl rounded-full" />
+        <div className="mt-6">
+          <RankingSkeleton rows={5} />
+        </div>
+      </section>
+    </div>
+  );
+}
+
+/** Os cards dos membros: foto, nome e @handle. */
+function MembersSkeleton({ count }: { count: number }) {
+  return (
+    <ul aria-hidden="true" className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+      {Array.from({ length: Math.min(count, 6) }, (_, i) => (
+        <li key={i} className="flex items-center gap-3 rounded-lg bg-card/60 px-3 py-2.5">
+          <Skeleton className="size-8 shrink-0 rounded-full" />
+          <span className="flex flex-1 flex-col gap-1.5">
+            <Skeleton className="h-3.5" style={{ width: `${[60, 45, 70, 52, 38, 64][i]}%` }} />
+            <Skeleton className="h-2.5 w-1/3" />
+          </span>
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -158,6 +202,7 @@ function Members({ detail, me }: { detail: GroupDetail; me: Me }) {
             <span className="min-w-0">
               <span className="flex items-center gap-2">
                 <span className="truncate text-sm font-medium">{member.name}</span>
+                <DevBadge dev={member.dev} />
                 {member.id === me.id && <YouTag />}
                 {member.id === detail.ownerId && (
                   <span className="shrink-0 text-[11px] font-semibold text-primary">{t.groups.owner}</span>

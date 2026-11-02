@@ -36,7 +36,7 @@ export interface GroupSummary {
 
 export interface GroupDetail extends GroupSummary {
   ownerId: string;
-  members: { id: string; handle: string; name: string; image: string | null; joinedAt: Date }[];
+  members: { id: string; handle: string; name: string; image: string | null; dev: boolean; joinedAt: Date }[];
 }
 
 async function membershipCount(db: Db, accountId: string): Promise<number> {
@@ -93,7 +93,14 @@ export async function getGroup(db: Db, accountId: string, groupId: string): Prom
   const [group] = await db.select().from(groups).where(eq(groups.id, groupId));
   if (!group) throw new AppError(404, "not_found", "Grupo não encontrado");
   const members = await db
-    .select({ id: user.id, handle: user.handle, name: user.name, image: user.image, joinedAt: groupMembers.joinedAt })
+    .select({
+      id: user.id,
+      handle: user.handle,
+      name: user.name,
+      image: user.image,
+      dev: user.dev,
+      joinedAt: groupMembers.joinedAt,
+    })
     .from(groupMembers)
     .innerJoin(user, eq(user.id, groupMembers.accountId))
     .where(eq(groupMembers.groupId, groupId))
