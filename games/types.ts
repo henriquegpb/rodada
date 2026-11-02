@@ -26,8 +26,11 @@ export type PlayStatus = "playing" | "won" | "lost" | "done";
 export type GameRules =
   /** Acertar uma resposta em até N tentativas. Resultado: tentativas usadas. */
   | { type: "attempts"; maxAttempts: number }
-  /** Chutes sem limite até acertar (ou desistir). Resultado: quantos chutes levou. */
-  | { type: "unlimited" }
+  /**
+   * Chutes sem limite até acertar (ou desistir). Resultado: quantos chutes levou. `minGuesses`: o
+   * menor número de chutes que resolve (no Elo, um por grupo); padrão 1.
+   */
+  | { type: "unlimited"; minGuesses?: number }
   /** Achar o máximo de itens antes do tempo acabar. Resultado: itens achados de `total`. */
   | { type: "timed"; seconds: number; total: number }
   /**

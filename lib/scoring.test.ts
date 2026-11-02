@@ -30,6 +30,15 @@ describe("Nota", () => {
     expect(gradePlay(lives, "won", 1)).toBe(67);
   });
 
+  it("sem limite, o mínimo de chutes do jogo vale 100", () => {
+    const elo: GameRules = { type: "unlimited", minGuesses: 4 };
+    expect(gradePlay(elo, "won", 4)).toBe(100);
+    expect(gradePlay(elo, "won", 5)).toBe(90);
+    expect(gradePlay(elo, "won", 8)).toBe(60);
+    expect(gradePlay(elo, "won", 40)).toBe(10);
+    expect(gradePlay(elo, "lost", 7)).toBe(0);
+  });
+
   it("derrota e desistência valem zero onde é preciso acertar", () => {
     expect(gradePlay(attempts, "lost", 6)).toBe(0);
     expect(gradePlay(unlimited, "lost", 12)).toBe(0);
