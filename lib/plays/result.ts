@@ -32,6 +32,28 @@ export function formatResult(rules: GameRules, status: PlayStatus, count: number
 }
 
 /**
+ * Como fica a partida depois de mais uma tentativa aceita: acertou, acabaram as tentativas ou as
+ * vidas, respondeu a última pergunta do quiz, ou segue.
+ */
+export function statusAfter(rules: GameRules, guesses: readonly Guess[], solved: boolean): PlayStatus {
+  if (solved) return "won";
+  const outOfAttempts =
+    (rules.type === "attempts" && guesses.length >= rules.maxAttempts) ||
+    (rules.type === "lives" && playCount(rules, guesses) >= rules.lives);
+  if (outOfAttempts) return "lost";
+  // No quiz a última resposta encerra; a engine marca `solved` quando acertou todas.
+  if (rules.type === "quiz" && guesses.length >= rules.total) return "done";
+  return "playing";
+}
+
+/**
+ * Encerrar antes da hora: com tempo é só o fim do relógio e por pontos é ficar com os que tem
+ * ("done"); nos outros, desistir é perder.
+ */
+export const giveUpStatus = (rules: GameRules): PlayStatus =>
+  rules.type === "timed" || rules.type === "points" ? "done" : "lost";
+
+/**
  * O dia conta para a sequência do jogo? Por tentativas, só vitória; com tempo, quiz e pontos, basta terminar.
  */
 export function countsForStreak(rules: GameRules, status: PlayStatus): boolean {

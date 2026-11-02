@@ -4,15 +4,16 @@ import { loadEngine, peekEngine } from "@/games/engines";
 import { getGame } from "@/games";
 import type { GameEngine, GameRules, Guess, PlayStatus, PlayView } from "@/games/types";
 import { addDays, challengeNumber } from "@/lib/daily/date";
-import { playCount } from "./result";
+import { giveUpStatus, statusAfter } from "./result";
 import { dailyStore, practiceStore, type PlayStore, type StoredPlay } from "./store";
+import { reportPlay, startClockOnServer } from "./sync";
 
 /**
  * Ponto único por onde a UI fala com o "servidor" dos jogos.
  *
- * Hoje roda no navegador, chamando a engine direto. Quando o backend existir, estas funções
- * viram chamadas às route handlers com a mesma assinatura, e nenhum componente precisa mudar.
- * O relógio dos jogos com tempo também passa a valer pelo horário do servidor.
+ * O jogo roda no navegador, chamando a engine direto. Ao terminar, a Partida do dia vai para o
+ * servidor (./sync.ts), que refaz a partida e calcula a Nota; quem não entrou na Conta joga igual,
+ * só que fora dos Rankings. Nos jogos com tempo, o relógio que vale para o Ranking é o do servidor.
  *
  * Toda função recebe `practice`: o treino usa o desafio de um dia qualquer, guardado à parte,
  * e nunca conta para sequência, estatística ou histórico.
@@ -54,6 +55,8 @@ function toView(slug: string, dateKey: string, puzzle: unknown, practice: boolea
 function close(store: PlayStore, stored: StoredPlay, status: PlayStatus, answerLabel: string): StoredPlay {
   const closed = { ...stored, status, answerLabel, finishedAt: new Date().toISOString() };
   store.savePlay(closed);
+  // Partida do dia terminada: vai para o servidor, se houver Conta logada. Treino nunca vai.
+  if (store === dailyStore) void reportPlay(closed);
   return closed;
 }
 
@@ -137,6 +140,7 @@ export async function beginPlay(slug: string, dateKey: string, practice = false)
   if (existing) return toView(slug, dateKey, puzzle, practice, existing);
   const stored = fresh(slug, dateKey);
   store.savePlay(stored);
+  if (!practice) startClockOnServer(slug, dateKey);
   return toView(slug, dateKey, puzzle, practice, stored);
 }
 
@@ -145,11 +149,9 @@ export async function finishPlay(slug: string, dateKey: string, practice = false
   const store = storeFor(practice);
   const engine = await loadEngine(slug);
   const { puzzle, answer } = engine.createChallenge(dateKey);
-  // Com tempo, terminar é só o fim do relógio; por pontos, ficar com os que tem ("done").
-  // Nos outros, desistir é perder.
-  const type = rulesOf(slug).type;
-  const status: PlayStatus = type === "timed" || type === "points" ? "done" : "lost";
-  let stored = store.getPlay(slug, dateKey) ?? (type === "timed" ? undefined : fresh(slug, dateKey));
+  const rules = rulesOf(slug);
+  const status = giveUpStatus(rules);
+  let stored = store.getPlay(slug, dateKey) ?? (rules.type === "timed" ? undefined : fresh(slug, dateKey));
   if (stored?.status === "playing") stored = close(store, stored, status, engine.describeAnswer(answer));
   return toView(slug, dateKey, puzzle, practice, stored);
 }
@@ -177,12 +179,7 @@ export async function submitGuess(
   if (!result.ok) return { error: result.error };
 
   const guesses = [...stored.guesses, { input, feedback: result.feedback }];
-  const outOfAttempts =
-    (rules.type === "attempts" && guesses.length >= rules.maxAttempts) ||
-    (rules.type === "lives" && playCount(rules, guesses) >= rules.lives);
-  // No quiz a última resposta encerra; a engine marca `solved` quando acertou todas.
-  const quizOver = rules.type === "quiz" && guesses.length >= rules.total;
-  const status: PlayStatus = result.solved ? "won" : outOfAttempts ? "lost" : quizOver ? "done" : "playing";
+  const status = statusAfter(rules, guesses, result.solved);
   const next = { ...stored, guesses };
   if (status === "playing") {
     store.savePlay(next);
