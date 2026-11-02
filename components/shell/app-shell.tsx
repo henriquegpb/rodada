@@ -24,7 +24,7 @@ import { formatResult } from "@/lib/plays/result";
 import { NO_STREAK, overallStreak } from "@/lib/stats";
 import { trackEvent } from "@/lib/analytics";
 import { notePath } from "@/lib/nav-history";
-import { pickGroup, useGroups, useMe } from "@/lib/ranking/client";
+import { pickGroup, useGroups, useMe, type Me } from "@/lib/ranking/client";
 import type { GroupSummary } from "@/server/groups";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
@@ -69,7 +69,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   const previewMeta = preview ? getGame(preview.slug)?.meta : undefined;
 
   // Os Grupos da Conta embaixo de "Grupos", abertos pelo chevron; na tela de Grupos já vêm abertos.
-  const { groups } = useGroups(useMe());
+  const me = useMe();
+  const { groups } = useGroups(me);
   const [groupsOpen, setGroupsOpen] = useState<boolean | null>(null);
   const showGroups = groupsOpen ?? pathname.startsWith("/grupos");
 
@@ -92,10 +93,13 @@ export function AppShell({ children }: { children: ReactNode }) {
     // Assim a sidebar nunca sai do lugar nem aparece o "elástico" do scroll em volta dela.
     <div className="h-dvh overflow-hidden lg:grid lg:grid-cols-[248px_1fr]">
       <aside className="hidden h-dvh flex-col border-r border-sidebar-border bg-sidebar px-4 py-6 lg:flex">
-        <Logo className="shrink-0 px-3" />
+        <div className="flex shrink-0 items-center justify-between pl-3">
+          <Logo />
+          <ProfileButton me={me} active={pathname === "/perfil"} />
+        </div>
         {/* Só a navegação rola: com muitos jogos, logo e rodapé (estrela, relógio, tema) ficam parados. */}
         <div className="-mx-4 mt-8 min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-4">
-          {/* Um trilho só: o indicador desliza de Hoje até Perfil, passando por cima dos jogos e dos grupos. */}
+          {/* Um trilho só: o indicador desliza entre Hoje, Ranking e Grupos, passando por cima dos grupos. */}
           <SpotlightNav
             label="Navegação"
             activeHref={pathname}
@@ -104,19 +108,6 @@ export function AppShell({ children }: { children: ReactNode }) {
                 href: "/",
                 label: t.nav.home,
                 leading: <LayoutGrid size={17} strokeWidth={2} />,
-                children: (
-                  <div className="mb-3 mt-3 pl-2">
-                    <BranchedMenu
-                      items={gamesMenu}
-                      // Nos modos (Dupla, Quadra) o galho aceso continua sendo o do Palavra.
-                      active={rootGame(pathname.slice(1))?.meta.slug ?? ""}
-                      onSelect={(slug) => router.push(`/${slug}`)}
-                      onHover={showPreview}
-                      onHoverEnd={hidePreview}
-                      {...TREE}
-                    />
-                  </div>
-                ),
               },
               { href: "/ranking", label: t.nav.ranking, leading: <Trophy size={17} strokeWidth={2} /> },
               {
@@ -152,9 +143,22 @@ export function AppShell({ children }: { children: ReactNode }) {
                   </div>
                 ) : undefined,
               },
-              { href: "/perfil", label: t.nav.profile, leading: <UserRound size={17} strokeWidth={2} /> },
             ]}
           />
+          <p className="mb-1.5 mt-7 px-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground/70">
+            {t.nav.games}
+          </p>
+          <div className="pl-2">
+            <BranchedMenu
+              items={gamesMenu}
+              // Nos modos (Dupla, Quadra) o galho aceso continua sendo o do Palavra.
+              active={rootGame(pathname.slice(1))?.meta.slug ?? ""}
+              onSelect={(slug) => router.push(`/${slug}`)}
+              onHover={showPreview}
+              onHoverEnd={hidePreview}
+              {...TREE}
+            />
+          </div>
         </div>
         <div className="shrink-0 border-t border-sidebar-border px-3 pt-5">
           <GitHubStar />
@@ -186,6 +190,32 @@ export function AppShell({ children }: { children: ReactNode }) {
         <MobileNav pathname={pathname} />
       </div>
     </div>
+  );
+}
+
+/** O Perfil, na linha do logo: a foto (ou a inicial) de quem entrou, ou o ícone de pessoa. */
+function ProfileButton({ me, active }: { me: Me | null | undefined; active: boolean }) {
+  return (
+    <Link
+      href="/perfil"
+      aria-label={t.nav.profile}
+      aria-current={active ? "page" : undefined}
+      className={cn(
+        "grid size-9 place-items-center overflow-hidden rounded-full text-muted-foreground ring-2 ring-transparent transition-[color,box-shadow,background-color] hover:bg-sidebar-accent hover:text-sidebar-foreground",
+        active && "text-sidebar-foreground ring-[#ff6a1a]",
+      )}
+    >
+      {me?.image ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={me.image} alt="" className="size-full object-cover" />
+      ) : me ? (
+        <span className="grid size-full place-items-center bg-secondary text-sm font-semibold uppercase text-sidebar-foreground">
+          {me.name.charAt(0)}
+        </span>
+      ) : (
+        <UserRound size={18} strokeWidth={2} />
+      )}
+    </Link>
   );
 }
 
