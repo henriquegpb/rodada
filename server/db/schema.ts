@@ -19,6 +19,8 @@ export const user = pgTable("users", {
   /** Sempre em minúsculas: [a-z0-9_], 3–20. Vira o endereço do Perfil. */
   handle: text("handle").notNull().unique(),
   bio: text("bio").notNull().default(""),
+  /** Ajudou a construir o Rodada: ganha a pílula "Dev" no ranking e no Perfil. Só muda pelo banco. */
+  dev: boolean("dev").notNull().default(false),
   /** Quando as Partidas do navegador foram importadas; a importação só acontece uma vez. */
   importedAt: timestamp("imported_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

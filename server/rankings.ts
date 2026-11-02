@@ -23,7 +23,7 @@ export type RankingKind =
 export interface RankingRow {
   /** Ranking denso: valores iguais, posições iguais. */
   position: number;
-  account: { id: string; handle: string; name: string; image: string | null };
+  account: { id: string; handle: string; name: string; image: string | null; dev: boolean };
   /** Soma de Notas: o Score diário do dia, ou a soma da janela de 30 dias. */
   total: number;
   /** O que se mostra: o Score diário, ou a Média de 30 dias (total ÷ 30, uma casa). */
@@ -94,6 +94,7 @@ interface RawRow {
   handle: string;
   name: string;
   image: string | null;
+  dev: boolean;
   total: number;
   played: boolean;
   count: number | null;
@@ -128,7 +129,7 @@ export async function ranking(
     query = sql`
       with src as (${source(kind, today, members)}),
       ranked as (
-        select u.id, u.handle, u.name, u.image,
+        select u.id, u.handle, u.name, u.image, u.dev,
           coalesce(src.total, 0)::int as total,
           src.account_id is not null as played,
           src.count::int as count, src.status,
@@ -145,7 +146,7 @@ export async function ranking(
     query = sql`
       with src as (${source(kind, today)}),
       ranked as (
-        select u.id, u.handle, u.name, u.image,
+        select u.id, u.handle, u.name, u.image, u.dev,
           src.total::int as total,
           true as played,
           src.count::int as count, src.status,
@@ -162,7 +163,7 @@ export async function ranking(
   const all = result.rows.map(
     (r): RankingRow => ({
       position: r.position,
-      account: { id: r.id, handle: r.handle, name: r.name, image: r.image },
+      account: { id: r.id, handle: r.handle, name: r.name, image: r.image, dev: r.dev },
       total: r.total,
       value: kind.kind === "daily" ? r.total : Math.round((r.total / WINDOW_DAYS) * 10) / 10,
       played: r.played,
