@@ -89,7 +89,6 @@ export const ptBR = {
     achievements: "Conquistas",
     seePublic: "Ver meu perfil público",
     edit: "Editar perfil",
-    account: "Conta",
     editHint: "É assim que as pessoas te veem no ranking e nos grupos.",
     changePhoto: "Trocar foto",
     photoHint: "JPEG, PNG ou WebP, até 2 MB.",

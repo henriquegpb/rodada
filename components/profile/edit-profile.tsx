@@ -4,6 +4,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Camera, LogOut } from "lucide-react";
 import { FocusInput } from "@/components/microkit/focus-input";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { checkHandle, saveProfile, signOut, uploadAvatar, type Me } from "@/lib/ranking/client";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
@@ -12,31 +13,41 @@ import { Avatar } from "./avatar";
 const MAX_NAME = 50;
 const MAX_BIO = 160;
 
-/**
- * Os controles da própria Conta, na aba Perfil: foto, nome, @handle e bio (só manda o que mudou) e
- * o botão de sair.
- */
-export function AccountSettings({ me, bio }: { me: Me; bio: string }) {
+/** O modal da própria Conta: foto, nome, @handle e bio (só manda o que mudou) e o botão de sair. */
+export function EditProfile({
+  me,
+  bio,
+  open,
+  onOpenChange,
+}: {
+  me: Me;
+  bio: string;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
   return (
-    <section id="conta" className="scroll-mt-8">
-      <h2 className="font-display text-xl">{t.profile.account}</h2>
-      <p className="mt-1 text-sm text-muted-foreground">{t.profile.editHint}</p>
-      <div className="mt-5 max-w-md">
-        {/* Chave pelo que está salvo: depois de salvar (ou trocar de Conta), o formulário recomeça dali. */}
-        <Form key={`${me.id}:${me.name}:${me.handle}:${bio}`} me={me} currentBio={bio} />
-      </div>
-      <button
-        type="button"
-        onClick={() => void signOut()}
-        className="mt-6 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 -ml-3 text-sm text-muted-foreground transition-colors hover:bg-card hover:text-foreground"
-      >
-        <LogOut size={14} /> {t.login.signOut}
-      </button>
-    </section>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-md">
+        <DialogTitle className="font-display text-xl">{t.profile.edit}</DialogTitle>
+        <DialogDescription>{t.profile.editHint}</DialogDescription>
+        {/* Abre sempre com o que está salvo agora. */}
+        {open && <Form me={me} currentBio={bio} onDone={() => onOpenChange(false)} />}
+        <button
+          type="button"
+          onClick={() => {
+            onOpenChange(false);
+            void signOut();
+          }}
+          className="mx-auto inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+        >
+          <LogOut size={14} /> {t.login.signOut}
+        </button>
+      </DialogContent>
+    </Dialog>
   );
 }
 
-function Form({ me, currentBio }: { me: Me; currentBio: string }) {
+function Form({ me, currentBio, onDone }: { me: Me; currentBio: string; onDone: () => void }) {
   const [name, setName] = useState(me.name);
   const [handle, setHandle] = useState(me.handle);
   const [bio, setBio] = useState(currentBio);
@@ -89,7 +100,7 @@ function Form({ me, currentBio }: { me: Me; currentBio: string }) {
 
   return (
     <form
-      className="flex flex-col gap-5"
+      className="mt-2 flex flex-col gap-5"
       onSubmit={async (e) => {
         e.preventDefault();
         if (!dirty || busy || handleError) return;
@@ -97,6 +108,7 @@ function Form({ me, currentBio }: { me: Me; currentBio: string }) {
         try {
           await saveProfile(changes);
           toast.success(t.profile.saved);
+          onDone();
         } catch (error) {
           toast.error((error as Error).message);
         } finally {
