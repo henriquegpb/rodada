@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import type { AttemptRules, BoardProps } from "../../types";
 import { ACTIVE_ROW_SCROLL, FLIP_STAGGER_MS, Keyboard, MARK_RANK, Tile, useWordEntry } from "../../palavra/kit";
 import type { LetterMark } from "../../palavra/types";
+import { solvedBoards } from "./engine";
 import type { MultiWordFeedback, MultiWordPuzzle } from "./types";
 
 /**
@@ -60,7 +61,10 @@ export function MultiWordBoard({
         });
       });
     }
-    return (key: string) => perBoard.map((map) => map.get(key));
+    // Tabuleiro resolvido não conta mais: ali toda letra vale como inexistente, e a tecla apaga
+    // quando também não serve em nenhum tabuleiro ainda aberto.
+    const solved = solvedBoards(settled, boards);
+    return (key: string) => perBoard.map((map, b) => (solved[b] ? "absent" : map.get(key)));
   }, [settled, boards]);
 
   return (
