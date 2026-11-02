@@ -45,6 +45,12 @@ describe("Nota", () => {
     expect(notas).toEqual([100, 95, 75, 64, 53, 43, 32, 21, 10, 10]);
   });
 
+  it("Sentido vale 60 com 30 chutes e chega a 10 com 80", () => {
+    const { rules } = getGame("sentido")!.meta;
+    const notas = [1, 30, 40, 50, 60, 70, 80, 200].map((n) => gradePlay(rules, "won", n));
+    expect(notas).toEqual([100, 60, 50, 40, 30, 20, 10, 10]);
+  });
+
   it("derrota e desistência valem zero onde é preciso acertar", () => {
     expect(gradePlay(attempts, "lost", 6)).toBe(0);
     expect(gradePlay(unlimited, "lost", 12)).toBe(0);

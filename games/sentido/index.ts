@@ -13,7 +13,8 @@ export const sentido: GameDefinition<SentidoPuzzle, SentidoFeedback, UnlimitedRu
     tagline: "Quente ou frio, com palavras",
     description: "Ache a palavra secreta: cada chute mostra quão perto ela está no sentido.",
     icon: Radar,
-    rules: { type: "unlimited" },
+    // Partidas levam dezenas de chutes (as dicas contam): 60 com 30 chutes, até 10 com 80.
+    rules: { type: "unlimited", curve: [[1, 100], [30, 60], [80, 10]] },
     color: "#e8b77a",
     launchedOn: "2026-10-29",
     howToPlay: [
