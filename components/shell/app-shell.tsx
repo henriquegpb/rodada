@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Check, Flame, Gamepad2, LayoutGrid, Star, UserRound, X } from "lucide-react";
+import { Check, Flame, Gamepad2, LayoutGrid, Star, Trophy, UserRound, Users, X } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { games, getGame, rootGame } from "@/games";
 import { preloadEngine } from "@/games/engines";
@@ -70,6 +70,8 @@ export function AppShell({ children }: { children: ReactNode }) {
     label: t.nav.profile,
     leading: <UserRound size={17} strokeWidth={2} />,
   };
+  const rankingItem = { href: "/ranking", label: t.nav.ranking, leading: <Trophy size={17} strokeWidth={2} /> };
+  const groupsItem = { href: "/grupos", label: t.nav.groups, leading: <Users size={17} strokeWidth={2} /> };
   // Os jogos da rodada como galhos de uma árvore (React Bits · Branched Menu).
   const gamesMenu = [
     {
@@ -93,6 +95,8 @@ export function AppShell({ children }: { children: ReactNode }) {
         {/* Só a navegação rola: com muitos jogos, logo e rodapé (estrela, relógio, tema) ficam parados. */}
         <div className="-mx-4 mt-8 min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-4">
           <SpotlightNav items={[profileItem]} activeHref={pathname} label={t.nav.profile} />
+          <SpotlightNav items={[rankingItem]} activeHref={pathname} label={t.nav.ranking} />
+          <SpotlightNav items={[groupsItem]} activeHref={pathname} label={t.nav.groups} />
           <SpotlightNav items={[homeItem]} activeHref={pathname} label={t.nav.home} />
           <div className="mt-3 pl-2">
             <BranchedMenu
@@ -147,7 +151,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 }
 
 /**
- * Celular: Hoje · Jogos · Perfil. Com 9 jogos não cabe um ícone para cada; "Jogos" abre a lista
+ * Celular: Hoje · Jogos · Ranking · Grupos · Perfil. Com 9 jogos não cabe um ícone para cada; "Jogos" abre a lista
  * (e, dentro de um jogo, mostra o nome e o ícone dele).
  */
 function MobileNav({ pathname }: { pathname: string }) {
@@ -169,6 +173,8 @@ function MobileNav({ pathname }: { pathname: string }) {
             active: Boolean(current),
             onSelect: () => setOpen(true),
           },
+          { href: "/ranking", label: t.nav.ranking, icon: Trophy },
+          { href: "/grupos", label: t.nav.groups, icon: Users },
           { href: "/perfil", label: t.nav.profile, icon: UserRound },
         ]}
       />

@@ -1,3 +1,4 @@
+import { unstable_rethrow } from "next/navigation";
 import { auth } from "./auth";
 import { AppError } from "./errors";
 
@@ -33,6 +34,8 @@ export async function respond(run: () => Promise<unknown>): Promise<Response> {
     const result = await run();
     return result === undefined ? new Response(null, { status: 204 }) : Response.json(result);
   } catch (error) {
+    // Erros internos do Next (ler a URL no prerender, notFound…) seguem para ele, não viram 500.
+    unstable_rethrow(error);
     if (error instanceof AppError) {
       return Response.json({ error: { code: error.code, message: error.message } }, { status: error.status });
     }

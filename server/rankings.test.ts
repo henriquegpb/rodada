@@ -67,6 +67,27 @@ describe("Ranking diário", () => {
     expect(handles(result.rows)).toEqual(["ana", "bia"]);
   });
 
+  it("de um jogo usa a Nota daquela partida e traz o placar; o geral traz quantos jogos da Rodada", async () => {
+    const duplaWin = { slug: "dupla", dateKey: D1, guesses: dupla.createChallenge(D1).answer as string[] };
+    await registerPlay(db, ana, palavraIn(3, D1), noon(D1));
+    await registerPlay(db, bia, palavraIn(1, D1), noon(D1));
+    await registerPlay(db, caio, duplaWin, noon(D1));
+
+    const game = await ranking(db, { kind: "daily", dateKey: D1, slug: "palavra" }, { now: noon(D1, 30) });
+    expect(game.rows.map((r) => [r.account.handle, r.value, r.status, r.count])).toEqual([
+      ["bia", 100, "won", 1],
+      ["ana", 67, "won", 3],
+    ]);
+    const mode = await ranking(db, { kind: "daily", dateKey: D1, slug: "dupla" }, { now: noon(D1, 30) });
+    expect(handles(mode.rows)).toEqual(["caio"]);
+    const overall = await ranking(db, { kind: "daily", dateKey: D1 }, { now: noon(D1, 30) });
+    expect(overall.rows.map((r) => [r.account.handle, r.count, r.status])).toEqual([
+      ["bia", 1, null],
+      ["ana", 1, null],
+    ]);
+    await expect(ranking(db, { kind: "daily", dateKey: D1, slug: "xadrez" }, {})).rejects.toMatchObject({ status: 400 });
+  });
+
   it("dias anteriores continuam consultáveis, mas o futuro não", async () => {
     await registerPlay(db, ana, palavraIn(1, D1), noon(D1));
     const later = noon(D2);

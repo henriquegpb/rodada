@@ -1,4 +1,5 @@
 import { and, eq, sql, type SQL } from "drizzle-orm";
+import type { PlayStatus } from "@/games/types";
 import { addDays, getDateKey, isDateKey } from "@/lib/daily/date";
 import type { Db } from "./db";
 import { dailyScores, groupMembers, plays, user } from "./db/schema";
@@ -6,13 +7,18 @@ import { AppError } from "./errors";
 import { gameOf } from "./plays";
 
 /**
- * Rankings: Score diário de um dia, Média de 30 dias do Score diário e Média de 30 dias da Nota de
- * um jogo. Os números são os mesmos no geral e num Grupo; o Grupo só filtra quem aparece (ADR 0002).
+ * Rankings: Score diário de um dia (ou a Nota de um jogo num dia), Média de 30 dias do Score diário
+ * e Média de 30 dias da Nota de um jogo. Os números são os mesmos no geral e num Grupo; o Grupo só
+ * filtra quem aparece (ADR 0002).
  */
 
 export const WINDOW_DAYS = 30;
 
-export type RankingKind = { kind: "daily"; dateKey: string } | { kind: "rolling" } | { kind: "game"; slug: string };
+/** `daily` com `slug`: a Nota de um jogo (Modos inclusive) naquele dia. */
+export type RankingKind =
+  | { kind: "daily"; dateKey: string; slug?: string }
+  | { kind: "rolling" }
+  | { kind: "game"; slug: string };
 
 export interface RankingRow {
   /** Ranking denso: valores iguais, posições iguais. */
@@ -24,6 +30,13 @@ export interface RankingRow {
   value: number;
   /** Jogou no período. Só é falso no Ranking de um Grupo, que mostra todos os membros. */
   played: boolean;
+  /**
+   * Só no Ranking diário: o placar da partida (`playCount`), com `slug`; sem ele, quantos jogos da
+   * Rodada terminou no dia. Null nos outros e em quem não jogou.
+   */
+  count: number | null;
+  /** Só no Ranking diário de um jogo: como a partida terminou. */
+  status: Exclude<PlayStatus, "playing"> | null;
 }
 
 export interface Ranking {
@@ -39,24 +52,32 @@ export function windowOf(today: string) {
 }
 
 /**
- * Linhas (account_id, total, reached) do período; `reached` desempata quem chegou primeiro. Dia em
- * que a Conta só jogou Modos não conta como jogado no Score diário.
+ * Linhas (account_id, total, reached, count, status) do período; `reached` desempata quem chegou
+ * primeiro. Dia em que a Conta só jogou Modos não conta como jogado no Score diário.
  */
 function source(kind: RankingKind, today: string, members?: SQL): SQL {
   const only = (column: typeof dailyScores.accountId | typeof plays.accountId) => (members ? sql`and ${column} in (${members})` : sql``);
+  if (kind.kind === "daily" && kind.slug) {
+    return sql`select ${plays.accountId} as account_id, ${plays.nota} as total, ${plays.finishedAt} as reached,
+        ${plays.count} as count, ${plays.status} as status
+      from ${plays} where ${plays.slug} = ${kind.slug} and ${plays.dateKey} = ${kind.dateKey} ${only(plays.accountId)}`;
+  }
   if (kind.kind === "daily") {
-    return sql`select ${dailyScores.accountId} as account_id, ${dailyScores.score} as total, ${dailyScores.updatedAt} as reached
+    return sql`select ${dailyScores.accountId} as account_id, ${dailyScores.score} as total, ${dailyScores.updatedAt} as reached,
+        ${dailyScores.roundFinished} as count, null::text as status
       from ${dailyScores} where ${dailyScores.dateKey} = ${kind.dateKey} and ${dailyScores.roundFinished} > 0
       ${only(dailyScores.accountId)}`;
   }
   const { from, to } = windowOf(today);
   if (kind.kind === "rolling") {
-    return sql`select ${dailyScores.accountId} as account_id, sum(${dailyScores.score}) as total, max(${dailyScores.updatedAt}) as reached
+    return sql`select ${dailyScores.accountId} as account_id, sum(${dailyScores.score}) as total, max(${dailyScores.updatedAt}) as reached,
+        null::int as count, null::text as status
       from ${dailyScores} where ${dailyScores.dateKey} between ${from} and ${to} and ${dailyScores.roundFinished} > 0
       ${only(dailyScores.accountId)}
       group by ${dailyScores.accountId}`;
   }
-  return sql`select ${plays.accountId} as account_id, sum(${plays.nota}) as total, max(${plays.finishedAt}) as reached
+  return sql`select ${plays.accountId} as account_id, sum(${plays.nota}) as total, max(${plays.finishedAt}) as reached,
+      null::int as count, null::text as status
     from ${plays} where ${plays.slug} = ${kind.slug} and ${plays.dateKey} between ${from} and ${to} ${only(plays.accountId)}
     group by ${plays.accountId}`;
 }
@@ -65,7 +86,7 @@ function validate(kind: RankingKind, today: string) {
   if (kind.kind === "daily" && (!isDateKey(kind.dateKey) || kind.dateKey > today)) {
     throw new AppError(400, "invalid_request", "Dia inválido");
   }
-  if (kind.kind === "game") gameOf(kind.slug);
+  if (kind.kind === "game" || (kind.kind === "daily" && kind.slug !== undefined)) gameOf(kind.slug);
 }
 
 interface RawRow {
@@ -75,6 +96,8 @@ interface RawRow {
   image: string | null;
   total: number;
   played: boolean;
+  count: number | null;
+  status: RankingRow["status"];
   position: number;
   participants: number;
 }
@@ -108,6 +131,7 @@ export async function ranking(
         select u.id, u.handle, u.name, u.image,
           coalesce(src.total, 0)::int as total,
           src.account_id is not null as played,
+          src.count::int as count, src.status,
           dense_rank() over (order by coalesce(src.total, 0) desc)::int as position,
           row_number() over (order by coalesce(src.total, 0) desc, src.reached asc nulls last, u.handle) as rn,
           count(*) over ()::int as participants
@@ -124,6 +148,7 @@ export async function ranking(
         select u.id, u.handle, u.name, u.image,
           src.total::int as total,
           true as played,
+          src.count::int as count, src.status,
           dense_rank() over (order by src.total desc)::int as position,
           row_number() over (order by src.total desc, src.reached asc, u.handle) as rn,
           count(*) over ()::int as participants
@@ -141,6 +166,8 @@ export async function ranking(
       total: r.total,
       value: kind.kind === "daily" ? r.total : Math.round((r.total / WINDOW_DAYS) * 10) / 10,
       played: r.played,
+      count: r.count,
+      status: r.status,
     }),
   );
   const mine = all.find((r) => r.account.id === accountId) ?? null;

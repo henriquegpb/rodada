@@ -83,13 +83,14 @@ export function startClockOnServer(slug: string, dateKey: string) {
 
 /**
  * Leva as Partidas do dia guardadas neste navegador para a Conta. O servidor só aceita uma
- * importação por Conta; chame logo depois do primeiro login. Devolve null se não foi possível
- * (sem login, já importado ou sem conexão).
+ * importação por Conta; chame logo depois do primeiro login. Já importado devolve zero aceitas;
+ * null é que não deu (sem login ou sem conexão) e vale tentar de novo.
  */
 export async function importLocalPlays(): Promise<{ accepted: number; rejected: number } | null> {
   const plays = Object.values(dailyStore.getPlays())
     .filter((p) => p.status !== "playing")
     .map((p) => ({ slug: p.slug, dateKey: p.dateKey, guesses: p.guesses.map((g) => g.input), finishedAt: p.finishedAt }));
   const response = await post("/api/plays/import", { plays });
+  if (response?.status === 409) return { accepted: 0, rejected: 0 };
   return response?.ok ? response.json() : null;
 }

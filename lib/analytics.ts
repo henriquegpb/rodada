@@ -22,6 +22,11 @@ export interface AnalyticsEvents {
   sound_toggled: { muted: boolean };
   theme_changed: { theme: string };
   github_star_clicked: Record<string, never>;
+  /** Pediu para entrar na Conta (`from`: a tela onde foi). */
+  login_started: { method: "google" | "email"; from: string };
+  group_created: Record<string, never>;
+  group_joined: { from: string };
+  invite_copied: Record<string, never>;
 }
 
 export function trackEvent<K extends keyof AnalyticsEvents>(name: K, properties: AnalyticsEvents[K]) {

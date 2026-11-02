@@ -7,7 +7,8 @@ import { ranking, type RankingKind } from "@/server/rankings";
 
 /**
  * Rankings. Parâmetros:
- *  - kind: "daily" (com date=AAAA-MM-DD, padrão hoje), "rolling" (Média de 30 dias) ou "game" (com slug)
+ *  - kind: "daily" (com date=AAAA-MM-DD, padrão hoje; com slug, só aquele jogo), "rolling" (Média de
+ *    30 dias) ou "game" (Média de 30 dias de um jogo, com slug)
  *  - group: id do Grupo; sem ele, o Ranking geral
  *  - limit: quantas posições (padrão 100, máximo 100)
  */
@@ -17,7 +18,7 @@ export async function GET(request: Request) {
     const today = getDateKey();
     const kindName = params.get("kind") ?? "daily";
     let kind: RankingKind;
-    if (kindName === "daily") kind = { kind: "daily", dateKey: params.get("date") ?? today };
+    if (kindName === "daily") kind = { kind: "daily", dateKey: params.get("date") ?? today, slug: params.get("slug") ?? undefined };
     else if (kindName === "rolling") kind = { kind: "rolling" };
     else if (kindName === "game") kind = { kind: "game", slug: params.get("slug") ?? "" };
     else throw new AppError(400, "invalid_request", "kind deve ser daily, rolling ou game");

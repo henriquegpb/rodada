@@ -69,6 +69,8 @@ Regras:
 - **Use sempre `pickDaily`** para escolher o desafio. Ele garante o mesmo desafio para todo mundo, sem repetição, e embaralhado pelo segredo do servidor. Nunca use `Math.random()` nem `Date.now()` aqui.
 - **O `puzzle` não pode conter a resposta**, nem algo que a revele (um nome de arquivo, um código).
 - Uma tentativa inválida (palavra que não existe, repetida…) devolve `{ ok: false, error }` e não gasta tentativa. A mensagem aparece para o jogador.
+- **A engine também roda no servidor**: o ranking refaz as tentativas de cada partida nela para conferir o placar. Por isso ela não pode depender do navegador (`window`, `localStorage`, `fetch` de arquivo relativo).
+- Jogo **por pontos** implementa `maxPoints(puzzle)`: quanto vale o desafio inteiro. É a régua do jogo no ranking geral.
 
 ### 3. Tabuleiro
 

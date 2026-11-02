@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { ShareButton } from "@/components/microkit/cursor-follow-share-button";
 import { Countdown } from "@/components/countdown";
+import { RankingLine } from "@/components/ranking/ranking-line";
 import { modesOf } from "@/games";
 import type { GameDefinition, PlayView } from "@/games/types";
 import { useRound } from "@/lib/plays/hooks";
@@ -169,7 +170,10 @@ export function ResultDialog({
               <RotateCcw size={18} /> {t.practice.playAnother}
             </button>
           ) : (
-            <ShareButton label={t.game.share} onClick={share} />
+            <>
+              <ShareButton label={t.game.share} onClick={share} />
+              <RankingLine slug={game.meta.slug} dateKey={play.dateKey} />
+            </>
           )}
           <div className="flex items-center justify-between gap-4 text-sm">
             {play.practice ? (

@@ -48,7 +48,7 @@ O `.env.example` lista as variáveis. Para jogar, nenhuma é obrigatória; o log
 ## Como funciona
 
 ```
-app/                  rotas (Next.js App Router): /, /[jogo], /perfil
+app/                  rotas (Next.js App Router): /, /[jogo], /perfil, /ranking, /grupos
 games/                um módulo por jogo + registro (veja CONTRIBUTING.md)
   types.ts            contrato comum a todos os jogos
   index.ts            registro da parte de UI
@@ -58,6 +58,7 @@ games/                um módulo por jogo + registro (veja CONTRIBUTING.md)
 lib/
   daily/              data em America/Sao_Paulo, seed, sorteio do dia
   plays/              partidas salvas no navegador + serviço que fala com a engine
+  ranking/            Conta logada, buscas de Rankings e Grupos na API e dados de mentira (?mock)
   stats.ts scoring.ts estatísticas, sequências, pontuação e Nota
   achievements.ts     registro das Conquistas e seus Níveis
   i18n/               todos os textos da plataforma (PT-BR)
@@ -76,6 +77,8 @@ scripts/build-data.ts gera os dados dos jogos a partir das fontes abertas
 **Tipos de jogo.** Cada jogo declara suas regras (`meta.rules`): **por tentativas** (Palavra, País, Mosaico, Rota: acertar em até N chutes), **sem limite** (Calor, Elo e Sentido: chutar até acertar, ou desistir), **por tempo** (Mundo: achar o máximo antes do relógio zerar) **quiz** (Capital e Bandeira: 10 perguntas seguidas, uma resposta cada) ou **por pontos** (Colmeia: cada achado vale pontos, até achar tudo ou encerrar) ou **por vidas** (Rainhas: montar a solução peça por peça; cada peça errada custa uma vida). No jogo por tempo, o relógio começa ao clicar em "Começar" e continua correndo mesmo se a pessoa fechar a página.
 
 **Pontuação**: nos jogos por tentativas, `tentativas máximas + 1 − tentativas usadas`, e derrota vale 0. No jogo por tempo, um ponto por item achado; no quiz, um por acerto; por pontos, os do próprio jogo; por vidas, um por vida que sobrou. Para os Rankings, esse Score bruto vira a **Nota** (0–100 do máximo possível no desafio), e o **Score diário** é a soma das Notas dos jogos da Rodada ([ADR 0002](docs/adr/0002-nota-absoluta-e-media-de-30-dias.md)).
+
+**Ranking e Grupos.** `/ranking` mostra o Ranking do dia: o geral (Score diário) e um por jogo (a Nota daquela partida, Modos inclusive), trocados por abas. Qualquer pessoa vê; para aparecer, entra na Conta (Google ou link por e-mail) e as partidas já guardadas no navegador vão junto, uma vez por Conta. Em `/grupos` dá para criar um Grupo, chamar a turma pelo link de convite (`/grupos/convite?c=…`) e ver o mesmo ranking só entre os membros. Para desenhar essas telas sem banco, abra com `?mock` (só fora de produção).
 
 **Sequências.** A sequência de cada jogo por tentativas ou por vidas conta vitórias seguidas, e perder zera. No jogo por tempo, no quiz e por pontos, conta dias jogados. A sequência geral conta dias seguidos com pelo menos um jogo terminado. As duas continuam vivas até o fim do dia seguinte.
 
