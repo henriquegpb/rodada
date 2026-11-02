@@ -9,6 +9,7 @@ import type { GameMeta } from "@/games/types";
 import { formatResult } from "@/lib/plays/result";
 import { useBoard } from "@/lib/ranking/client";
 import type { Ranking, RankingRow } from "@/server/rankings";
+import { GlideSwap } from "@/components/ui/glide-swap";
 import { PillTabs } from "@/components/ui/pill-tabs";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
@@ -19,55 +20,82 @@ const PAGE_SIZE = 20;
 /** O valor da aba do ranking geral; não colide com slug de jogo. */
 const OVERALL = "geral";
 
+/** As abas, na ordem: o geral e cada jogo (modos inclusive). */
+const VIEWS = [OVERALL, ...games.map((g) => g.meta.slug)];
+
 /**
  * O ranking do dia, o de todo mundo ou o de um Grupo: o geral e o de cada jogo (modos inclusive)
- * na mesma lista, trocados pela pílula. Cada aba busca o seu; trocar de aba volta para a primeira
- * página.
+ * na mesma lista, trocados pela pílula. Cada aba busca o seu; a pílula muda na hora e a lista
+ * troca deslizando quando a nova chega (sem piscar "carregando" no meio). Trocar de aba volta para
+ * a primeira página.
  */
 export function Boards({ dateKey, group }: { dateKey: string; group?: string }) {
   const [view, setView] = useState(OVERALL);
-  const meta = view === OVERALL ? null : getGame(view)!.meta;
-  const { board, error } = useBoard({ dateKey, slug: meta?.slug, group });
+  const { board, error } = useBoard({ dateKey, slug: view === OVERALL ? undefined : view, group });
+
+  // O que está na tela: a última aba que chegou (ou falhou). Estado derivado, no próprio render.
+  const [shown, setShown] = useState<{ view: string; board: Ranking | null; error: string | null } | null>(null);
+  if ((board || error) && (shown?.view !== view || shown.board !== board || shown.error !== error)) {
+    setShown({ view, board, error });
+  }
+  const [direction, setDirection] = useState<1 | -1>(1);
+
   return (
-    <section className="max-w-2xl">
+    <section>
       <PillTabs
         label={t.ranking.title}
         value={view}
-        onChange={setView}
+        onChange={(next) => {
+          setDirection(VIEWS.indexOf(next) >= VIEWS.indexOf(view) ? 1 : -1);
+          setView(next);
+        }}
         options={[
           { key: OVERALL, label: t.ranking.overall },
           ...games.map(({ meta: game }) => ({ key: game.slug, label: game.name, color: game.color })),
         ]}
       />
-      <div key={view} role="tabpanel" className="pt-6">
-        <div className="mb-4 flex items-baseline justify-between gap-6">
-          <p className="text-sm text-muted-foreground">{meta ? meta.tagline : t.ranking.overallHint}</p>
-          {board && board.participants > 0 && (
-            <span className="shrink-0 text-xs text-muted-foreground tabular-nums">{t.ranking.players(board.participants)}</span>
-          )}
-        </div>
-        {!board ? (
-          <p className="text-sm text-muted-foreground">{error ?? t.ranking.loading}</p>
-        ) : meta ? (
-          <GameBoard meta={meta} board={board} />
-        ) : (
-          <Rows
-            board={board}
-            empty={t.ranking.emptyOverall}
-            value={(row) =>
-              row.played ? (
-                <>
-                  {row.count !== null && <span className="text-xs text-muted-foreground">{t.ranking.games(row.count)}</span>}
-                  <span className="w-16 text-right font-semibold">{t.ranking.points(row.value)}</span>
-                </>
-              ) : (
-                <NotPlayed />
-              )
-            }
-          />
+      {shown ? (
+        <GlideSwap id={shown.view} direction={direction} className="mt-6">
+          <Panel view={shown.view} board={shown.board} error={shown.error} />
+        </GlideSwap>
+      ) : (
+        <p className="mt-6 text-sm text-muted-foreground">{t.ranking.loading}</p>
+      )}
+    </section>
+  );
+}
+
+function Panel({ view, board, error }: { view: string; board: Ranking | null; error: string | null }) {
+  const meta = view === OVERALL ? null : getGame(view)!.meta;
+  return (
+    <div role="tabpanel">
+      <div className="mb-4 flex items-baseline justify-between gap-6">
+        <p className="text-sm text-muted-foreground">{meta ? meta.tagline : t.ranking.overallHint}</p>
+        {board && board.participants > 0 && (
+          <span className="shrink-0 text-xs text-muted-foreground tabular-nums">{t.ranking.players(board.participants)}</span>
         )}
       </div>
-    </section>
+      {!board ? (
+        <p className="text-sm text-muted-foreground">{error}</p>
+      ) : meta ? (
+        <GameBoard meta={meta} board={board} />
+      ) : (
+        <Rows
+          board={board}
+          empty={t.ranking.emptyOverall}
+          value={(row) =>
+            row.played ? (
+              <>
+                {row.count !== null && <span className="text-xs text-muted-foreground">{t.ranking.games(row.count)}</span>}
+                <span className="w-16 text-right font-semibold">{t.ranking.points(row.value)}</span>
+              </>
+            ) : (
+              <NotPlayed />
+            )
+          }
+        />
+      )}
+    </div>
   );
 }
 

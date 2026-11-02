@@ -1,15 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { Link2, LogOut, Users } from "lucide-react";
+import { LogOut, Plus, Users } from "lucide-react";
+import { Check as CheckIcon, Link2 as LinkIcon } from "lucide";
+import { MorphIcon } from "morphicons/react";
 import { useToday } from "@/lib/daily/hooks";
 import { trackEvent } from "@/lib/analytics";
 import {
   createGroup,
   joinGroup,
-  lastGroup,
   leaveGroup,
+  pickGroup,
   rememberGroup,
   useGroup,
   useGroups,
@@ -18,30 +21,64 @@ import {
 } from "@/lib/ranking/client";
 import type { GroupDetail, GroupSummary } from "@/server/groups";
 import { t } from "@/lib/i18n";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { GlideSwap } from "@/components/ui/glide-swap";
 import { PillTabs } from "@/components/ui/pill-tabs";
 import { Boards, SectionTitle, YouTag } from "./boards";
 import { InlineForm } from "./inline-form";
 import { SignInCard } from "./sign-in";
 
-/** Os Grupos da Conta: escolhe um e vê os membros, o convite e o ranking do dia só entre eles. */
+/**
+ * Os Grupos da Conta: escolhe um (pela pílula, pela sidebar ou pela URL `?g=`) e vê os membros, o
+ * convite e o ranking do dia só entre eles.
+ */
 export function GroupsScreen() {
   const today = useToday();
   const me = useMe();
   const { groups, error } = useGroups(me);
-  const [id, setId] = useState<string | null>(null);
+  const router = useRouter();
+  const search = useSearchParams();
+  const param = search.get("g");
+  const [creating, setCreating] = useState(false);
+
+  const selected = groups ? pickGroup(groups, param) : undefined;
+  // De que lado o grupo novo entra: o da ordem na pílula. Estado derivado, no próprio render.
+  const [previous, setPrevious] = useState(selected?.id);
+  const [direction, setDirection] = useState<1 | -1>(1);
+  if (groups && selected && selected.id !== previous) {
+    const from = groups.findIndex((g) => g.id === previous);
+    setDirection(groups.indexOf(selected) >= from ? 1 : -1);
+    setPrevious(selected.id);
+  }
+
   if (!today || me === undefined) return null;
 
-  const selected = groups?.find((g) => g.id === (id ?? lastGroup())) ?? groups?.[0];
-  const select = (next: string) => {
-    setId(next);
-    rememberGroup(next);
+  const select = (id: string) => {
+    rememberGroup(id);
+    // Troca só o grupo; o resto da query (o `?mock`, por exemplo) fica.
+    const next = new URLSearchParams(search);
+    next.set("g", id);
+    router.replace(`/grupos?${next}`, { scroll: false });
   };
 
   return (
     <div className="flex flex-col gap-10">
       <header>
-        <h1 className="font-display text-6xl leading-[0.9]">{t.groups.title}</h1>
-        <p className="mt-3 text-muted-foreground">{t.groups.subtitle}</p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="font-display text-6xl leading-[0.9]">{t.groups.title}</h1>
+            <p className="mt-3 text-muted-foreground">{t.groups.subtitle}</p>
+          </div>
+          {me && (
+            <button
+              type="button"
+              onClick={() => setCreating(true)}
+              className="flex h-10 shrink-0 items-center gap-2 rounded-full bg-primary px-4 text-sm font-semibold text-primary-foreground transition-[filter,transform] hover:brightness-110 active:scale-[0.98]"
+            >
+              <Plus size={16} strokeWidth={2.5} /> {t.groups.newGroup}
+            </button>
+          )}
+        </div>
         {groups && groups.length > 1 && selected && (
           <PillTabs
             label={t.groups.title}
@@ -58,22 +95,35 @@ export function GroupsScreen() {
       ) : !groups ? (
         <p className="text-muted-foreground">{error ?? t.groups.loading}</p>
       ) : selected ? (
-        <>
-          {/* Cada grupo começa da primeira página e do geral. */}
-          <div key={selected.id} role="tabpanel" className="flex flex-col gap-14">
-            <GroupPanel summary={selected} me={me} onLeft={() => setId(null)} />
+        <GlideSwap id={selected.id} direction={direction}>
+          <div role="tabpanel" className="flex flex-col gap-14">
+            <GroupPanel summary={selected} me={me} onLeft={() => router.replace("/grupos", { scroll: false })} />
             <Boards dateKey={today} group={selected.id} />
           </div>
-          <NewGroup onDone={select} />
-        </>
+        </GlideSwap>
       ) : (
         <div className="flex max-w-xl flex-col items-start gap-2 rounded-xl bg-card p-6">
           <Users size={22} className="text-primary" />
           <p className="mt-1 font-semibold">{t.groups.none}</p>
           <p className="text-sm text-muted-foreground">{t.groups.noneHint}</p>
-          <NewGroup onDone={select} bare />
+          <NewGroupForms className="mt-4" onDone={select} />
         </div>
       )}
+
+      <Dialog open={creating} onOpenChange={setCreating}>
+        <DialogContent className="sm:max-w-md">
+          <DialogTitle className="font-display text-xl">{t.groups.newGroup}</DialogTitle>
+          <DialogDescription>{t.groups.noneHint}</DialogDescription>
+          <NewGroupForms
+            stacked
+            className="mt-2"
+            onDone={(id) => {
+              setCreating(false);
+              select(id);
+            }}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -82,7 +132,7 @@ export function GroupsScreen() {
 function GroupPanel({ summary, me, onLeft }: { summary: GroupSummary; me: Me; onLeft: () => void }) {
   const detail = useGroup(summary.id);
   return (
-    <section className="flex max-w-2xl flex-col gap-6">
+    <section className="flex flex-col gap-6">
       <div>
         <SectionTitle players={summary.memberCount}>{t.groups.members}</SectionTitle>
         {detail ? <Members detail={detail} me={me} /> : <p className="text-sm text-muted-foreground">{t.groups.loading}</p>}
@@ -94,7 +144,7 @@ function GroupPanel({ summary, me, onLeft }: { summary: GroupSummary; me: Me; on
 
 function Members({ detail, me }: { detail: GroupDetail; me: Me }) {
   return (
-    <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+    <ul className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
       {detail.members.map((member) => (
         <li key={member.id} className="flex items-center gap-3 rounded-lg bg-card/60 px-3 py-2.5">
           {member.image ? (
@@ -123,16 +173,6 @@ function Members({ detail, me }: { detail: GroupDetail; me: Me }) {
 }
 
 function Invite({ summary, onLeft }: { summary: GroupSummary; onLeft: () => void }) {
-  const copy = async () => {
-    const link = `${window.location.origin}/grupos/convite?c=${summary.inviteCode}`;
-    try {
-      await navigator.clipboard.writeText(link);
-      trackEvent("invite_copied", {});
-      toast.success(t.groups.copied);
-    } catch {
-      toast.error(t.game.copyFailed);
-    }
-  };
   const leave = async () => {
     if (!window.confirm(t.groups.leaveConfirm(summary.name))) return;
     try {
@@ -148,13 +188,7 @@ function Invite({ summary, onLeft }: { summary: GroupSummary; onLeft: () => void
         <p className="text-sm font-semibold">{t.groups.invite}</p>
         <p className="text-xs text-muted-foreground">{t.groups.inviteHint}</p>
       </div>
-      <button
-        type="button"
-        onClick={copy}
-        className="flex h-9 items-center gap-2 rounded-full bg-primary px-4 text-sm font-semibold text-primary-foreground transition-[filter,transform] hover:brightness-110 active:scale-[0.98]"
-      >
-        <Link2 size={15} /> {t.groups.copyLink}
-      </button>
+      <CopyLink code={summary.inviteCode} />
       <button
         type="button"
         onClick={leave}
@@ -166,10 +200,48 @@ function Invite({ summary, onLeft }: { summary: GroupSummary; onLeft: () => void
   );
 }
 
-/** Criar um Grupo ou entrar num pelo código do convite. `bare`: dentro do cartão de quem não tem nenhum. */
-function NewGroup({ onDone, bare = false }: { onDone: (id: string) => void; bare?: boolean }) {
-  const forms = (
-    <div className="grid w-full gap-3 sm:grid-cols-2">
+/** Copia o link do convite; o ícone do link vira um visto por um instante. */
+function CopyLink({ code }: { code: string }) {
+  const [copied, setCopied] = useState(false);
+  useEffect(() => {
+    if (!copied) return;
+    const timer = window.setTimeout(() => setCopied(false), 1800);
+    return () => window.clearTimeout(timer);
+  }, [copied]);
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(`${window.location.origin}/grupos/convite?c=${code}`);
+      trackEvent("invite_copied", {});
+      setCopied(true);
+      toast.success(t.groups.copied);
+    } catch {
+      toast.error(t.game.copyFailed);
+    }
+  };
+  return (
+    <button
+      type="button"
+      onClick={copy}
+      className="flex h-9 items-center gap-2 rounded-full bg-primary px-4 text-sm font-semibold text-primary-foreground transition-[filter,transform] hover:brightness-110 active:scale-[0.98]"
+    >
+      <MorphIcon icon={copied ? CheckIcon : LinkIcon} size={15} strokeWidth={2.25} />
+      {t.groups.copyLink}
+    </button>
+  );
+}
+
+/** Criar um Grupo ou entrar num pelo código do convite. `stacked`: um embaixo do outro (no diálogo). */
+function NewGroupForms({
+  onDone,
+  stacked = false,
+  className,
+}: {
+  onDone: (id: string) => void;
+  stacked?: boolean;
+  className?: string;
+}) {
+  return (
+    <div className={stacked ? `flex flex-col gap-3 ${className ?? ""}` : `grid w-full gap-3 sm:grid-cols-2 ${className ?? ""}`}>
       <InlineForm
         label={t.groups.namePlaceholder}
         placeholder={t.groups.namePlaceholder}
@@ -203,12 +275,5 @@ function NewGroup({ onDone, bare = false }: { onDone: (id: string) => void; bare
         }}
       />
     </div>
-  );
-  if (bare) return <div className="mt-4 w-full">{forms}</div>;
-  return (
-    <section className="max-w-2xl">
-      <SectionTitle players={0}>{t.groups.newGroup}</SectionTitle>
-      <div className="mt-4">{forms}</div>
-    </section>
   );
 }

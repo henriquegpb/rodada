@@ -210,6 +210,35 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
+/*
+ * Troca de painel (components/ui/glide-swap.tsx), do Microkit · Blur Glide Menu: o que sai desliza
+ * para um lado desfocando, o que entra vem do outro e foca. `--swap-dir`: 1 para a direita, -1 para
+ * a esquerda (a ordem das abas).
+ */
+@keyframes swap-in {
+  0% { opacity: 0; transform: translateX(calc(var(--swap-dir, 1) * 32px)); filter: blur(8px); }
+  45% { opacity: 0.9; }
+  65% { filter: blur(4px); }
+  100% { opacity: 1; transform: none; filter: blur(0); }
+}
+@keyframes swap-out {
+  0% { opacity: 1; transform: none; filter: blur(0); }
+  30% { opacity: 0.9; filter: blur(6px); }
+  100% { opacity: 0; transform: translateX(calc(var(--swap-dir, 1) * -32px)); filter: blur(9px); }
+}
+.swap-in {
+  animation: swap-in 0.4s cubic-bezier(0.45, 0.05, 0.15, 1) both;
+}
+.swap-out {
+  animation: swap-out 0.4s cubic-bezier(0.45, 0.05, 0.15, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .swap-in,
+  .swap-out {
+    animation-duration: 0.01ms;
+  }
+}
+
 /* Títulos: Archivo esticado, a voz da marca. */
 .font-display {
   font-stretch: 125%;

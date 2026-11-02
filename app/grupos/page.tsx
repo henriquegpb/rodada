@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { GroupsScreen } from "@/components/ranking/groups-screen";
 import { t } from "@/lib/i18n";
@@ -6,5 +7,10 @@ import { t } from "@/lib/i18n";
 export const metadata: Metadata = { title: t.nav.groups, robots: { index: false } };
 
 export default function GroupsPage() {
-  return <GroupsScreen />;
+  // O grupo aberto vem na query (?g=): a tela espera por ela, a casca sai na hora.
+  return (
+    <Suspense>
+      <GroupsScreen />
+    </Suspense>
+  );
 }

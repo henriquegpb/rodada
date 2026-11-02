@@ -13,11 +13,16 @@ export interface SpotlightNavItem {
   trailing?: ReactNode;
   /** Título de seção mostrado acima do item. */
   heading?: string;
+  /** Botão à direita do item, fora do link (abrir e fechar o que vem embaixo). */
+  action?: ReactNode;
+  /** O que fica embaixo do item, dentro do mesmo trilho (os jogos de Hoje, os Grupos). */
+  children?: ReactNode;
 }
 
 /**
  * Microkit · Spotlight Indicator (https://microkit.co/components/spotlight-indicator), adaptado:
- * links de navegação em vez de botões, com o trilho brilhante deslizando até a rota ativa.
+ * links de navegação em vez de botões, com o trilho brilhante deslizando até a rota ativa. Um item
+ * pode ter um botão à direita e um bloco embaixo; o trilho passa por cima deles até o item ativo.
  */
 export function SpotlightNav({
   items,
@@ -61,30 +66,34 @@ export function SpotlightNav({
         ref={barRef}
         className="pointer-events-none absolute -left-4 w-[3px] rounded-r-sm bg-[#ff6a1a] opacity-0 shadow-[2px_0_5px_rgba(255,106,26,.7),4px_0_11px_rgba(255,106,26,.35)] transition-[top,height,opacity] duration-300 ease-[cubic-bezier(.4,0,.2,1)]"
       />
-      {items.map(({ href, label, leading, trailing, heading }, index) => (
+      {items.map(({ href, label, leading, trailing, heading, action, children }, index) => (
         <Fragment key={href}>
           {heading && (
             <p className="mb-1.5 mt-7 h-4 px-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground/70">
               {heading}
             </p>
           )}
-          <Link
-            href={href}
-            ref={(element) => {
-              linkRefs.current[index] = element;
-            }}
-            aria-current={active === index ? "page" : undefined}
-            className={cn(
-              "flex h-10 items-center gap-3 rounded-md px-3 text-[15px] font-medium transition-colors duration-200",
-              active === index
-                ? "bg-sidebar-accent text-sidebar-foreground"
-                : "text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground",
-            )}
-          >
-            {leading}
-            <span className="truncate">{label}</span>
-            {trailing && <span className="ml-auto shrink-0">{trailing}</span>}
-          </Link>
+          <div className="relative">
+            <Link
+              href={href}
+              ref={(element) => {
+                linkRefs.current[index] = element;
+              }}
+              aria-current={active === index ? "page" : undefined}
+              className={cn(
+                "flex h-10 items-center gap-3 rounded-md px-3 text-[15px] font-medium transition-colors duration-200",
+                active === index
+                  ? "bg-sidebar-accent text-sidebar-foreground"
+                  : "text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground",
+              )}
+            >
+              {leading}
+              <span className="truncate">{label}</span>
+              {trailing && <span className="ml-auto shrink-0">{trailing}</span>}
+            </Link>
+            {action && <div className="absolute inset-y-0 right-1 flex items-center">{action}</div>}
+          </div>
+          {children}
         </Fragment>
       ))}
     </nav>
