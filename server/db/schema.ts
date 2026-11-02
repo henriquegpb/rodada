@@ -107,8 +107,8 @@ export const plays = pgTable(
 );
 
 /**
- * O dia de uma Conta: Score diário (soma das Notas dos jogos da Rodada) e quantos jogos da Rodada
- * terminou. Existe desde que a Conta termine qualquer jogo no dia, inclusive um Modo.
+ * O dia de uma Conta: Score diário (soma das Notas de todos os jogos, Modos inclusive) e quantos
+ * jogos da Rodada terminou. Existe desde que a Conta termine qualquer jogo no dia, inclusive um Modo.
  */
 export const dailyScores = pgTable(
   "daily_scores",

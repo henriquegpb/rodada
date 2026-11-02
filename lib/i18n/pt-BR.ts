@@ -112,7 +112,7 @@ export const ptBR = {
     title: "Ranking",
     subtitle: (n: number) => `Rodada ${n}. Zera à meia-noite de Brasília.`,
     overall: "Geral",
-    overallHint: "Cada jogo da rodada vale até 100 pontos, conforme o resultado. Os modos têm ranking próprio, mas não somam.",    points: (n: number) => `${n} pts`,
+    overallHint: "Cada jogo vale até 100 pontos, conforme o resultado, e os modos (Dupla, Quadra, Rainhas 9×9 e 10×10) também somam.",    points: (n: number) => `${n} pts`,
     games: (n: number) => `${n} ${n === 1 ? "jogo" : "jogos"}`,
     players: (n: number) => `${n} ${n === 1 ? "pessoa" : "pessoas"}`,
     you: "você",

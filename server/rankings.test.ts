@@ -57,17 +57,21 @@ describe("Ranking diário", () => {
     expect(result.me).toMatchObject({ position: 3, account: { handle: "caio" } });
   });
 
-  it("dia só com Modo não conta como jogado, e Modo depois da Rodada não muda o desempate", async () => {
+  it("Modos somam no Score diário, e um dia só com Modo também conta", async () => {
     const duplaWin = { slug: "dupla", dateKey: D1, guesses: dupla.createChallenge(D1).answer as string[] };
-    await registerPlay(db, caio, duplaWin, noon(D1));
+    const { play } = await registerPlay(db, caio, duplaWin, noon(D1));
     await registerPlay(db, ana, palavraIn(1, D1), noon(D1, 1));
     await registerPlay(db, bia, palavraIn(1, D1), noon(D1, 2));
     await registerPlay(db, ana, duplaWin, noon(D1, 3));
     const result = await ranking(db, { kind: "daily", dateKey: D1 }, { now: noon(D1, 30) });
-    expect(handles(result.rows)).toEqual(["ana", "bia"]);
+    expect(result.rows.map((r) => [r.account.handle, r.value])).toEqual([
+      ["ana", 100 + play.nota],
+      ["bia", 100],
+      ["caio", play.nota],
+    ]);
   });
 
-  it("de um jogo usa a Nota daquela partida e traz o placar; o geral traz quantos jogos da Rodada", async () => {
+  it("de um jogo usa a Nota daquela partida e traz o placar; o geral traz quantos jogos, Modos inclusive", async () => {
     const duplaWin = { slug: "dupla", dateKey: D1, guesses: dupla.createChallenge(D1).answer as string[] };
     await registerPlay(db, ana, palavraIn(3, D1), noon(D1));
     await registerPlay(db, bia, palavraIn(1, D1), noon(D1));
@@ -83,6 +87,7 @@ describe("Ranking diário", () => {
     const overall = await ranking(db, { kind: "daily", dateKey: D1 }, { now: noon(D1, 30) });
     expect(overall.rows.map((r) => [r.account.handle, r.count, r.status])).toEqual([
       ["bia", 1, null],
+      ["caio", 1, null],
       ["ana", 1, null],
     ]);
     await expect(ranking(db, { kind: "daily", dateKey: D1, slug: "xadrez" }, {})).rejects.toMatchObject({ status: 400 });

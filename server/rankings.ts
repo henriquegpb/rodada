@@ -31,8 +31,8 @@ export interface RankingRow {
   /** Jogou no período. Só é falso no Ranking de um Grupo, que mostra todos os membros. */
   played: boolean;
   /**
-   * Só no Ranking diário: o placar da partida (`playCount`), com `slug`; sem ele, quantos jogos da
-   * Rodada terminou no dia. Null nos outros e em quem não jogou.
+   * Só no Ranking diário: o placar da partida (`playCount`), com `slug`; sem ele, quantos jogos
+   * (Modos inclusive) terminou no dia. Null nos outros e em quem não jogou.
    */
   count: number | null;
   /** Só no Ranking diário de um jogo: como a partida terminou. */
@@ -53,7 +53,7 @@ export function windowOf(today: string) {
 
 /**
  * Linhas (account_id, total, reached, count, status) do período; `reached` desempata quem chegou
- * primeiro. Dia em que a Conta só jogou Modos não conta como jogado no Score diário.
+ * primeiro. A linha do Score diário existe desde a primeira partida do dia, Modo inclusive.
  */
 function source(kind: RankingKind, today: string, members?: SQL): SQL {
   const only = (column: typeof dailyScores.accountId | typeof plays.accountId) => (members ? sql`and ${column} in (${members})` : sql``);
@@ -63,17 +63,17 @@ function source(kind: RankingKind, today: string, members?: SQL): SQL {
       from ${plays} where ${plays.slug} = ${kind.slug} and ${plays.dateKey} = ${kind.dateKey} ${only(plays.accountId)}`;
   }
   if (kind.kind === "daily") {
+    const finished = sql`(select count(*) from ${plays}
+      where ${plays.accountId} = ${dailyScores.accountId} and ${plays.dateKey} = ${dailyScores.dateKey})`;
     return sql`select ${dailyScores.accountId} as account_id, ${dailyScores.score} as total, ${dailyScores.updatedAt} as reached,
-        ${dailyScores.roundFinished} as count, null::text as status
-      from ${dailyScores} where ${dailyScores.dateKey} = ${kind.dateKey} and ${dailyScores.roundFinished} > 0
-      ${only(dailyScores.accountId)}`;
+        ${finished} as count, null::text as status
+      from ${dailyScores} where ${dailyScores.dateKey} = ${kind.dateKey} ${only(dailyScores.accountId)}`;
   }
   const { from, to } = windowOf(today);
   if (kind.kind === "rolling") {
     return sql`select ${dailyScores.accountId} as account_id, sum(${dailyScores.score}) as total, max(${dailyScores.updatedAt}) as reached,
         null::int as count, null::text as status
-      from ${dailyScores} where ${dailyScores.dateKey} between ${from} and ${to} and ${dailyScores.roundFinished} > 0
-      ${only(dailyScores.accountId)}
+      from ${dailyScores} where ${dailyScores.dateKey} between ${from} and ${to} ${only(dailyScores.accountId)}
       group by ${dailyScores.accountId}`;
   }
   return sql`select ${plays.accountId} as account_id, sum(${plays.nota}) as total, max(${plays.finishedAt}) as reached,
