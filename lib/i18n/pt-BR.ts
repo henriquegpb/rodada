@@ -107,6 +107,7 @@ export const ptBR = {
     toNext: (level: string) => `Até o ${level}`,
     maxLevel: "Nível máximo",
     locked: "Ainda não conquistada",
+    seeAll: (earned: number, total: number) => `Ver todas · ${earned} de ${total}`,
     loading: "Carregando o perfil…",
   },
   ranking: {
@@ -146,6 +147,10 @@ export const ptBR = {
     failed: "Não deu para entrar. Tente de novo.",
     signedInAs: "Entrou como",
     signOut: "Sair",
+  },
+  dev: {
+    label: "Dev",
+    hint: "Participou do desenvolvimento do Rodada",
   },
   groups: {
     title: "Grupos",

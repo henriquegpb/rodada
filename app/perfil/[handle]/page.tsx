@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import { ProfileSkeleton } from "@/components/profile/profile-layout";
 import { PublicProfile } from "@/components/profile/public-profile";
 import { t } from "@/lib/i18n";
 
@@ -14,7 +15,7 @@ export async function generateMetadata({ params }: PageProps<"/perfil/[handle]">
 export default function PublicProfilePage({ params }: PageProps<"/perfil/[handle]">) {
   // O handle vem da URL: fica atrás do Suspense para a casca da página sair na hora.
   return (
-    <Suspense fallback={<p className="text-sm text-muted-foreground">{t.profile.loading}</p>}>
+    <Suspense fallback={<ProfileSkeleton />}>
       <Profile params={params} />
     </Suspense>
   );

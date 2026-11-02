@@ -2,12 +2,13 @@
 
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { authClient } from "@/lib/auth-client";
+import { getDateKey } from "@/lib/daily/date";
 import { importLocalPlays, onPlayReported } from "@/lib/plays/sync";
 import { t } from "@/lib/i18n";
 import type { GroupDetail, GroupSummary } from "@/server/groups";
 import type { Profile } from "@/server/profiles";
 import type { Ranking } from "@/server/rankings";
-import { MOCK_ME, mockBoard, mockGroup, mockGroups } from "./mock";
+import { MOCK_ME, mockBoard, mockGroup, mockGroups, mockProfile } from "./mock";
 
 /**
  * O lado do navegador dos Rankings e dos Grupos: a Conta logada, as buscas na API (`/api/rankings`,
@@ -155,9 +156,11 @@ export function useGroup(id: string | null): GroupDetail | null {
 }
 
 /** O Perfil público de uma Conta pelo handle. */
-export function useProfile(handle: string | null): { profile: Profile | null; error: string | null } {
-  const { data, error } = useApi<Profile>(handle ? `/api/profiles/${encodeURIComponent(handle)}` : null);
-  return { profile: data, error };
+export function useProfile(handle: string | null): { profile: (Profile & { mock?: true }) | null; error: string | null } {
+  const mock = useMock();
+  const { data, error } = useApi<Profile>(handle && !mock ? `/api/profiles/${encodeURIComponent(handle)}` : null);
+  const fake = useMemo(() => (mock && handle ? mockProfile(handle, getDateKey(new Date())) : null), [mock, handle]);
+  return fake ? { profile: fake, error: null } : { profile: data, error };
 }
 
 /**

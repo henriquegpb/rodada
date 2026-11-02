@@ -48,32 +48,50 @@ function artOf(id: string): Art {
 const HEX = "polygon(50% 0, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%)";
 
 /** Uma medalha: a arte no meio, o aro na cor do Nível e, acima do Bronze, o "x2", "x3", "x4". */
-export function AchievementBadge({ achievement, className }: { achievement: AchievementProgress; className?: string }) {
+export function AchievementBadge({
+  achievement,
+  small = false,
+  className,
+}: {
+  achievement: AchievementProgress;
+  /** 48px em vez de 64px, para a coluna do Perfil. */
+  small?: boolean;
+  className?: string;
+}) {
   const { icon: Icon, color, hex } = artOf(achievement.id);
   const { level } = achievement;
   const tier = level ? LEVELS.indexOf(level) + 1 : 0;
   const shape = hex ? { clipPath: HEX } : undefined;
 
   return (
-    <span className={cn("relative inline-block size-16", !level && "opacity-35 grayscale", className)}>
+    <span className={cn("relative inline-block", small ? "size-12" : "size-16", !level && "opacity-35 grayscale", className)}>
       <span
         className={cn("absolute inset-0", !hex && "rounded-full", !level && "bg-secondary")}
         style={{ ...shape, background: level ? RINGS[level] : undefined }}
       />
       <span
-        className={cn("absolute inset-[3px] grid place-items-center text-white", !hex && "rounded-full")}
+        className={cn(
+          "absolute grid place-items-center text-white",
+          small ? "inset-[2.5px]" : "inset-[3px]",
+          !hex && "rounded-full",
+        )}
         style={{
           ...shape,
           background: `radial-gradient(circle at 35% 30%, color-mix(in srgb, ${color} 55%, white), ${color} 55%, color-mix(in srgb, ${color} 60%, black))`,
         }}
       >
-        <Icon size={26} strokeWidth={2.25} className="drop-shadow-[0_1px_1px_rgb(0_0_0/0.35)]" />
+        <Icon size={small ? 20 : 26} strokeWidth={2.25} className="drop-shadow-[0_1px_1px_rgb(0_0_0/0.35)]" />
       </span>
       {hex && level && (
-        <Sparkles size={16} className="absolute -top-0.5 right-0 fill-yellow-200 text-yellow-100 drop-shadow" />
+        <Sparkles size={small ? 12 : 16} className="absolute -top-0.5 right-0 fill-yellow-200 text-yellow-100 drop-shadow" />
       )}
       {tier > 1 && (
-        <span className="absolute -right-1 bottom-0 rounded-full bg-background px-1.5 py-0.5 text-[11px] font-semibold leading-none ring-1 ring-border">
+        <span
+          className={cn(
+            "absolute -right-1 bottom-0 rounded-full bg-background py-0.5 font-semibold leading-none ring-1 ring-border",
+            small ? "px-1 text-[10px]" : "px-1.5 text-[11px]",
+          )}
+        >
           x{tier}
         </span>
       )}
@@ -84,28 +102,44 @@ export function AchievementBadge({ achievement, className }: { achievement: Achi
 /** A cor sólida de cada Nível, para a barra e os marcos. */
 const SOLID: Record<Level, string> = { bronze: "#DC702A", prata: "#CECECE", ouro: "#F7D14E", diamante: "#CDA0FF" };
 
-/** A grade de medalhas com o nome embaixo; tocar numa abre o modal com o progresso. */
-export function Achievements({ items }: { items: AchievementProgress[] }) {
+/**
+ * A grade de medalhas com o nome embaixo; tocar numa abre o modal com o progresso. `compact` (a
+ * coluna do Perfil): só as conquistadas, menores, e "Ver todas" abre a grade inteira num modal.
+ */
+export function Achievements({ items, compact = false }: { items: AchievementProgress[]; compact?: boolean }) {
   // Primeiro as conquistadas, do Nível mais alto para o mais baixo.
   const order = (a: AchievementProgress) => (a.level ? LEVELS.indexOf(a.level) : -1);
   const sorted = [...items].sort((a, b) => order(b) - order(a));
+  const earned = sorted.filter((a) => a.level);
+  const shown = compact ? earned : sorted;
   const [selected, setSelected] = useState<string | null>(null);
+  const [all, setAll] = useState(false);
   const open = sorted.find((a) => a.id === selected);
 
   return (
     <>
-      <ul className="grid grid-cols-[repeat(auto-fill,minmax(5.5rem,1fr))] gap-x-2 gap-y-4">
-        {sorted.map((a) => (
+      {shown.length > 0 && (
+      <ul
+        className={cn(
+          "grid",
+          compact ? "grid-cols-4 gap-x-1 gap-y-2" : "grid-cols-[repeat(auto-fill,minmax(5.5rem,1fr))] gap-x-2 gap-y-4",
+        )}
+      >
+        {shown.map((a) => (
           <li key={a.id}>
             <button
               type="button"
               onClick={() => setSelected(a.id)}
-              className="group flex w-full flex-col items-center gap-2 rounded-xl px-1 py-2 transition-colors hover:bg-card/60"
+              className={cn(
+                "group flex w-full flex-col items-center rounded-xl transition-colors hover:bg-card/60",
+                compact ? "gap-1 px-0.5 py-1.5" : "gap-2 px-1 py-2",
+              )}
             >
-              <AchievementBadge achievement={a} className="transition-transform group-hover:scale-105" />
+              <AchievementBadge achievement={a} small={compact} className="transition-transform group-hover:scale-105" />
               <span
                 className={cn(
-                  "line-clamp-2 text-center text-xs leading-tight",
+                  "line-clamp-2 text-center leading-tight",
+                  compact ? "text-[10px]" : "text-xs",
                   a.level ? "font-medium" : "text-muted-foreground",
                 )}
               >
@@ -115,6 +149,21 @@ export function Achievements({ items }: { items: AchievementProgress[] }) {
           </li>
         ))}
       </ul>
+      )}
+      {compact && (
+        <button type="button" onClick={() => setAll(true)} className="mt-2 text-xs font-semibold text-primary">
+          {t.profile.seeAll(earned.length, sorted.length)}
+        </button>
+      )}
+      {compact && (
+        <Dialog open={all} onOpenChange={setAll}>
+          <DialogContent className="max-h-[85dvh] overflow-y-auto sm:max-w-2xl">
+            <DialogTitle className="font-display text-xl">{t.profile.achievements}</DialogTitle>
+            <DialogDescription>{t.profile.seeAll(earned.length, sorted.length)}</DialogDescription>
+            <Achievements items={items} />
+          </DialogContent>
+        </Dialog>
+      )}
       <Dialog open={Boolean(open)} onOpenChange={(next) => !next && setSelected(null)}>
         <DialogContent className="sm:max-w-sm">{open && <AchievementDetail achievement={open} />}</DialogContent>
       </Dialog>
@@ -138,9 +187,17 @@ function AchievementDetail({ achievement }: { achievement: AchievementProgress }
         <AchievementBadge achievement={achievement} />
       </div>
       <DialogTitle className="font-display text-xl">{achievement.name}</DialogTitle>
-      <p className="mt-1 text-sm font-semibold" style={{ color: level ? SOLID[level] : undefined }}>
-        {level ? LEVEL_NAMES[level] : t.profile.locked}
-      </p>
+      {level ? (
+        // O nome do Nível pintado com o degradê do aro.
+        <p
+          className="mt-1 bg-clip-text text-sm font-bold text-transparent"
+          style={{ backgroundImage: RINGS[level], WebkitBackgroundClip: "text" }}
+        >
+          {LEVEL_NAMES[level]}
+        </p>
+      ) : (
+        <p className="mt-1 text-sm font-semibold text-muted-foreground">{t.profile.locked}</p>
+      )}
       <DialogDescription className="mt-2">{achievement.description}</DialogDescription>
 
       <div className="mt-6 w-full">

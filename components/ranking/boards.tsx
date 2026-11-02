@@ -10,9 +10,11 @@ import { formatResult } from "@/lib/plays/result";
 import { useBoard } from "@/lib/ranking/client";
 import type { Ranking, RankingRow } from "@/server/rankings";
 import { RINGS } from "@/components/profile/achievement-badge";
+import { DevBadge } from "@/components/profile/dev-badge";
 import { ProfileLink } from "@/components/profile/profile-link";
 import { Champion } from "./champion";
 import { GlideSwap } from "@/components/ui/glide-swap";
+import { Skeleton } from "@/components/ui/skeleton";
 import { PillTabs } from "@/components/ui/pill-tabs";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
@@ -64,9 +66,35 @@ export function Boards({ dateKey, group }: { dateKey: string; group?: string }) 
           <Panel view={shown.view} board={shown.board} error={shown.error} />
         </GlideSwap>
       ) : (
-        <p className="mt-6 text-sm text-muted-foreground">{t.ranking.loading}</p>
+        <div className="mt-6">
+          <RankingSkeleton />
+        </div>
       )}
     </section>
+  );
+}
+
+/** O ranking enquanto a primeira aba não chega: a linha da dica e as linhas com o círculo da posição. */
+export function RankingSkeleton({ rows = 8 }: { rows?: number }) {
+  return (
+    <div role="status" aria-label={t.ranking.loading}>
+      <div className="mb-4 flex items-center justify-between gap-6">
+        <Skeleton className="h-4 w-2/3 max-w-md" />
+        <Skeleton className="h-3 w-16" />
+      </div>
+      <ol className="flex flex-col">
+        {Array.from({ length: rows }, (_, i) => (
+          <li key={i} className="flex items-center gap-2">
+            <Skeleton className="size-7 shrink-0 rounded-full" />
+            <div className="flex h-11 flex-1 items-center gap-3 rounded-lg px-3">
+              {/* Larguras diferentes, para não parecer uma régua. */}
+              <Skeleton className="h-3.5" style={{ width: `${[38, 52, 30, 46, 34, 58, 42, 28][i % 8]}%` }} />
+              <Skeleton className="ml-auto h-3.5 w-14" />
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
   );
 }
 
@@ -219,6 +247,8 @@ function Row({ row, me, value }: { row: RankingRow; me: boolean; value: ReactNod
           <ProfileLink handle={row.account.handle} className="truncate font-medium hover:underline">
             {row.account.name}
           </ProfileLink>
+          {/* Um pixel acima: alinhada pela altura das letras do nome, não pela caixa da linha. */}
+          <DevBadge dev={row.account.dev} className="-translate-y-px" />
           {me && <YouTag />}
         </span>
         <span className="flex items-center gap-4">{value}</span>
