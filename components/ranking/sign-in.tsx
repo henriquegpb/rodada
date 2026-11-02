@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { LogOut, Trophy } from "lucide-react";
+import { LogOut, Mail } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
 import { sendLoginLink, signInWithGoogle, signOut, type Me } from "@/lib/ranking/client";
 import { t } from "@/lib/i18n";
@@ -12,66 +12,58 @@ import { InlineForm } from "./inline-form";
 const here = () => window.location.pathname + window.location.search;
 
 /**
- * Convite para entrar na Conta: Google ou link mágico por e-mail, sem senha. Volta para a mesma
- * tela já logado; as partidas deste navegador vão junto (veja `useImportOnLogin`).
+ * Entrar na Conta, pequeno, no canto da tela: Google, ou o e-mail (o campo abre ao clicar) para o
+ * link mágico. Volta para a mesma tela já logado; as partidas deste navegador vão junto (veja
+ * `useImportOnLogin`).
  */
-export function SignInCard({
-  title = t.login.title,
-  text = t.login.text,
-  from,
-  className,
-}: {
-  title?: string;
-  text?: string;
-  /** Tela onde está, para o analytics. */
-  from: string;
-  className?: string;
-}) {
+export function SignInButtons({ from, className }: { from: string; className?: string }) {
+  const [email, setEmail] = useState(false);
   const [sentTo, setSentTo] = useState<string | null>(null);
+  if (sentTo) return <p role="status" className={cn("max-w-64 text-xs text-muted-foreground", className)}>{t.login.sent(sentTo)}</p>;
   return (
-    <div className={cn("flex max-w-xl flex-col gap-4 rounded-xl bg-card p-6", className)}>
-      <div>
-        <p className="flex items-center gap-2 font-semibold">
-          <Trophy size={16} className="text-primary" /> {title}
-        </p>
-        <p className="mt-1 text-sm text-muted-foreground">{text}</p>
-      </div>
-      <button
-        type="button"
-        onClick={() => {
-          trackEvent("login_started", { method: "google", from });
-          void signInWithGoogle(here());
-        }}
-        className="flex h-11 items-center justify-center gap-2.5 rounded-full bg-foreground px-5 text-sm font-semibold text-background transition-[filter,transform] hover:brightness-110 active:scale-[0.98]"
-      >
-        <GoogleMark /> {t.login.google}
-      </button>
-      <p className="flex items-center gap-3 text-xs text-muted-foreground before:h-px before:flex-1 before:bg-border after:h-px after:flex-1 after:bg-border">
-        {t.login.or}
-      </p>
-      {sentTo ? (
-        <p role="status" className="text-sm">
-          {t.login.sent(sentTo)}
-        </p>
-      ) : (
+    <div className={cn("flex items-start gap-2", className)}>
+      {email ? (
         <InlineForm
+          compact
+          className="w-64"
+          autoFocus
           label={t.login.emailLabel}
           submit={t.login.sendLink}
           type="email"
           required
           autoComplete="email"
           placeholder={t.login.emailPlaceholder}
-          onSubmit={async (email) => {
+          onSubmit={async (value) => {
             trackEvent("login_started", { method: "email", from });
             try {
-              await sendLoginLink(email, here());
-              setSentTo(email.trim());
+              await sendLoginLink(value, here());
+              setSentTo(value.trim());
             } catch (error) {
               return (error as Error).message;
             }
           }}
         />
+      ) : (
+        <button
+          type="button"
+          aria-label={t.login.emailLabel}
+          title={t.login.emailLabel}
+          onClick={() => setEmail(true)}
+          className="grid size-9 place-items-center rounded-full bg-card text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <Mail size={15} />
+        </button>
       )}
+      <button
+        type="button"
+        onClick={() => {
+          trackEvent("login_started", { method: "google", from });
+          void signInWithGoogle(here());
+        }}
+        className="flex h-9 shrink-0 items-center gap-2 rounded-full bg-foreground px-4 text-sm font-semibold text-background transition-[filter,transform] hover:brightness-110 active:scale-[0.98]"
+      >
+        <GoogleMark /> {t.login.google}
+      </button>
     </div>
   );
 }

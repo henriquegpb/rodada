@@ -145,7 +145,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               },
             ]}
           />
-          <div className="mt-5 pl-2">
+          <div className="mt-1 pl-2">
             <BranchedMenu
               items={gamesMenu}
               // Nos modos (Dupla, Quadra) o galho aceso continua sendo o do Palavra.

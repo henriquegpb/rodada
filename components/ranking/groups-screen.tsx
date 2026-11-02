@@ -26,7 +26,7 @@ import { GlideSwap } from "@/components/ui/glide-swap";
 import { PillTabs } from "@/components/ui/pill-tabs";
 import { Boards, SectionTitle, YouTag } from "./boards";
 import { InlineForm } from "./inline-form";
-import { SignInCard } from "./sign-in";
+import { SignInButtons } from "./sign-in";
 
 /**
  * Os Grupos da Conta: escolhe um (pela pílula, pela sidebar ou pela URL `?g=`) e vê os membros, o
@@ -69,6 +69,7 @@ export function GroupsScreen() {
             <h1 className="font-display text-6xl leading-[0.9]">{t.groups.title}</h1>
             <p className="mt-3 text-muted-foreground">{t.groups.subtitle}</p>
           </div>
+          {me === null && <SignInButtons from="groups" />}
           {me && (
             <button
               type="button"
@@ -91,7 +92,7 @@ export function GroupsScreen() {
       </header>
 
       {me === null ? (
-        <SignInCard title={t.login.groupsTitle} text={t.login.groupsText} from="groups" />
+        <p className="text-muted-foreground">{t.login.groupsText}</p>
       ) : !groups ? (
         <p className="text-muted-foreground">{error ?? t.groups.loading}</p>
       ) : selected ? (

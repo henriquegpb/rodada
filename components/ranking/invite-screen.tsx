@@ -6,7 +6,7 @@ import { Users } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
 import { joinGroup, rememberGroup, useInvite, useMe } from "@/lib/ranking/client";
 import { t } from "@/lib/i18n";
-import { SignInCard } from "./sign-in";
+import { SignInButtons } from "./sign-in";
 
 /**
  * O link de convite (`/grupos/convite?c=CODIGO`): mostra o Grupo e entra nele; quem não entrou na
@@ -47,7 +47,10 @@ export function InviteScreen() {
       {invite.full ? (
         <p className="text-muted-foreground">{t.groups.full}</p>
       ) : me === null ? (
-        <SignInCard title={t.login.groupsTitle} text={t.login.groupsText} from="invite" />
+        <div className="flex flex-col items-start gap-3">
+          <p className="text-muted-foreground">{t.login.groupsTitle}</p>
+          <SignInButtons from="invite" />
+        </div>
       ) : (
         <div className="flex flex-col items-start gap-2">
           <button
