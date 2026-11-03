@@ -1,18 +1,21 @@
 "use client";
 
-/** Peças das telas de ranking e de grupos: o ranking do dia com as abas e as listas paginadas. */
+/** Peças das telas de ranking e de grupos: os rankings com o dia, as abas e as listas paginadas. */
 
-import { useState, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { Check, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { games, getGame } from "@/games";
 import type { GameMeta } from "@/games/types";
 import { formatResult } from "@/lib/plays/result";
-import { useBoard } from "@/lib/ranking/client";
+import { EPOCH_DATE } from "@/lib/daily/date";
+import { usePlayRecords } from "@/lib/plays/hooks";
+import { useBoard, type Period } from "@/lib/ranking/client";
 import type { Ranking, RankingRow } from "@/server/rankings";
 import { RINGS } from "@/components/profile/achievement-badge";
 import { DevBadge } from "@/components/profile/dev-badge";
 import { ProfileLink } from "@/components/profile/profile-link";
 import { Champion } from "./champion";
+import { DayPicker } from "./day-picker";
 import { GlideSwap } from "@/components/ui/glide-swap";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PillTabs } from "@/components/ui/pill-tabs";
@@ -28,27 +31,79 @@ const OVERALL = "geral";
 /** As abas, na ordem: o geral e cada jogo (modos inclusive). */
 const VIEWS = [OVERALL, ...games.map((g) => g.meta.slug)];
 
+/** O que está na tela: qual ranking e a resposta que chegou para ele. */
+interface Shown {
+  id: string;
+  view: string;
+  period: Period;
+  date: string;
+  board: Ranking | null;
+  error: string | null;
+}
+
 /**
- * O ranking do dia, o de todo mundo ou o de um Grupo: o geral e o de cada jogo (modos inclusive)
- * na mesma lista, trocados pela pílula. Cada aba busca o seu; a pílula muda na hora e a lista
- * troca deslizando quando a nova chega (sem piscar "carregando" no meio). Trocar de aba volta para
- * a primeira página.
+ * Os rankings, o de todo mundo ou o de um Grupo: o geral e o de cada jogo (modos inclusive) na
+ * mesma lista, trocados pela pílula; de um dia (hoje, ou outro escolhido no calendário) ou a Média
+ * dos últimos 30 dias. Cada escolha busca o seu; os controles mudam na hora e a lista troca
+ * deslizando quando a nova chega (sem piscar "carregando" no meio). Trocar volta para a primeira
+ * página.
  */
 export function Boards({ dateKey, group }: { dateKey: string; group?: string }) {
   const [view, setView] = useState(OVERALL);
-  const { board, error } = useBoard({ dateKey, slug: view === OVERALL ? undefined : view, group });
+  const [period, setPeriod] = useState<Period>("day");
+  // O dia escolhido no calendário; sem escolha, hoje (e passa para o dia novo à meia-noite).
+  const [picked, setPicked] = useState<string | null>(null);
+  const date = picked ?? dateKey;
+  const records = usePlayRecords();
+  const played = useMemo(
+    () => new Set(records.filter((r) => r.status !== "playing").map((r) => r.dateKey)),
+    [records],
+  );
+  const { board, error } = useBoard({ dateKey: date, slug: view === OVERALL ? undefined : view, group, period });
 
-  // O que está na tela: a última aba que chegou (ou falhou). Estado derivado, no próprio render.
-  const [shown, setShown] = useState<{ view: string; board: Ranking | null; error: string | null } | null>(null);
-  if ((board || error) && (shown?.view !== view || shown.board !== board || shown.error !== error)) {
-    setShown({ view, board, error });
+  // O que está na tela: a última escolha que chegou (ou falhou). Estado derivado, no próprio render.
+  const id = `${period}:${period === "day" ? date : ""}:${view}`;
+  const [shown, setShown] = useState<Shown | null>(null);
+  if ((board || error) && (shown?.id !== id || shown.board !== board || shown.error !== error)) {
+    setShown({ id, view, period, date, board, error });
   }
   const [direction, setDirection] = useState<1 | -1>(1);
   const champion = shown?.board?.me?.played && shown.board.me.position === 1;
 
   return (
     <section>
-      {champion && <Champion key={shown.view} />}
+      {champion && <Champion key={shown.id} />}
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
+        {period === "day" ? (
+          <DayPicker
+            value={date}
+            today={dateKey}
+            min={EPOCH_DATE}
+            marked={played}
+            onChange={(next) => {
+              setDirection(next < date ? -1 : 1);
+              setPicked(next === dateKey ? null : next);
+            }}
+          />
+        ) : (
+          // Na altura do seletor de dia, para os controles não pularem na troca.
+          <p className="flex h-8 items-center text-[17px] font-medium leading-6 tracking-[-0.2px]">
+            {t.ranking.rollingLabel}
+          </p>
+        )}
+        <PillTabs
+          label={t.ranking.period}
+          value={period}
+          onChange={(next) => {
+            setDirection(next === "rolling" ? 1 : -1);
+            setPeriod(next as Period);
+          }}
+          options={[
+            { key: "day", label: t.ranking.day },
+            { key: "rolling", label: t.ranking.rolling },
+          ]}
+        />
+      </div>
       <PillTabs
         label={t.ranking.title}
         value={view}
@@ -62,8 +117,8 @@ export function Boards({ dateKey, group }: { dateKey: string; group?: string }) 
         ]}
       />
       {shown ? (
-        <GlideSwap id={shown.view} direction={direction} className="mt-6">
-          <Panel view={shown.view} board={shown.board} error={shown.error} />
+        <GlideSwap id={shown.id} direction={direction} className="mt-6">
+          <Panel shown={shown} today={dateKey} />
         </GlideSwap>
       ) : (
         <div className="mt-6">
@@ -98,24 +153,54 @@ export function RankingSkeleton({ rows = 8 }: { rows?: number }) {
   );
 }
 
-function Panel({ view, board, error }: { view: string; board: Ranking | null; error: string | null }) {
+function Panel({ shown, today }: { shown: Shown; today: string }) {
+  const { view, period, date, board, error } = shown;
   const meta = view === OVERALL ? null : getGame(view)!.meta;
+  const rolling = period === "rolling";
+  const hint = rolling
+    ? meta
+      ? t.ranking.gameRollingHint(meta.name)
+      : t.ranking.rollingHint
+    : meta
+      ? meta.tagline
+      : t.ranking.overallHint;
+  const empty = rolling
+    ? t.ranking.emptyRolling
+    : date !== today
+      ? t.ranking.emptyDay
+      : meta
+        ? t.ranking.empty
+        : t.ranking.emptyOverall;
   return (
     <div role="tabpanel">
       <div className="mb-4 flex items-baseline justify-between gap-6">
-        <p className="text-sm text-muted-foreground">{meta ? meta.tagline : t.ranking.overallHint}</p>
+        <p className="text-sm text-muted-foreground">{hint}</p>
         {board && board.participants > 0 && (
           <span className="shrink-0 text-xs text-muted-foreground tabular-nums">{t.ranking.players(board.participants)}</span>
         )}
       </div>
       {!board ? (
         <p className="text-sm text-muted-foreground">{error}</p>
+      ) : rolling ? (
+        <Rows
+          board={board}
+          empty={empty}
+          value={(row) =>
+            row.played ? (
+              <span className="w-20 text-right font-semibold" style={meta ? { color: meta.color } : undefined}>
+                {t.ranking.average(row.value)}
+              </span>
+            ) : (
+              <NotPlayed />
+            )
+          }
+        />
       ) : meta ? (
-        <GameBoard meta={meta} board={board} />
+        <GameBoard meta={meta} board={board} empty={empty} />
       ) : (
         <Rows
           board={board}
-          empty={t.ranking.emptyOverall}
+          empty={empty}
           value={(row) =>
             row.played ? (
               <>
@@ -141,11 +226,11 @@ export function SectionTitle({ players, children }: { players: number; children:
   );
 }
 
-function GameBoard({ meta, board }: { meta: GameMeta; board: Ranking }) {
+function GameBoard({ meta, board, empty }: { meta: GameMeta; board: Ranking; empty: string }) {
   return (
     <Rows
       board={board}
-      empty={t.ranking.empty}
+      empty={empty}
       value={(row) =>
         row.played && row.status && row.count !== null ? (
           <>

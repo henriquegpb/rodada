@@ -125,17 +125,37 @@ export function useMe(): Me | null | undefined {
   return { id, name, handle: handle ?? "", image: image ?? null };
 }
 
+/** O ranking de um dia ou a Média dos últimos 30 dias. */
+export type Period = "day" | "rolling";
+
 /**
- * O Ranking do dia: o geral (soma das Notas da Rodada) ou, com `slug`, o de um jogo; com `group`,
- * só entre os membros do Grupo. `dateKey` null (ainda no servidor) não busca nada.
+ * Um Ranking: o geral (soma das Notas da Rodada) ou, com `slug`, o de um jogo; com `group`, só
+ * entre os membros do Grupo. Por padrão o do dia `dateKey`; com `period: "rolling"`, a Média dos
+ * últimos 30 dias (o `dateKey` aí não muda nada). `dateKey` null (ainda no servidor) não busca nada.
  */
-export function useBoard({ dateKey, slug, group }: { dateKey: string | null; slug?: string; group?: string }) {
+export function useBoard({
+  dateKey,
+  slug,
+  group,
+  period = "day",
+}: {
+  dateKey: string | null;
+  slug?: string;
+  group?: string;
+  period?: Period;
+}) {
   const mock = useMock();
-  const params = new URLSearchParams({ kind: "daily", date: dateKey ?? "" });
+  const rolling = period === "rolling";
+  const params = new URLSearchParams(
+    rolling ? { kind: slug ? "game" : "rolling" } : { kind: "daily", date: dateKey ?? "" },
+  );
   if (slug) params.set("slug", slug);
   if (group) params.set("group", group);
   const { data, error } = useApi<Ranking>(dateKey && !mock ? `/api/rankings?${params}` : null, true);
-  const fake = useMemo(() => (mock && dateKey ? mockBoard(dateKey, slug, group) : null), [mock, dateKey, slug, group]);
+  const fake = useMemo(
+    () => (mock && dateKey ? mockBoard(dateKey, slug, group, rolling) : null),
+    [mock, dateKey, slug, group, rolling],
+  );
   return fake ? { board: fake, error: null } : { board: data, error };
 }
 
