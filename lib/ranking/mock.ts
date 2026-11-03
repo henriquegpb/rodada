@@ -93,12 +93,25 @@ function mockPlays(dateKey: string): Record<string, Map<number, FakePlay>> {
 }
 
 /** O Ranking do dia como a API devolve: geral ou de um jogo, de todo mundo ou de um Grupo. */
-export function mockBoard(dateKey: string, slug?: string, groupId?: string): Ranking {
+export function mockBoard(dateKey: string, slug?: string, groupId?: string, rolling = false): Ranking {
   const plays = mockPlays(dateKey);
   const group = GROUPS.find((g) => g.id === groupId);
   const who = group ? group.members : accounts.map((_, i) => i);
+  // Com `rolling`, os 30 dias até `dateKey` (desde a estreia), como a Média de 30 dias da API.
+  const span = rolling
+    ? Array.from({ length: 30 }, (_, k) => addDays(dateKey, -k))
+        .filter((d) => d >= EPOCH_DATE)
+        .map(mockPlays)
+    : [];
 
   let lines = who.map((i) => {
+    if (rolling) {
+      const found = span.flatMap((day) =>
+        (slug ? [day[slug]?.get(i)] : games.map((g) => day[g.meta.slug].get(i))).filter((p) => p !== undefined),
+      );
+      const total = found.reduce((sum, p) => sum + p.nota, 0);
+      return { i, total, played: found.length > 0, count: null, status: null };
+    }
     if (slug) {
       const play = plays[slug]?.get(i);
       return { i, total: play?.nota ?? 0, played: Boolean(play), count: play?.count ?? null, status: play?.status ?? null };
@@ -112,9 +125,9 @@ export function mockBoard(dateKey: string, slug?: string, groupId?: string): Ran
   // `?mock=1st`: o "você" passa à frente em todo ranking, para ver a tela do 1º lugar.
   if (new URLSearchParams(window.location.search).get("mock") === "1st") {
     const best = Math.max(0, ...lines.map((l) => l.total));
-    const won = slug ? ("won" as const) : null;
+    const won = slug && !rolling ? ("won" as const) : null;
     lines = lines.filter((l) => l.i !== 0);
-    lines.push({ i: 0, total: best + 1, played: true, count: 1, status: won });
+    lines.push({ i: 0, total: best + 1, played: true, count: rolling ? null : 1, status: won });
   }
   lines.sort((a, b) => b.total - a.total || a.i - b.i);
 
@@ -123,7 +136,7 @@ export function mockBoard(dateKey: string, slug?: string, groupId?: string): Ran
     position: totals.indexOf(l.total) + 1,
     account: accounts[l.i],
     total: l.total,
-    value: l.total,
+    value: rolling ? Math.round((l.total / 30) * 10) / 10 : l.total,
     played: l.played,
     count: l.count,
     status: l.status,

@@ -1,0 +1,288 @@
+/* ── Seletor de dia do Ranking (components/ranking/day-picker.tsx) ─────────────────────────────
+ * O mesmo da aba Recordings da Nora (web, app/styles/timeline.css): o dia é o botão, as setas
+ * andam um dia, e o mês desce com desfoque, um destaque que desliza até o dia sob o mouse e o mês
+ * novo entrando pelo lado de onde veio. As cores fixas da Nora viraram as do tema, para valer no
+ * claro e no escuro. */
+.day-selector-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  position: relative;
+}
+
+.day-selector-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  /* Puxado para a margem pelo próprio padding: o TEXTO começa onde começa o conteúdo acima. */
+  margin-left: -8px;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--foreground);
+  font: inherit;
+  cursor: pointer;
+  transition: background 0.18s ease;
+}
+
+.day-selector-trigger:hover,
+.day-selector-trigger[aria-expanded="true"] {
+  background: color-mix(in srgb, var(--foreground) 6%, transparent);
+}
+
+.day-selector-trigger:focus-visible,
+.day-selector-nav:focus-visible,
+.day-selector-calendar-day:focus-visible,
+.day-selector-calendar-month-nav:focus-visible {
+  outline: 1.5px solid color-mix(in srgb, var(--foreground) 50%, transparent);
+  outline-offset: 1px;
+}
+
+.day-selector-label {
+  font-size: 17px;
+  line-height: 24px;
+  font-weight: 500;
+  letter-spacing: -0.2px;
+  user-select: none;
+  white-space: nowrap;
+  animation: daySelectorIn 0.32s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+.day-selector-caret {
+  color: color-mix(in srgb, var(--foreground) 50%, transparent);
+  transition: transform 0.34s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.day-selector-trigger[aria-expanded="true"] .day-selector-caret {
+  transform: rotate(180deg);
+}
+
+@keyframes daySelectorIn {
+  from { opacity: 0; filter: blur(4px); transform: translateY(3px); }
+  to { opacity: 1; filter: blur(0); transform: none; }
+}
+
+.day-selector {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.day-selector-nav {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: color-mix(in srgb, var(--foreground) 60%, transparent);
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.day-selector-nav:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--foreground) 6%, transparent);
+  color: var(--foreground);
+}
+
+.day-selector-nav:active:not(:disabled) { opacity: 0.7; }
+.day-selector-nav:disabled { opacity: 0.3; cursor: default; }
+
+/* O mês. */
+.day-selector-calendar-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: -8px;
+  z-index: 100;
+  width: 300px;
+  padding: 10px;
+  border: 1px solid color-mix(in srgb, var(--foreground) 7%, transparent);
+  border-radius: 16px;
+  background: var(--popover);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--foreground) 4%, transparent), 0 16px 34px rgba(0, 0, 0, 0.5);
+  transform-origin: top left;
+  opacity: 1;
+  filter: blur(0);
+  transform: none;
+  visibility: visible;
+  transition: opacity 0.22s ease, transform 0.36s cubic-bezier(0.32, 0.72, 0, 1), filter 0.28s ease, visibility 0s;
+}
+
+.day-selector-calendar-dropdown:not([data-open]) {
+  opacity: 0;
+  filter: blur(5px);
+  transform: translateY(-6px) scale(0.97);
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.26s cubic-bezier(0.32, 0.72, 0, 1), filter 0.22s ease, visibility 0s linear 0.26s;
+}
+
+.day-selector-calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+
+.day-selector-calendar-month-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.day-selector-calendar-month-nav {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: color-mix(in srgb, var(--foreground) 60%, transparent);
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.day-selector-calendar-month-nav:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--foreground) 7%, transparent);
+  color: var(--foreground);
+}
+
+.day-selector-calendar-month-nav:disabled { opacity: 0.3; cursor: default; }
+
+.day-selector-calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  margin-bottom: 2px;
+}
+
+.day-selector-calendar-weekday {
+  display: grid;
+  place-items: center;
+  height: 26px;
+  font-size: 11px;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--foreground) 40%, transparent);
+}
+
+.day-selector-calendar-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+/* O mês novo entra desfocando pelo lado de onde veio. */
+.day-selector-calendar-grid[data-dir="1"],
+.day-selector-calendar-month-label[data-dir="1"] {
+  animation: dayCalendarIn 0.4s cubic-bezier(0.45, 0.05, 0.15, 1) both;
+}
+
+.day-selector-calendar-grid[data-dir="-1"],
+.day-selector-calendar-month-label[data-dir="-1"] {
+  animation: dayCalendarInBack 0.4s cubic-bezier(0.45, 0.05, 0.15, 1) both;
+}
+
+@keyframes dayCalendarIn {
+  0% { opacity: 0; transform: translateX(24px); filter: blur(8px); }
+  65% { filter: blur(3px); }
+  100% { opacity: 1; transform: none; filter: blur(0); }
+}
+
+@keyframes dayCalendarInBack {
+  0% { opacity: 0; transform: translateX(-24px); filter: blur(8px); }
+  65% { filter: blur(3px); }
+  100% { opacity: 1; transform: none; filter: blur(0); }
+}
+
+/* Um destaque só para o mês, deslizando até o dia sob o mouse. */
+.day-selector-calendar-cursor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* Uma coluna da grade por onde ele desliza. */
+  width: calc(100% / 7);
+  height: 38px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--foreground) 7%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.18s ease;
+}
+
+.day-selector-calendar-cursor[data-visible] { opacity: 1; }
+
+.day-selector-calendar-day {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  height: 38px;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  /* Dia sem jogo recua; os dias em que você jogou ficam em cheio. */
+  color: color-mix(in srgb, var(--foreground) 45%, transparent);
+  font: inherit;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: color 0.18s ease;
+}
+
+.day-selector-calendar-day > span { position: relative; z-index: 1; }
+
+.day-selector-calendar-day--has-entries { color: var(--foreground); font-weight: 500; }
+.day-selector-calendar-day:hover:not(:disabled) { color: var(--foreground); }
+
+/* A marca de que você jogou: um ponto embaixo do número. */
+.day-selector-calendar-day--has-entries::after {
+  content: "";
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  margin-left: -2px;
+  border-radius: 50%;
+  background: var(--foreground);
+}
+
+.day-selector-calendar-day--today { font-weight: 700; }
+.day-selector-calendar-day--today:not(.day-selector-calendar-day--selected) > span {
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 4px;
+}
+
+.day-selector-calendar-day--selected {
+  background: var(--foreground);
+  color: var(--background);
+}
+
+.day-selector-calendar-day--selected:hover:not(:disabled) { color: var(--background); }
+.day-selector-calendar-day--selected.day-selector-calendar-day--has-entries::after { background: var(--background); }
+
+.day-selector-calendar-day--outside { opacity: 0.4; }
+
+.day-selector-calendar-day:disabled {
+  opacity: 0.2;
+  cursor: default;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .day-selector-label,
+  .day-selector-calendar-grid[data-dir],
+  .day-selector-calendar-month-label[data-dir] { animation-duration: 0.01ms; }
+  .day-selector-calendar-dropdown,
+  .day-selector-calendar-dropdown:not([data-open]),
+  .day-selector-calendar-cursor,
+  .day-selector-caret { transition-duration: 0.01ms; }
+}
