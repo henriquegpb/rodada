@@ -2,25 +2,20 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Check, X } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { getGame } from "@/games";
 import { preloadEngine } from "@/games/engines";
 import type { GameMeta } from "@/games/types";
 import { GameVideo } from "@/components/game/game-preview";
 import { HoverGlideGroup } from "@/components/microkit/hover-glide-cards";
-import { HistoryGrid } from "@/components/stats/history-grid";
-import { FlameArt, StreakFlame } from "@/components/streak/streak-flame";
+import { StreakFlame } from "@/components/streak/streak-flame";
 import { challengeNumber } from "@/lib/daily/date";
-import { usePlayRecords, useRound } from "@/lib/plays/hooks";
-import { formatResult } from "@/lib/plays/result";
-import type { DayStatus } from "@/lib/plays/status";
-import { NO_STREAK, gameStats, type Streak } from "@/lib/stats";
+import { useRound } from "@/lib/plays/hooks";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 
 export function HomeScreen() {
   const { today, round } = useRound();
-  const records = usePlayRecords();
   const date = today
     ? new Date(`${today}T12:00:00Z`).toLocaleDateString("pt-BR", {
         weekday: "long",
@@ -44,41 +39,22 @@ export function HomeScreen() {
         </div>
 
         <HoverGlideGroup label={t.nav.games} className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {round.map(({ meta, status }) => (
-            <GameTile
-              key={meta.slug}
-              meta={meta}
-              status={status}
-              streak={today ? gameStats(records, meta.slug, meta.rules, today).streak : NO_STREAK}
-            />
+          {round.map(({ meta }) => (
+            <GameTile key={meta.slug} meta={meta} />
           ))}
         </HoverGlideGroup>
       </section>
 
-      {today && (
-        <section>
-          <h2 className="font-display mb-4 text-xl">{t.home.history}</h2>
-          <HistoryGrid records={records} today={today} days={14} />
-        </section>
-      )}
     </div>
   );
 }
 
 /**
- * Capa do jogo: chapada na cor do jogo, com a ilustração, o status de hoje e a sequência do jogo.
+ * Capa do jogo: chapada na cor do jogo, com a ilustração, o nome e a chamada.
  * Com o mouse em cima, a ilustração dá lugar a um vídeo do jogo sendo jogado (só com mouse: no
  * toque o card já abre o jogo). O vídeo só entra na página no primeiro hover.
  */
-function GameTile({
-  meta,
-  status,
-  streak,
-}: {
-  meta: GameMeta;
-  status: DayStatus;
-  streak: Streak;
-}) {
+function GameTile({ meta }: { meta: GameMeta }) {
   const Cover = getGame(meta.slug)!.Cover;
   const [hovered, setHovered] = useState(false);
   const [seen, setSeen] = useState(false);
@@ -93,20 +69,9 @@ function GameTile({
       }}
       onPointerLeave={() => setHovered(false)}
       data-glide-card=""
-      className="group relative flex aspect-[5/4] flex-col overflow-hidden rounded-xl p-5 text-ink lg:aspect-[4/5] lg:p-4 outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      className="group relative flex aspect-[16/10] flex-col overflow-hidden rounded-xl p-5 text-ink lg:aspect-square lg:p-4 outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       style={{ background: meta.color }}
     >
-      <div className="flex items-start justify-between gap-2">
-        {/* Pílula escura: a chama na cor do jogo sumiria sobre a capa da mesma cor. */}
-        <span
-          className="flex h-6 items-center gap-1 rounded-full bg-ink pl-1.5 pr-2 text-xs font-bold tabular-nums text-white"
-          title={`${t.home.streak}: ${streak.current}`}
-        >
-          <FlameArt lit={streak.doneToday} color={meta.color} className="h-4 w-2.5" />
-          {streak.current}
-        </span>
-        <Stamp status={status} meta={meta} />
-      </div>
       <div className="relative my-auto grid place-items-center">
         <Cover
           className={cn(
@@ -136,19 +101,5 @@ function GameTile({
         </span>
       </div>
     </Link>
-  );
-}
-
-function Stamp({ status, meta }: { status: DayStatus; meta: GameMeta }) {
-  const base = "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold tabular-nums";
-  if (status.kind === "new") return <span className={`${base} border-2 border-ink/80`}>{t.status.play}</span>;
-  if (status.kind === "playing") return <span className={`${base} bg-white/75`}>{t.status.playing}</span>;
-  const result = formatResult(meta.rules, status.kind, status.count);
-  return (
-    <span className={cn(base, "text-white", status.kind === "lost" ? "bg-ink/80" : "bg-ink")}>
-      {status.kind === "won" && <Check size={13} strokeWidth={3} />}
-      {status.kind === "lost" && <X size={13} strokeWidth={3} />}
-      {result}
-    </span>
   );
 }
