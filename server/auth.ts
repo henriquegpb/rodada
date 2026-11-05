@@ -47,6 +47,8 @@ export const auth = betterAuth({
     additionalFields: {
       handle: { type: "string", required: false, input: false },
       bio: { type: "string", required: false, input: false, defaultValue: "" },
+      // Só muda pelo banco; na sessão para a tela saber se mostra as ferramentas de Dev.
+      dev: { type: "boolean", required: false, input: false, defaultValue: false },
     },
     deleteUser: {
       enabled: true,

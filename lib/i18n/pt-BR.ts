@@ -170,6 +170,10 @@ export const ptBR = {
   dev: {
     label: "Dev",
     hint: "Participou do desenvolvimento do Rodada",
+    deleteAccount: "Excluir conta",
+    deletePending: "Excluindo…",
+    deleteDone: "Excluída",
+    deleted: (name: string) => `Conta de ${name} excluída`,
   },
   groups: {
     title: "Grupos",
