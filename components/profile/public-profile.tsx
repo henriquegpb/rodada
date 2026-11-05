@@ -3,6 +3,7 @@
 import { useToday } from "@/lib/daily/hooks";
 import { useMe, useProfile } from "@/lib/ranking/client";
 import { t } from "@/lib/i18n";
+import { DeleteAccountButton } from "./delete-account";
 import { ProfileLayout, ProfileSide, ProfileSkeleton } from "./profile-layout";
 import { EditButton, ProfileActivity } from "./profile-screen";
 
@@ -30,8 +31,14 @@ export function PublicProfile({ handle }: { handle: string }) {
         <ProfileSide
           account={account}
           meta={t.profile.since(since)}
-          // No próprio Perfil público também dá para editar.
-          action={me?.id === account.id ? <EditButton me={me} bio={account.bio} /> : undefined}
+          // No próprio Perfil público também dá para editar; no de outra pessoa, Dev pode excluir a Conta.
+          action={
+            me?.id === account.id ? (
+              <EditButton me={me} bio={account.bio} />
+            ) : me?.dev ? (
+              <DeleteAccountButton account={account} />
+            ) : undefined
+          }
           stats={stats}
           achievements={achievements}
         />

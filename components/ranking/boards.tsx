@@ -9,13 +9,12 @@ import type { GameMeta } from "@/games/types";
 import { formatResult } from "@/lib/plays/result";
 import { EPOCH_DATE } from "@/lib/daily/date";
 import { usePlayRecords } from "@/lib/plays/hooks";
-import { useBoard, useMe, type Period } from "@/lib/ranking/client";
+import { useBoard, type Period } from "@/lib/ranking/client";
 import type { Ranking, RankingRow } from "@/server/rankings";
 import { RINGS } from "@/components/profile/achievement-badge";
 import { DevBadge } from "@/components/profile/dev-badge";
 import { ProfileLink } from "@/components/profile/profile-link";
 import { Champion } from "./champion";
-import { DeleteAccountButton } from "./delete-account";
 import { DayPicker } from "./day-picker";
 import { GlideSwap } from "@/components/ui/glide-swap";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -276,8 +275,6 @@ function Rows({
   value: (row: RankingRow) => ReactNode;
 }) {
   const [page, setPage] = useState(0);
-  // Dev vê um X ao lado de cada nome (menos o próprio) para excluir a Conta.
-  const dev = useMe()?.dev === true;
   if (!board.rows.length) return <p className="text-sm text-muted-foreground">{empty}</p>;
 
   const pages = Math.ceil(board.rows.length / PAGE_SIZE);
@@ -288,7 +285,7 @@ function Rows({
   const myPage = myIndex < 0 ? null : Math.floor(myIndex / PAGE_SIZE);
   const away = board.me !== null && myPage !== current;
   const row = (r: RankingRow) => (
-    <Row key={r.account.id} row={r} me={r.account.id === meId} deletable={dev && r.account.id !== meId} value={value(r)} />
+    <Row key={r.account.id} row={r} me={r.account.id === meId} value={value(r)} />
   );
 
   return (
@@ -312,7 +309,7 @@ function Rows({
 /** Ouro, prata e bronze. */
 const MEDALS = [RINGS.ouro, RINGS.prata, RINGS.bronze];
 
-function Row({ row, me, deletable, value }: { row: RankingRow; me: boolean; deletable: boolean; value: ReactNode }) {
+function Row({ row, me, value }: { row: RankingRow; me: boolean; value: ReactNode }) {
   const podium = row.played && row.position <= 3;
   return (
     <li className="group flex items-center gap-2 text-sm tabular-nums">
@@ -338,7 +335,6 @@ function Row({ row, me, deletable, value }: { row: RankingRow; me: boolean; dele
           {/* Um pixel acima: alinhada pela altura das letras do nome, não pela caixa da linha. */}
           <DevBadge dev={row.account.dev} className="-translate-y-px" />
           {me && <YouTag />}
-          {deletable && <DeleteAccountButton account={row.account} />}
         </span>
         <span className="flex items-center gap-4">{value}</span>
       </div>
