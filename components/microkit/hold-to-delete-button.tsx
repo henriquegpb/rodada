@@ -26,24 +26,25 @@ interface Labels {
   label: string;
   pendingLabel: string;
   doneLabel: string;
+  iconSize: number;
 }
 
 function ButtonContent({ state, labels }: { state: DeleteState; labels: Labels }) {
   const deleted = state === "deleted";
   const text = state === "pending" ? labels.pendingLabel : labels.label;
   return (
-    <span className="inline-flex items-center gap-[10px]">
+    <span className="inline-flex items-center gap-[0.6em]">
       <span className="grid shrink-0" aria-hidden="true">
         <Trash2
           className="[grid-area:1/1] [transition:opacity_.24s_ease,transform_.32s_cubic-bezier(.16,1,.3,1)] data-[active=false]:opacity-0 data-[active=false]:[transform:scale(.5)] motion-reduce:transition-none"
           data-active={!deleted}
-          size={20}
+          size={labels.iconSize}
           strokeWidth={2}
         />
         <Check
           className="[grid-area:1/1] [transition:opacity_.24s_ease,transform_.32s_cubic-bezier(.16,1,.3,1)] data-[active=false]:opacity-0 data-[active=false]:[transform:scale(.5)] motion-reduce:transition-none"
           data-active={deleted}
-          size={20}
+          size={labels.iconSize}
           strokeWidth={2.4}
         />
       </span>
@@ -70,6 +71,7 @@ export function HoldToDeleteButton({
   label = "Segure para excluir",
   pendingLabel = "Excluindo…",
   doneLabel = "Excluído",
+  iconSize = 20,
   className,
 }: {
   /** Roda quando a barra enche; se rejeitar, o botão volta ao começo. */
@@ -77,6 +79,7 @@ export function HoldToDeleteButton({
   label?: string;
   pendingLabel?: string;
   doneLabel?: string;
+  iconSize?: number;
   className?: string;
 }) {
   const [state, setState] = useState<DeleteState>("idle");
@@ -140,12 +143,12 @@ export function HoldToDeleteButton({
         onBlur={cancel}
         onContextMenu={(event) => event.preventDefault()}
       >
-        <ButtonContent state={state} labels={{ label, pendingLabel, doneLabel }} />
+        <ButtonContent state={state} labels={{ label, pendingLabel, doneLabel, iconSize }} />
         <span
           className="pointer-events-none absolute inset-0 flex items-center justify-center bg-[#f97316] text-white [clip-path:inset(0_100%_0_0)] [transition:clip-path_.5s_cubic-bezier(.16,1,.3,1)] group-data-[state=holding]:[clip-path:inset(0)] group-data-[state=holding]:[transition:clip-path_1.6s_linear] group-data-[state=pending]:[clip-path:inset(0)] group-data-[state=deleted]:[clip-path:inset(0)] motion-reduce:group-data-[state=idle]:[transition:none] motion-reduce:group-data-[state=deleted]:[transition:none]"
           aria-hidden="true"
         >
-          <ButtonContent state={state} labels={{ label, pendingLabel, doneLabel }} />
+          <ButtonContent state={state} labels={{ label, pendingLabel, doneLabel, iconSize }} />
         </span>
       </button>
     </>

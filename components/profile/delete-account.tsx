@@ -37,9 +37,10 @@ export function DeleteAccountButton({ account }: { account: { id: string; name: 
       label={t.dev.deleteAccount}
       pendingLabel={t.dev.deletePending}
       doneLabel={t.dev.deleteDone}
-      // O light-dark() do Microkit não vale aqui (o Tailwind o troca por variáveis que o tema não
-      // define): fundo e texto vêm do tema, como o "Editar perfil".
-      className="h-11 w-full bg-secondary text-[15px] text-foreground hover:data-[state=idle]:bg-secondary/80"
+      iconSize={14}
+      // O formato do "Editar perfil". O light-dark() do Microkit não vale aqui (o Tailwind o troca
+      // por variáveis que o tema não define), então fundo e texto também vêm do tema.
+      className="h-9 w-full rounded-lg bg-secondary px-3 text-sm font-semibold tracking-normal text-foreground hover:data-[state=idle]:bg-secondary hover:data-[state=idle]:brightness-110"
     />
   );
 }
