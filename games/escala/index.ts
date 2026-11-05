@@ -22,7 +22,7 @@ export const escala: GameDefinition<EscalaPuzzle, EscalaFeedback, PointsRules> =
     launchedOn: "2026-11-05",
     howToPlay: [
       "São 5 rodadas. Em cada uma, um bicho aparece em azul no tamanho de verdade, com a altura ou o comprimento escrito.",
-      "Arraste a bolinha (ou a barra embaixo) até o outro bicho ficar do tamanho certo perto dele e confirme.",
+      "Arraste na cena (ou use a barra embaixo) até o outro bicho ficar do tamanho certo perto dele e confirme.",
       "Acertando em cheio, 100 pontos. A nota cai conforme o erro e chega a zero quando o palpite é 2,5 vezes maior ou menor.",
       "Os tamanhos são a média de um adulto. Na aba Países, o mesmo com o mapa: a medida é de norte a sul.",
     ],

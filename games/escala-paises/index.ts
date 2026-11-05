@@ -23,7 +23,7 @@ export const escalaPaises: GameDefinition<EscalaPuzzle, EscalaFeedback, PointsRu
     launchedOn: "2026-11-05",
     howToPlay: [
       "São 5 rodadas. Em cada uma, um país aparece em azul no tamanho de verdade, com a extensão de norte a sul escrita.",
-      "Arraste a bolinha (ou a barra embaixo) até o outro país ficar do tamanho certo e confirme.",
+      "Arraste na cena (ou use a barra embaixo) até o outro país ficar do tamanho certo e confirme.",
       "Acertando em cheio, 100 pontos. A nota cai conforme o erro e chega a zero quando o palpite é 2,5 vezes maior ou menor.",
     ],
     seo: {

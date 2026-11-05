@@ -80,7 +80,6 @@ export function EscalaBoard({ play, submitGuess, finish }: BoardProps<EscalaPuzz
   }
 
   const height = scene.targetHeight(value);
-  const handle = { x: scene.x0 + height * scene.targetAspect, y: GROUND - height };
   const slider = Math.round((1000 * Math.log(draft / scene.min)) / Math.log(scene.max / scene.min));
   const off = result ? Math.round(Math.abs(result.guess / result.actual - 1) * 100) : 0;
 
@@ -135,13 +134,6 @@ export function EscalaBoard({ play, submitGuess, finish }: BoardProps<EscalaPuzz
 
           {result && <Figure shape={round.target.shape} x={scene.x0} height={scene.targetHeight(result.actual)} className="fill-foreground/25" />}
           <Figure shape={round.target.shape} x={scene.x0} height={height} fill={COLOR} style={{ opacity: result ? 0.8 : 1 }} />
-
-          {guessing && (
-            <g pointerEvents="none">
-              <circle cx={handle.x} cy={handle.y} r="14" className="fill-card" stroke={COLOR} strokeWidth="4" />
-              <path d={`M${handle.x - 5} ${handle.y + 5} L${handle.x + 5} ${handle.y - 5}`} stroke={COLOR} strokeWidth="3" strokeLinecap="round" />
-            </g>
-          )}
         </svg>
 
         {result && (
