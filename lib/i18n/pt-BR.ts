@@ -170,6 +170,13 @@ export const ptBR = {
   dev: {
     label: "Dev",
     hint: "Participou do desenvolvimento do Rodada",
+    deleteAccount: (name: string) => `Excluir a conta de ${name}`,
+    deleteTitle: (name: string) => `Excluir a conta de ${name}?`,
+    deleteHint: "Sai tudo: partidas, rankings, conquistas, grupos e a foto. Não dá para desfazer.",
+    deleteHold: "Segure para excluir",
+    deletePending: "Excluindo…",
+    deleteDone: "Excluída",
+    deleted: (name: string) => `Conta de ${name} excluída`,
   },
   groups: {
     title: "Grupos",

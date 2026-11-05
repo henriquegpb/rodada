@@ -1,7 +1,10 @@
-import { cacheLife } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import { addDays } from "@/lib/daily/date";
 import { getDb } from "./db";
 import { ranking, type RankingKind } from "./rankings";
+
+/** A etiqueta dos Rankings gerais em cache: expirar ela tira da lista uma Conta excluída. */
+export const RANKINGS_TAG = "rankings";
 
 /**
  * Rankings gerais em cache: todo mundo vê a mesma lista, então ela é calculada uma vez por janela
@@ -10,6 +13,7 @@ import { ranking, type RankingKind } from "./rankings";
  */
 export async function cachedGlobalRanking(kind: RankingKind, today: string, limit: number) {
   "use cache";
+  cacheTag(RANKINGS_TAG);
   // Dias passados mudam pouco (ontem até 5 minutos depois da meia-noite; importações a qualquer hora).
   if (kind.kind === "daily" && kind.dateKey < addDays(today, -1)) cacheLife("hours");
   else if (kind.kind === "daily") cacheLife("minutes");
