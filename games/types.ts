@@ -24,8 +24,12 @@ export type PlayStatus = "playing" | "won" | "lost" | "done";
 
 /** Como uma partida termina e como o resultado é contado. */
 export type GameRules =
-  /** Acertar uma resposta em até N tentativas. Resultado: tentativas usadas. */
-  | { type: "attempts"; maxAttempts: number }
+  /**
+   * Acertar uma resposta em até N tentativas. Resultado: tentativas usadas. `curve`: a Nota por
+   * número de tentativas, para jogos em que acertar de primeira é impossível (sem ela, a Nota cai
+   * em linha reta de 100 com 1 tentativa até 1/N com N).
+   */
+  | { type: "attempts"; maxAttempts: number; curve?: GuessCurve }
   /**
    * Chutes sem limite até acertar (ou desistir). Resultado: quantos chutes levou. `curve`: a Nota
    * por número de chutes (veja `UNLIMITED_CURVE`).

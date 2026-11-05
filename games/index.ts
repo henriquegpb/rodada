@@ -15,12 +15,13 @@ import { colmeia } from "./colmeia";
 import { rainhas } from "./rainhas";
 import { rainhas9 } from "./rainhas-9";
 import { rainhas10 } from "./rainhas-10";
+import { grau } from "./grau";
 
 /**
  * Registro dos jogos (e modos), na ordem em que aparecem no site.
  * Ao adicionar um jogo, registre também a engine em ./engines.ts.
  */
-export const games: GameDefinition[] = [palavra, dupla, quadra, bandeira, pais, capital, mosaico, rota, calor, mundo, elo, sentido, colmeia, rainhas, rainhas9, rainhas10] as GameDefinition[];
+export const games: GameDefinition[] = [palavra, dupla, quadra, bandeira, pais, capital, mosaico, rota, calor, mundo, elo, sentido, colmeia, rainhas, rainhas9, rainhas10, grau] as GameDefinition[];
 
 /** Os jogos da rodada do dia: tudo que não é modo de outro jogo. */
 export const roundGames = games.filter((g) => !g.meta.parent);

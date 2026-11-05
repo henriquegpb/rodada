@@ -18,7 +18,8 @@ function onCurve(curve: GuessCurve, count: number): number {
 
 /**
  * Score bruto de uma partida, na escala do próprio jogo; os Rankings usam a Nota (`gradePlay`).
- * Tentativas: quanto menos, mais pontos; derrota vale zero (6 tentativas → 6 a 1).
+ * Tentativas: quanto menos, mais pontos; derrota vale zero (6 tentativas → 6 a 1). Com `curve`, a Nota
+ * da curva, como no sem limite.
  * Sem limite: a Nota da curva do jogo (`curve`, ou `UNLIMITED_CURVE`); desistir vale zero.
  * Tempo: um ponto por item achado. Quiz: um ponto por acerto. Pontos: os do próprio jogo.
  * Vidas: uma por vida que sobrou (3 vidas sem errar → 3); perder vale zero.
@@ -28,6 +29,7 @@ export function scorePlay(rules: GameRules, status: PlayStatus, count: number): 
   if (status !== "won") return 0;
   if (rules.type === "unlimited") return onCurve(rules.curve ?? UNLIMITED_CURVE, count);
   if (rules.type === "lives") return rules.lives - count;
+  if (rules.curve) return onCurve(rules.curve, count);
   return rules.maxAttempts + 1 - count;
 }
 
@@ -38,7 +40,7 @@ export function scorePlay(rules: GameRules, status: PlayStatus, count: number): 
 export function maxScore(rules: GameRules, pointsMax?: number): number {
   switch (rules.type) {
     case "attempts":
-      return rules.maxAttempts;
+      return rules.curve ? 100 : rules.maxAttempts;
     case "unlimited":
       return 100;
     case "timed":

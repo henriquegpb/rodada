@@ -131,7 +131,7 @@ export const capital: GameDefinition<CapitalPuzzle, CapitalFeedback, AttemptRule
 
 **Regras.** `rules` diz como a partida termina e como o resultado é contado:
 
-- `{ type: "attempts", maxAttempts }`: acertar em até N tentativas. A partida acaba em `won` ou `lost`, e a plataforma mostra "3/6" ou "X/6".
+- `{ type: "attempts", maxAttempts, curve? }`: acertar em até N tentativas. A partida acaba em `won` ou `lost`, e a plataforma mostra "3/6" ou "X/6". `curve` dá a Nota por tentativas quando acertar de primeira é impossível (o `grau/` precisa de pelo menos 2).
 - `{ type: "unlimited" }`: chutes sem limite até acertar. O tabuleiro pode chamar `finish()` para desistir, e a partida acaba em `lost`. A plataforma mostra "8 chutes" ou "X". O jogo `calor/` é o modelo.
 - `{ type: "timed", seconds, total }`: achar o máximo de itens antes do relógio zerar. O tabuleiro recebe `begin()` (começa o relógio) e `finish()` (tempo esgotado ou desistência). Cada tentativa aceita é um item achado, e `solved: true` encerra com vitória quando acha todos. A plataforma mostra "142/197". O jogo `mundo/` é o modelo.
 - `{ type: "quiz", total }`: `total` perguntas seguidas, uma resposta cada. Cada tentativa responde a pergunta da vez e o feedback diz se acertou em `correct`, que é o que o placar conta. A partida acaba depois da última resposta: em `won` se acertou todas, senão em `done`. A plataforma mostra "7/10". O jogo `capital/` é o modelo.
