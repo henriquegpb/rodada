@@ -11,8 +11,9 @@ import { requireAccount, respond } from "@/server/http";
  */
 export async function DELETE(request: Request, ctx: RouteContext<"/api/accounts/[id]">) {
   return respond(async () => {
-    const { image } = await deleteAccountAsDev(getDb(), await requireAccount(request), (await ctx.params).id);
-    await deleteAvatar(image);
+    const targetId = (await ctx.params).id;
+    const { image } = await deleteAccountAsDev(getDb(), await requireAccount(request), targetId);
+    await deleteAvatar(image, targetId);
     revalidateTag(RANKINGS_TAG, { expire: 0 });
   });
 }
