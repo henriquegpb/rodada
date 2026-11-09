@@ -45,6 +45,16 @@ export function shuffle<T>(items: readonly T[], rng: Rng): T[] {
 }
 
 /**
+ * Dia do desafio a partir de 0. Uma data inválida daria NaN, e o sorteio devolveria `undefined`
+ * em silêncio (o que já travou a Dupla num laço infinito); melhor falhar alto.
+ */
+function dayIndex(dateKey: string): number {
+  const day = challengeNumber(dateKey) - 1;
+  if (!Number.isFinite(day)) throw new Error(`data inválida: ${dateKey}`);
+  return day;
+}
+
+/**
  * Escolhe o item do dia sem repetir até a lista acabar: cada "ciclo" de N dias percorre
  * uma permutação diferente da lista.
  */
@@ -53,7 +63,7 @@ export function pickDaily<T>(
   { slug, dateKey, seed = DAILY_SEED }: { slug: string; dateKey: string; seed?: string },
 ): T {
   if (pool.length === 0) throw new Error(`pool vazio para ${slug}`);
-  const day = challengeNumber(dateKey) - 1;
+  const day = dayIndex(dateKey);
   const cycle = Math.floor(day / pool.length);
   const order = shuffle(pool, createRng(`${seed}:${slug}:${cycle}`));
   return order[((day % pool.length) + pool.length) % pool.length];
@@ -71,7 +81,7 @@ export function pickDailyMany<T>(
 ): T[] {
   if (pool.length < count) throw new Error(`pool pequeno demais para ${slug}`);
   const perCycle = Math.floor(pool.length / count);
-  const day = challengeNumber(dateKey) - 1;
+  const day = dayIndex(dateKey);
   const cycle = Math.floor(day / perCycle);
   const slot = ((day % perCycle) + perCycle) % perCycle;
   const order = shuffle(pool, createRng(`${seed}:${slug}:${cycle}`));

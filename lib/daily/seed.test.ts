@@ -76,3 +76,10 @@ describe("pickDailyMany", () => {
     expect(pickDailyMany(pool, 5, { slug: "t", dateKey: "2001-03-04" })).toHaveLength(5);
   });
 });
+
+describe("data inválida", () => {
+  it("pickDaily e pickDailyMany falham em vez de devolver undefined", () => {
+    expect(() => pickDaily(pool, { slug: "t", dateKey: "2026-10-40" })).toThrow(/data inválida/);
+    expect(() => pickDailyMany(pool, 3, { slug: "t", dateKey: "nada" })).toThrow(/data inválida/);
+  });
+});

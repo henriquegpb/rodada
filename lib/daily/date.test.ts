@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addDays, challengeNumber, daysBetween, EPOCH_DATE, getDateKey, msUntilNextChallenge, zonedMidnight } from "./date";
+import { addDays, challengeNumber, daysBetween, EPOCH_DATE, getDateKey, isDateKey, msUntilNextChallenge, zonedMidnight } from "./date";
 
 describe("getDateKey", () => {
   it("vira o dia à meia-noite de Brasília, não à meia-noite UTC", () => {
@@ -35,5 +35,19 @@ describe("próximo desafio", () => {
   it("conta o tempo até a próxima meia-noite de Brasília", () => {
     expect(msUntilNextChallenge(new Date("2026-10-22T02:59:00Z"))).toBe(60_000);
     expect(msUntilNextChallenge(new Date("2026-10-22T03:00:00Z"))).toBe(86_400_000);
+  });
+});
+
+describe("isDateKey", () => {
+  it("aceita datas que existem, inclusive 29 de fevereiro em ano bissexto", () => {
+    for (const d of ["2026-10-22", "2026-12-31", "2028-02-29"]) expect(isDateKey(d)).toBe(true);
+  });
+
+  it("recusa datas com o formato certo que não existem no calendário", () => {
+    for (const d of ["2026-10-40", "2026-11-31", "2026-02-29", "2026-13-01", "2026-00-10"]) expect(isDateKey(d)).toBe(false);
+  });
+
+  it("recusa o que não é YYYY-MM-DD", () => {
+    for (const d of ["2026-1-1", "22/10/2026", "", null, 20261022]) expect(isDateKey(d)).toBe(false);
   });
 });
