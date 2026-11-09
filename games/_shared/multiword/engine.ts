@@ -1,16 +1,11 @@
 import { pickDaily } from "@/lib/daily/seed";
 import { normalize } from "@/lib/normalize";
-import type { GameEngine, Guess } from "../../types";
+import type { GameEngine } from "../../types";
 import { answers, checkWord, evaluate, WORD_LENGTH } from "../../palavra/engine";
+import { solvedBoards, solvedIn } from "./solved";
 import type { MultiWordFeedback, MultiWordPuzzle } from "./types";
 
-const solvedIn = (feedback: MultiWordFeedback, board: number) =>
-  feedback.boards[board]?.every((m) => m === "correct") ?? false;
-
-/** Tabuleiros já resolvidos depois destas tentativas. */
-export function solvedBoards(guesses: readonly Guess<MultiWordFeedback>[], boards: number): boolean[] {
-  return Array.from({ length: boards }, (_, b) => guesses.some((g) => solvedIn(g.feedback, b)));
-}
+export { solvedBoards } from "./solved";
 
 /**
  * Várias palavras ao mesmo tempo (Dupla, Quadra): cada tentativa vale para todos os tabuleiros
