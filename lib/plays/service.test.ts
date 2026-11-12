@@ -10,7 +10,7 @@ Object.assign(globalThis, {
   },
 });
 
-const { peekPlay, startPlay, submitGuess, nextPracticeKey } = await import("./service");
+const { closeStalePlays, peekPlay, startPlay, submitGuess, nextPracticeKey } = await import("./service");
 const { dailyStore, practiceStore } = await import("./store");
 const { engine } = await import("@/games/palavra/engine");
 
@@ -99,5 +99,32 @@ describe("treino (Jogar outra)", () => {
     // A limpeza fica para o startPlay.
     await startPlay("palavra", TODAY);
     expect(dailyStore.getPlay("palavra", TODAY)).toBeUndefined();
+  });
+});
+
+describe("virada do dia", () => {
+  const YESTERDAY = "2026-10-21";
+
+  beforeEach(() => {
+    for (const p of Object.values(dailyStore.getPlays())) dailyStore.deletePlay(p.slug, p.dateKey);
+    memory.clear();
+  });
+
+  it("a partida de ontem que ficou no meio vira desistência; a de hoje segue", async () => {
+    await submitGuess("palavra", YESTERDAY, "carro");
+    await submitGuess("palavra", TODAY, "carro");
+    await closeStalePlays(TODAY);
+
+    const yesterday = dailyStore.getPlay("palavra", YESTERDAY)!;
+    expect(yesterday).toMatchObject({ status: "lost", answerLabel: expect.any(String), finishedAt: expect.any(String) });
+    expect(yesterday.guesses).toHaveLength(1);
+    expect(dailyStore.getPlay("palavra", TODAY)?.status).toBe("playing");
+  });
+
+  it("não mexe nas partidas de ontem que já terminaram", async () => {
+    await submitGuess("palavra", YESTERDAY, engine.createChallenge(YESTERDAY).answer);
+    const before = dailyStore.getPlay("palavra", YESTERDAY);
+    await closeStalePlays(TODAY);
+    expect(dailyStore.getPlay("palavra", YESTERDAY)).toEqual(before);
   });
 });
