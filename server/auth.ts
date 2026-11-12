@@ -51,8 +51,9 @@ export const auth = betterAuth({
     additionalFields: {
       handle: { type: "string", required: false, input: false },
       bio: { type: "string", required: false, input: false, defaultValue: "" },
-      // Só muda pelo banco; na sessão para a tela saber se mostra as ferramentas de Dev.
+      // Só mudam pelo banco. `dev` é a pílula; `admin` faz a tela mostrar as ferramentas de Admin.
       dev: { type: "boolean", required: false, input: false, defaultValue: false },
+      admin: { type: "boolean", required: false, input: false, defaultValue: false },
     },
     deleteUser: {
       enabled: true,

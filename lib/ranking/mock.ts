@@ -33,6 +33,8 @@ const accounts = NAMES.map((name, i) => ({
   image: null,
   // O "você" e mais uma pessoa com a pílula Dev, para ver como fica.
   dev: i === 0 || i === 4,
+  // O "você" é Admin, para ver o botão de excluir Conta nos Perfis dos outros.
+  admin: i === 0,
 }));
 
 /** O "você" do mock: joga poucos jogos (fica lá embaixo no geral) e manda bem no Palavra. */

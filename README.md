@@ -94,7 +94,7 @@ Só é preciso para o login, os Grupos e os Rankings; os jogos funcionam sem ele
 3. Rode `pnpm db:migrate`.
 4. Entre pelo link mágico: sem `RESEND_API_KEY`, o link aparece no terminal do `pnpm dev`. O Google e as fotos de perfil (Vercel Blob) são opcionais.
 
-Para ter as ferramentas de Dev numa Conta, marque `dev = true` na tabela `user`. Os testes do servidor não precisam de nada disso: rodam num Postgres em memória (PGlite).
+Para dar a pílula Dev a uma Conta, marque `dev = true` na tabela `users`; para ela poder excluir Contas, marque `admin = true`. Os testes do servidor não precisam de nada disso: rodam num Postgres em memória (PGlite).
 
 As rotas ficam em `app/api/` e a lógica em `server/`:
 
