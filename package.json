@@ -14,6 +14,7 @@
     "data:sentido": "tsx scripts/build-sentido.ts",
     "data:colmeia": "tsx scripts/build-colmeia.ts",
     "data:rainhas": "tsx scripts/build-rainhas.ts",
+    "data:ordem": "tsx scripts/build-ordem.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:recompute": "tsx scripts/recompute-scores.ts"

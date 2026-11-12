@@ -42,6 +42,7 @@ pnpm data:build   # regenera palavras, países, silhuetas e bandeiras a partir d
 pnpm data:sentido # regenera vocabulário e vetores do Sentido (baixa ~240 MB para data-raw/)
 pnpm data:colmeia # regenera as colmeias do dia
 pnpm data:rainhas # regenera os tabuleiros das Rainhas (alguns minutos)
+pnpm data:ordem   # baixa população, PIB e expectativa de vida do Banco Mundial para o Ordem
 pnpm db:migrate   # aplica as migrações do banco no DATABASE_URL
 pnpm db:generate  # gera uma migração depois de mudar server/db/schema.ts
 ```
@@ -123,6 +124,7 @@ As rotas ficam em `app/api/` e a lógica em `server/`:
 | Palavras secretas do Sentido           | Curadoria própria (`games/sentido/data/answers.json`)                                              | MIT               |
 | Geometria e centroides dos países      | [Natural Earth](https://www.naturalearthdata.com/) 1:50m Admin 0                                  | Domínio público   |
 | Áreas dos países (Ordem)               | Calculadas da geometria do Natural Earth (`areaKm2` em `games/_shared/geo/countries.json`); os países são os dos níveis 1 e 2 da Bandeira | Domínio público   |
+| População, PIB, PIB por pessoa e expectativa de vida (Ordem) | [Banco Mundial](https://data.worldbank.org/), World Development Indicators, o valor mais recente de cada país (`games/ordem/data/stats.json`, gerado por `pnpm data:ordem`); a densidade é a população dividida pela área acima | CC BY 4.0         |
 | Distância entre fronteiras (Calor)     | Calculada dos contornos do Natural Earth 1:110m (1:50m para microestados) em `scripts/build-data.ts` | Domínio público   |
 | Fronteiras terrestres (Rota)           | Calculadas da geometria do Natural Earth: vizinhos compartilham vértices na divisa (`scripts/build-data.ts`) | Domínio público   |
 | Silhuetas dos bichos (Escala)          | [PhyloPic](https://www.phylopic.org), só imagens em domínio público (CC0 ou Public Domain Mark), recortadas em `public/escala/`; autor e link de cada uma em `games/escala/data/animals.json`. Tamanhos: médias de adultos, curadoria própria | CC0 / Domínio público |

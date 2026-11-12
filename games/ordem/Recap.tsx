@@ -1,5 +1,5 @@
 import type { PlayView } from "../types";
-import { COLOR, MARK_EMOJI } from "./rules";
+import { CATEGORIES, COLOR, MARK_EMOJI } from "./rules";
 import type { OrdemFeedback, OrdemPuzzle } from "./types";
 
 /** Resumo do Ordem: uma linha por tentativa, verde onde o país estava no lugar certo. */
@@ -18,7 +18,9 @@ export function OrdemRecap({ play }: { play: PlayView<OrdemPuzzle, OrdemFeedback
   );
 }
 
-/** Uma linha de quadrados por tentativa: 🟩 no lugar certo, ⬛ fora. */
+/** A categoria do dia e uma linha de quadrados por tentativa: 🟩 no lugar certo, ⬛ fora. */
 export function ordemShareGrid(play: PlayView<OrdemPuzzle, OrdemFeedback>): string {
-  return play.guesses.map((g) => g.feedback.marks.map((m) => MARK_EMOJI[m]).join("")).join("\n");
+  const { emoji, label } = CATEGORIES[play.puzzle.category];
+  const grid = play.guesses.map((g) => g.feedback.marks.map((m) => MARK_EMOJI[m]).join("")).join("\n");
+  return `${emoji} ${label}\n${grid}`;
 }

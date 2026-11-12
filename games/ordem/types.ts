@@ -1,18 +1,23 @@
-/** Um país do desafio, como o jogador vê: sem a área. */
+/** O que se compara no dia: muda todo dia. */
+export type OrdemCategory = "area" | "population" | "gdp" | "gdpPerCapita" | "density" | "lifeExpectancy";
+
+/** Um país do desafio, como o jogador vê: sem o número. */
 export interface OrdemItem {
   code: string;
   name: string;
 }
 
-/** Os países do dia, numa ordem embaralhada que não diz nada sobre a resposta. */
+/** A categoria do dia e os países, numa ordem embaralhada que não diz nada sobre a resposta. */
 export interface OrdemPuzzle {
+  category: OrdemCategory;
   items: OrdemItem[];
 }
 
-/** A ordem certa (do maior para o menor) e a área de cada país, em km². */
+/** A ordem certa (do maior para o menor na categoria) e o número de cada país. */
 export interface OrdemAnswer {
+  category: OrdemCategory;
   order: string[];
-  areas: Record<string, number>;
+  values: Record<string, number>;
 }
 
 /**
@@ -25,6 +30,6 @@ export interface OrdemFeedback {
   /** Os códigos na ordem chutada, de cima (maior) para baixo (menor). */
   order: string[];
   marks: OrdemMark[];
-  /** A área de cada país que ficou na posição certa (km²); null nos outros. */
-  areas: (number | null)[];
+  /** O número de cada país que ficou na posição certa; null nos outros. */
+  values: (number | null)[];
 }

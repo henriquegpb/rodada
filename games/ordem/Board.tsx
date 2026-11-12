@@ -1,12 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowDown, ArrowUp, Check, Lock } from "lucide-react";
+import { ArrowDown, ArrowUp, Building2, Check, ChevronDown, ChevronUp, HeartPulse, Landmark, LandPlot, Lock, Users, Wallet, type LucideIcon } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import type { AttemptRules, BoardProps } from "../types";
-import { COLOR, encodeOrder, formatArea, lockedPositions } from "./rules";
-import type { OrdemFeedback, OrdemItem, OrdemPuzzle } from "./types";
+import { CATEGORIES, COLOR, encodeOrder, lockedPositions } from "./rules";
+import type { OrdemCategory, OrdemFeedback, OrdemItem, OrdemPuzzle } from "./types";
+
+const ICONS: Record<OrdemCategory, LucideIcon> = {
+  area: LandPlot,
+  population: Users,
+  gdp: Landmark,
+  gdpPerCapita: Wallet,
+  density: Building2,
+  lifeExpectancy: HeartPulse,
+};
 
 function Flag({ code, className }: { code: string; className?: string }) {
   // eslint-disable-next-line @next/next/no-img-element -- SVG estático de public/flags, sem otimização
@@ -14,12 +23,13 @@ function Flag({ code, className }: { code: string; className?: string }) {
 }
 
 /**
- * Tabuleiro do Ordem: os 5 países numa lista, do maior (em cima) para o menor (embaixo). Toque num
- * país e depois em outro para trocar os dois de lugar, ou use as setas. O que já está no lugar certo
- * fica travado e mostra a área.
+ * Tabuleiro do Ordem: a categoria do dia em destaque e os 5 países numa lista, do maior (em cima)
+ * para o menor (embaixo). Toque num país e depois em outro para trocar os dois de lugar, ou use as
+ * setas. O que já está no lugar certo fica travado e mostra o número.
  */
 export function OrdemBoard({ play, rules, submitGuess }: BoardProps<OrdemPuzzle, OrdemFeedback, AttemptRules>) {
   const playing = play.status === "playing";
+  const category = CATEGORIES[play.puzzle.category];
   const names = new Map(play.puzzle.items.map((i) => [i.code, i.name]));
   const last = play.guesses.at(-1)?.feedback;
   const locked = lockedPositions(play.guesses);
@@ -73,26 +83,27 @@ export function OrdemBoard({ play, rules, submitGuess }: BoardProps<OrdemPuzzle,
 
   return (
     <div className="mx-auto flex w-full max-w-md flex-col gap-4">
-      <p className="text-center text-sm text-muted-foreground">
+      <CategoryBanner category={play.puzzle.category} />
+
+      <p className="h-5 text-center text-sm text-muted-foreground">
         {playing
           ? selected !== null
             ? `Agora toque onde ${names.get(order[selected])} deve ficar`
-            : "Do maior para o menor, em área. Toque em dois países para trocar."
+            : "Toque em dois países para trocar de lugar."
           : play.status === "won"
             ? "Ordem certa!"
             : "Acabaram as tentativas"}
       </p>
 
-      <ol className="flex flex-col gap-2" aria-label="Países, do maior para o menor">
+      <EndLabel up>{category.top}</EndLabel>
+      <ol className="-my-2 flex flex-col gap-2" aria-label={`Países, ${category.direction.toLowerCase()}`}>
         {order.map((code, i) => {
           const isLocked = playing ? locked[i] : last?.marks[i] === "correct";
-          const area = isLocked ? last?.areas[i] : null;
+          const value = isLocked ? last?.values[i] : null;
           const wrong = !playing && last?.marks[i] === "wrong";
           return (
             <li key={code} className="flex items-center gap-2">
-              <span className="w-12 shrink-0 text-right text-xs font-medium text-muted-foreground">
-                {i === 0 ? "Maior" : i === order.length - 1 ? "Menor" : `${i + 1}º`}
-              </span>
+              <span className="w-6 shrink-0 text-center font-display text-lg tabular-nums text-muted-foreground">{i + 1}</span>
               <button
                 type="button"
                 onClick={() => pick(i)}
@@ -108,9 +119,9 @@ export function OrdemBoard({ play, rules, submitGuess }: BoardProps<OrdemPuzzle,
                 <Flag code={code} className="h-7 w-10 shrink-0" />
                 <span className="flex min-w-0 flex-1 flex-col">
                   <span className="truncate font-semibold">{names.get(code)}</span>
-                  {area != null && (
+                  {value != null && (
                     <span className="text-xs font-medium tabular-nums" style={{ color: COLOR }}>
-                      {formatArea(area)}
+                      {category.format(value)}
                     </span>
                   )}
                 </span>
@@ -146,6 +157,7 @@ export function OrdemBoard({ play, rules, submitGuess }: BoardProps<OrdemPuzzle,
           );
         })}
       </ol>
+      <EndLabel>{category.bottom}</EndLabel>
 
       {playing && (
         <div className="flex flex-col items-center gap-2">
@@ -166,6 +178,35 @@ export function OrdemBoard({ play, rules, submitGuess }: BoardProps<OrdemPuzzle,
 
       {play.guesses.length > 0 && <History guesses={play.guesses.map((g) => g.feedback)} items={play.puzzle.items} />}
     </div>
+  );
+}
+
+/** A categoria do dia, grande, com a direção da lista: é a primeira coisa que se lê. */
+function CategoryBanner({ category }: { category: OrdemCategory }) {
+  const { label, direction } = CATEGORIES[category];
+  const Icon = ICONS[category];
+  return (
+    <div className="flex items-center gap-3 rounded-xl border-2 px-4 py-3" style={{ borderColor: COLOR }}>
+      <span className="grid size-11 shrink-0 place-items-center rounded-full text-white" style={{ background: COLOR }}>
+        <Icon className="size-6" aria-hidden="true" />
+      </span>
+      <span className="flex min-w-0 flex-col">
+        <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Ordem de hoje</span>
+        <span className="font-display text-2xl leading-tight">{label}</span>
+        <span className="text-sm text-muted-foreground">{direction}</span>
+      </span>
+    </div>
+  );
+}
+
+/** "Mais gente" em cima da lista, "Menos gente" embaixo: o sentido fica à vista o tempo todo. */
+function EndLabel({ up = false, children }: { up?: boolean; children: React.ReactNode }) {
+  const Chevron = up ? ChevronUp : ChevronDown;
+  return (
+    <p className="flex items-center gap-1 pl-8 text-xs font-semibold uppercase tracking-wide" style={{ color: COLOR }}>
+      <Chevron className="size-4" aria-hidden="true" />
+      {children}
+    </p>
   );
 }
 
