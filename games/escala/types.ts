@@ -1,5 +1,8 @@
-/** Qual lado do contorno é o tamanho perguntado: a altura (y) ou o comprimento (x). */
-export type Measure = "altura" | "comprimento" | "diâmetro" | "norte a sul";
+/**
+ * Qual lado do contorno é o tamanho perguntado: a altura (y), ou o comprimento e a envergadura
+ * (asas ou pernas abertas), que são a largura (x).
+ */
+export type Measure = "altura" | "comprimento" | "envergadura" | "diâmetro" | "norte a sul";
 
 /** O desenho de uma coisa, sem o tamanho: imagem recortada rente ou path SVG com a sua caixa. */
 export type Shape =
