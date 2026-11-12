@@ -95,7 +95,8 @@ function rankingFor(answer: string): Ranking {
 
 function lookup(text: string): { word: string } | { error: string } | undefined {
   if (index.has(text)) return { word: text };
-  if (forms[text]) return { word: forms[text] };
+  // hasOwn: "constructor" e "__proto__" viriam do protótipo do objeto e passariam como palavra.
+  if (Object.hasOwn(forms, text)) return { word: forms[text] };
   const options = [...(byKey.get(normalize(text)) ?? [])];
   if (options.length === 1) return { word: options[0] };
   if (options.length > 1) {

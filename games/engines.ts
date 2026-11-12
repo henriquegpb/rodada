@@ -26,6 +26,7 @@ const loaders: Record<string, () => Promise<{ engine: GameEngine }>> = {
   grau: () => import("./grau/engine"),
   escala: () => import("./escala/engine"),
   "escala-paises": () => import("./escala-paises/engine"),
+  ordem: () => import("./ordem/engine"),
 };
 
 export const engineSlugs = Object.keys(loaders);

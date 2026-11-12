@@ -41,19 +41,25 @@ const google =
 export const auth = betterAuth({
   database: drizzleAdapter(getDb(), { provider: "pg", schema: { user, session, account, verification } }),
   socialProviders: google,
+  // Nome, handle, bio e foto mudam só por /api/me e /api/me/avatar, que validam tudo. A rota
+  // genérica do Better Auth aceitaria `name` e `image` livres (sem limite de tamanho, ou a URL da
+  // foto de outra Conta), então fica desligada.
+  disabledPaths: ["/update-user"],
   // A sessão fica assinada no cookie por 5 minutos: a maioria dos pedidos não consulta o banco.
   session: { cookieCache: { enabled: true, maxAge: 5 * 60 } },
   user: {
     additionalFields: {
       handle: { type: "string", required: false, input: false },
       bio: { type: "string", required: false, input: false, defaultValue: "" },
+      // Só muda pelo banco; na sessão para a tela saber se mostra as ferramentas de Dev.
+      dev: { type: "boolean", required: false, input: false, defaultValue: false },
     },
     deleteUser: {
       enabled: true,
       // As partidas e o resto saem em cascata; Grupos passam adiante e a foto sai do Blob.
       beforeDelete: async (deleted) => {
         await leaveAllGroups(getDb(), deleted.id);
-        await deleteAvatar(deleted.image);
+        await deleteAvatar(deleted.image, deleted.id);
       },
     },
   },

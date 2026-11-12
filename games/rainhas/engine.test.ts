@@ -70,11 +70,14 @@ describe("engine Rainhas", () => {
 });
 
 describe("tabuleiros das Rainhas", () => {
+  // Cada tamanho entra com o número duas vezes, para o título dizer "9×9" (e não "9×NaN").
+  // Conferir a unicidade de 400 tabuleiros 10×10 leva uns 10 s numa máquina comum: o limite
+  // padrão de 5 s derrubava o teste.
   it.each([
-    [8, boards8],
-    [9, boards9],
-    [10, boards10],
-  ] as const)("%i×%i: solução válida, única e que sai por dedução", (n, boards) => {
+    [8, 8, boards8],
+    [9, 9, boards9],
+    [10, 10, boards10],
+  ] as const)("%i×%i: solução válida, única e que sai por dedução", (n, _, boards) => {
     for (const board of boards) {
       const regions = regionsOf(board.regions);
       expect(regions).toHaveLength(n * n);
@@ -84,5 +87,5 @@ describe("tabuleiros das Rainhas", () => {
       expect(otherSolution(n, regions, board.queens)).toBeNull();
       expect(solveByLogic(n, regions)).toEqual(board.queens);
     }
-  });
+  }, 60_000);
 });

@@ -111,3 +111,12 @@ describe("dados do Sentido", () => {
     expect(data.words.length).toBeLessThan(65_536);
   });
 });
+
+describe("nomes do protótipo", () => {
+  it("recusa constructor, __proto__ e afins em vez de aceitar como palavra", () => {
+    const { answer } = engine.createChallenge(DAY);
+    for (const input of ["constructor", "__proto__", "toString", "hasOwnProperty"]) {
+      expect(engine.checkGuess(input, answer, [])).toMatchObject({ ok: false });
+    }
+  });
+});

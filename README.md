@@ -19,8 +19,9 @@ Jogos diários curtos num lugar só. Todo dia sai um desafio novo de cada jogo, 
 | **Sentido**  | Achar a palavra secreta pelo sentido: cada chute ganha uma posição numa lista de proximidade (1 é a resposta), como no Contexto. Tem dicas; sem limite de chutes; dá para desistir. |
 | **Grau**     | Dois ângulos por dia, 7 tentativas para os dois: diga quantos graus tem o primeiro e desenhe o segundo arrastando o braço. Vale errar por até 2°; cada erro diz se é maior ou menor e quão perto ficou (Fervendo a Gelado). |
 | **Escala**   | 5 rodadas: um bicho aparece no tamanho de verdade, com a altura ou o comprimento, e você arrasta o outro até o tamanho certo ao lado dele. Até 100 pontos por rodada. O modo **Países** faz o mesmo com as silhuetas do mapa, de norte a sul. |
+| **Ordem**    | 5 países por dia para pôr em ordem de área, do maior para o menor, em 5 tentativas. Cada tentativa trava os que estão no lugar certo e mostra a área deles; os outros não dizem se sobem ou descem. |
 
-O foco do produto é a camada social: grupos, ranking diário e sequências. As partidas ficam salvas no navegador e, com login, também no servidor, que mantém Contas, Grupos, Rankings e Conquistas. Veja [docs/backend.md](docs/backend.md) para subir o backend e usar a API; o vocabulário está no [GLOSSARY.md](GLOSSARY.md).
+O foco do produto é a camada social: grupos, ranking diário e sequências. As partidas ficam salvas no navegador e, com login, também no servidor, que mantém Contas, Grupos, Rankings e Conquistas. Veja [Backend](#backend) para subir o login e os Rankings.
 
 ## Rodando localmente
 
@@ -45,7 +46,7 @@ pnpm db:migrate   # aplica as migrações do banco no DATABASE_URL
 pnpm db:generate  # gera uma migração depois de mudar server/db/schema.ts
 ```
 
-O `.env.example` lista as variáveis. Para jogar, nenhuma é obrigatória; o login e os Rankings precisam de um Postgres (veja [docs/backend.md](docs/backend.md)).
+O `.env.example` lista as variáveis. Para jogar, nenhuma é obrigatória; o login e os Rankings precisam de um Postgres (veja [Backend](#backend)).
 
 ## Como funciona
 
@@ -67,22 +68,45 @@ lib/
 components/
   microkit/           microinterações do Microkit, adaptadas
   ui/                 shadcn/ui
-server/               backend: banco, login, partidas, Rankings, Grupos e Perfis (veja docs/backend.md)
+server/               backend: banco, login, partidas, Rankings, Grupos e Perfis (veja Backend, abaixo)
 app/api/              rotas HTTP do backend
 scripts/build-data.ts gera os dados dos jogos a partir das fontes abertas
 ```
 
 **Desafio do dia.** `pickDaily` percorre uma permutação da lista de respostas, embaralhada com uma seed. Assim não há repetição até a lista acabar. O resultado é determinístico para a mesma data e o mesmo segredo (`NEXT_PUBLIC_DAILY_SEED`). O segredo existe porque o código e as listas são abertos: sem ele, qualquer pessoa calcularia a resposta de amanhã.
 
-**Engine e UI separadas.** Cada jogo tem uma `engine.ts`, que gera o desafio e valida as tentativas, e um `index.ts` com a interface. A UI nunca importa a engine: ela fala com `lib/plays/service.ts`, que chama a engine no próprio navegador. Ao terminar, a partida do dia vai para o servidor, que refaz cada chute com a mesma engine antes de dar a Nota ([ADR 0001](docs/adr/0001-servidor-refaz-a-partida.md)). **A resposta ainda chega ao navegador, então quem abrir o DevTools consegue achá-la.** O próximo passo é gerar o desafio só no servidor.
+**Engine e UI separadas.** Cada jogo tem uma `engine.ts`, que gera o desafio e valida as tentativas, e um `index.ts` com a interface. A UI nunca importa a engine: ela fala com `lib/plays/service.ts`, que chama a engine no próprio navegador. Ao terminar, a partida do dia vai para o servidor, que refaz cada chute com a mesma engine antes de dar a Nota. **A resposta ainda chega ao navegador, então quem abrir o DevTools consegue achá-la.** O próximo passo é gerar o desafio só no servidor.
 
-**Tipos de jogo.** Cada jogo declara suas regras (`meta.rules`): **por tentativas** (Palavra, País, Mosaico, Rota, Grau: acertar em até N chutes), **sem limite** (Calor, Elo e Sentido: chutar até acertar, ou desistir), **por tempo** (Mundo: achar o máximo antes do relógio zerar) **quiz** (Capital e Bandeira: 10 perguntas seguidas, uma resposta cada) ou **por pontos** (Colmeia e Escala: cada achado vale pontos, até achar tudo ou encerrar) ou **por vidas** (Rainhas: montar a solução peça por peça; cada peça errada custa uma vida). No jogo por tempo, o relógio começa ao clicar em "Começar" e continua correndo mesmo se a pessoa fechar a página.
+**Tipos de jogo.** Cada jogo declara suas regras (`meta.rules`): **por tentativas** (Palavra, País, Mosaico, Rota, Grau, Ordem: acertar em até N chutes), **sem limite** (Calor, Elo e Sentido: chutar até acertar, ou desistir), **por tempo** (Mundo: achar o máximo antes do relógio zerar) **quiz** (Capital e Bandeira: 10 perguntas seguidas, uma resposta cada) ou **por pontos** (Colmeia e Escala: cada achado vale pontos, até achar tudo ou encerrar) ou **por vidas** (Rainhas: montar a solução peça por peça; cada peça errada custa uma vida). No jogo por tempo, o relógio começa ao clicar em "Começar" e continua correndo mesmo se a pessoa fechar a página.
 
-**Pontuação**: nos jogos por tentativas, `tentativas máximas + 1 − tentativas usadas` (ou a curva do jogo, como no Grau, em que 2 tentativas é o mínimo e vale 100), e derrota vale 0. No jogo por tempo, um ponto por item achado; no quiz, um por acerto; por pontos, os do próprio jogo; por vidas, um por vida que sobrou. Para os Rankings, esse Score bruto vira a **Nota** (0–100 do máximo possível no desafio), e o **Score diário** é a soma das Notas dos jogos da Rodada ([ADR 0002](docs/adr/0002-nota-absoluta-e-media-de-30-dias.md)).
+**Pontuação**: nos jogos por tentativas, `tentativas máximas + 1 − tentativas usadas` (ou a curva do jogo, como no Grau, em que 2 tentativas é o mínimo e vale 100), e derrota vale 0. No jogo por tempo, um ponto por item achado; no quiz, um por acerto; por pontos, os do próprio jogo; por vidas, um por vida que sobrou. Para os Rankings, esse Score bruto vira a **Nota** (0–100 do máximo possível no desafio), e o **Score diário** é a soma das Notas dos jogos da Rodada.
 
 **Ranking e Grupos.** `/ranking` mostra o Ranking do dia: o geral (Score diário, a soma das Notas de todos os jogos, Modos inclusive) e um por jogo (a Nota daquela partida, Modos inclusive), trocados por abas. Qualquer pessoa vê; para aparecer, entra na Conta (Google ou link por e-mail) e as partidas já guardadas no navegador vão junto, uma vez por Conta. Em `/grupos` dá para criar um Grupo, chamar a turma pelo link de convite (`/grupos/convite?c=…`) e ver o mesmo ranking só entre os membros. Para desenhar essas telas sem banco, abra com `?mock` (só fora de produção).
 
 **Sequências.** A sequência de cada jogo por tentativas ou por vidas conta vitórias seguidas, e perder zera. No jogo por tempo, no quiz e por pontos, conta dias jogados. A sequência geral conta dias seguidos com pelo menos um jogo terminado. As duas continuam vivas até o fim do dia seguinte.
+
+## Backend
+
+Só é preciso para o login, os Grupos e os Rankings; os jogos funcionam sem ele.
+
+1. Crie um Postgres no [Neon](https://neon.tech) (o plano grátis serve). O servidor usa o driver serverless do Neon, que fala por WebSocket, então um Postgres local comum não conecta direto.
+2. No `.env.local`, preencha `DATABASE_URL`, `BETTER_AUTH_SECRET` (`openssl rand -base64 32`) e `BETTER_AUTH_URL`.
+3. Rode `pnpm db:migrate`.
+4. Entre pelo link mágico: sem `RESEND_API_KEY`, o link aparece no terminal do `pnpm dev`. O Google e as fotos de perfil (Vercel Blob) são opcionais.
+
+Para ter as ferramentas de Dev numa Conta, marque `dev = true` na tabela `user`. Os testes do servidor não precisam de nada disso: rodam num Postgres em memória (PGlite).
+
+As rotas ficam em `app/api/` e a lógica em `server/`:
+
+| Rota | O que faz |
+| ---- | --------- |
+| `POST /api/plays`, `POST /api/plays/start` | Envia a partida do dia (refeita pela engine) e começa o relógio dos jogos com tempo |
+| `POST /api/plays/import` | Importa, uma vez por Conta, as partidas guardadas no navegador |
+| `GET /api/rankings` | Ranking do dia, dos 30 dias, por jogo ou de um Grupo |
+| `GET`/`PATCH /api/me`, `POST /api/me/avatar` | O próprio Perfil: nome, handle, bio e foto |
+| `GET /api/profiles/[handle]`, `GET /api/handles/[handle]` | Perfil público e se um handle está livre |
+| `/api/groups/…` | Criar, editar, entrar, sair, convidar e remover membros |
+| `DELETE /api/accounts/[id]` | Dev exclui a Conta de outra pessoa |
 
 ## Fontes dos dados e licenças
 
@@ -98,6 +122,7 @@ scripts/build-data.ts gera os dados dos jogos a partir das fontes abertas
 | Colmeias do dia                        | Geradas em `scripts/build-colmeia.ts` das palavras acima, filtradas pela frequência do [fserb/pt-br](https://github.com/fserb/pt-br) (`games/colmeia/data/puzzles.json`) | CC BY-SA 4.0      |
 | Palavras secretas do Sentido           | Curadoria própria (`games/sentido/data/answers.json`)                                              | MIT               |
 | Geometria e centroides dos países      | [Natural Earth](https://www.naturalearthdata.com/) 1:50m Admin 0                                  | Domínio público   |
+| Áreas dos países (Ordem)               | Calculadas da geometria do Natural Earth (`areaKm2` em `games/_shared/geo/countries.json`); os países são os dos níveis 1 e 2 da Bandeira | Domínio público   |
 | Distância entre fronteiras (Calor)     | Calculada dos contornos do Natural Earth 1:110m (1:50m para microestados) em `scripts/build-data.ts` | Domínio público   |
 | Fronteiras terrestres (Rota)           | Calculadas da geometria do Natural Earth: vizinhos compartilham vértices na divisa (`scripts/build-data.ts`) | Domínio público   |
 | Silhuetas dos bichos (Escala)          | [PhyloPic](https://www.phylopic.org), só imagens em domínio público (CC0 ou Public Domain Mark), recortadas em `public/escala/`; autor e link de cada uma em `games/escala/data/animals.json`. Tamanhos: médias de adultos, curadoria própria | CC0 / Domínio público |

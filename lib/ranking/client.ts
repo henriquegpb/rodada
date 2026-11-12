@@ -24,6 +24,8 @@ export interface Me {
   name: string;
   handle: string;
   image: string | null;
+  /** Tem `dev` no banco: vê as ferramentas de Dev, como excluir Contas pelo ranking. */
+  dev: boolean;
 }
 
 export interface InvitePreview {
@@ -121,8 +123,8 @@ export function useMe(): Me | null | undefined {
   if (mock) return MOCK_ME;
   if (isPending) return undefined;
   if (!data) return null;
-  const { id, name, handle, image } = data.user;
-  return { id, name, handle: handle ?? "", image: image ?? null };
+  const { id, name, handle, image, dev } = data.user;
+  return { id, name, handle: handle ?? "", image: image ?? null, dev: dev === true };
 }
 
 /** O ranking de um dia ou a Média dos últimos 30 dias. */
@@ -216,6 +218,17 @@ export async function uploadAvatar(file: File) {
   if (!response.ok) throw new Error(json?.error?.message ?? t.profile.saveFailed);
   await refreshAccount();
 }
+
+/**
+ * Exclui a Conta de outra pessoa, com tudo dela (só Dev). Não busca os rankings de novo: quem chama
+ * faz isso com `refreshAll` quando a tela estiver pronta para a linha sumir.
+ */
+export async function deleteAccount(id: string): Promise<void> {
+  await api(`/api/accounts/${encodeURIComponent(id)}`, "DELETE");
+}
+
+/** Faz as telas abertas (rankings, Grupos, Perfil) buscarem de novo. */
+export const refreshAll = changed;
 
 /** O que o link de convite mostra antes de entrar. */
 export function useInvite(code: string): { invite: InvitePreview | null; error: string | null } {
