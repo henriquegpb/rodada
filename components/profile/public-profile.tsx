@@ -31,11 +31,11 @@ export function PublicProfile({ handle }: { handle: string }) {
         <ProfileSide
           account={account}
           meta={t.profile.since(since)}
-          // No próprio Perfil público também dá para editar; no de outra pessoa, Dev pode excluir a Conta.
+          // No próprio Perfil público também dá para editar; no de outra pessoa, Admin pode excluir a Conta.
           action={
             me?.id === account.id ? (
               <EditButton me={me} bio={account.bio} />
-            ) : me?.dev ? (
+            ) : me?.admin ? (
               <DeleteAccountButton account={account} />
             ) : undefined
           }

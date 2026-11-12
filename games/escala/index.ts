@@ -21,10 +21,10 @@ export const escala: GameDefinition<EscalaPuzzle, EscalaFeedback, PointsRules> =
     hideAnswer: true,
     launchedOn: "2026-11-05",
     howToPlay: [
-      "São 5 rodadas. Em cada uma, um bicho aparece em azul no tamanho de verdade, com a altura ou o comprimento escrito.",
+      "São 5 rodadas. Em cada uma, um bicho aparece em azul no tamanho de verdade, com a medida escrita: altura, comprimento ou envergadura (de uma ponta à outra das asas ou das pernas abertas).",
       "Arraste na cena (ou use a barra embaixo) até o outro bicho ficar do tamanho certo perto dele e confirme.",
       "Acertando em cheio, 100 pontos. A nota cai conforme o erro e chega a zero quando o palpite é 2,5 vezes maior ou menor.",
-      "Os tamanhos são a média de um adulto. Na aba Países, o mesmo com o mapa: a medida é de norte a sul.",
+      "São quase 150 bichos, de joaninha a baleia-azul, com dinossauros e outros extintos no meio. Os tamanhos são a média de um adulto. Na aba Países, o mesmo com o mapa: a medida é de norte a sul.",
     ],
     seo: {
       title: "Escala: acerte o tamanho de verdade dos bichos e dos países",

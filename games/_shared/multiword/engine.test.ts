@@ -62,3 +62,10 @@ describe("Dupla e Quadra", () => {
     expect(quadra.describeAnswer(["carro", "pedra", "nuvem", "festa"])).toBe("CARRO · PEDRA · NUVEM · FESTA");
   });
 });
+
+describe("data inválida", () => {
+  it("Dupla e Quadra falham na hora em vez de travar num laço", () => {
+    expect(() => dupla.createChallenge("2026-10-40")).toThrow();
+    expect(() => quadra.createChallenge("2026-10-40")).toThrow();
+  });
+});

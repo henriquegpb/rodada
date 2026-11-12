@@ -10,7 +10,7 @@ import { t } from "@/lib/i18n";
 const DONE_MS = 900;
 
 /**
- * Só para Dev, no Perfil de outra pessoa: segurar o botão até a barra encher exclui a Conta com tudo
+ * Só para Admin, no Perfil de outra pessoa: segurar o botão até a barra encher exclui a Conta com tudo
  * dela, sem outra confirmação, e depois vai para o ranking. Se der errado, o erro aparece num aviso
  * e o botão volta ao começo.
  */

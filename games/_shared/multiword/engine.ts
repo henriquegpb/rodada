@@ -1,16 +1,11 @@
 import { pickDaily } from "@/lib/daily/seed";
 import { normalize } from "@/lib/normalize";
-import type { GameEngine, Guess } from "../../types";
+import type { GameEngine } from "../../types";
 import { answers, checkWord, evaluate, WORD_LENGTH } from "../../palavra/engine";
+import { solvedBoards, solvedIn } from "./solved";
 import type { MultiWordFeedback, MultiWordPuzzle } from "./types";
 
-const solvedIn = (feedback: MultiWordFeedback, board: number) =>
-  feedback.boards[board]?.every((m) => m === "correct") ?? false;
-
-/** Tabuleiros já resolvidos depois destas tentativas. */
-export function solvedBoards(guesses: readonly Guess<MultiWordFeedback>[], boards: number): boolean[] {
-  return Array.from({ length: boards }, (_, b) => guesses.some((g) => solvedIn(g.feedback, b)));
-}
+export { solvedBoards } from "./solved";
 
 /**
  * Várias palavras ao mesmo tempo (Dupla, Quadra): cada tentativa vale para todos os tabuleiros
@@ -24,7 +19,10 @@ export function createMultiWordEngine(slug: string, boards: number): GameEngine<
       for (let b = 0; b < boards; b++) {
         let attempt = 0;
         let word = pickDaily(answers, { slug: `${slug}:${b}`, dateKey });
-        while (picked.includes(word)) word = pickDaily(answers, { slug: `${slug}:${b}:${++attempt}`, dateKey });
+        while (picked.includes(word)) {
+          if (++attempt > 100) throw new Error(`${slug}: não achei palavras diferentes para ${dateKey}`);
+          word = pickDaily(answers, { slug: `${slug}:${b}:${attempt}`, dateKey });
+        }
         picked.push(word);
       }
       return { puzzle: { length: WORD_LENGTH, boards }, answer: picked };

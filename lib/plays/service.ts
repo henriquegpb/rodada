@@ -131,6 +131,29 @@ export function peekPlay(slug: string, dateKey: string, practice = false): PlayV
   return engine ? openPlay(engine, slug, dateKey, practice, false) : null;
 }
 
+/**
+ * Fecha as Partidas do dia que ficaram em andamento num dia que já passou: quem estava jogando na
+ * virada da meia-noite, ou largou a partida no meio, desistiu (é o que o servidor faz com toda
+ * partida enviada sem terminar). Nos primeiros minutos do dia novo o servidor ainda aceita a de
+ * ontem; depois disso ela fica só no navegador, encerrada em vez de "jogando" para sempre.
+ *
+ * Jogo com tempo só fecha quando o relógio acaba: quem começou às 23:59 termina a partida.
+ */
+export async function closeStalePlays(today: string): Promise<void> {
+  const stale = Object.values(dailyStore.getPlays()).filter((p) => p.status === "playing" && p.dateKey < today);
+  for (const { slug, dateKey } of stale) {
+    const game = getGame(slug);
+    if (!game) continue;
+    const engine = await loadEngine(slug);
+    // Relê depois do await: outra aba (ou a própria tela) pode ter fechado a partida nesse meio-tempo.
+    const stored = dailyStore.getPlay(slug, dateKey);
+    if (stored?.status !== "playing") continue;
+    const { rules } = game.meta;
+    if (rules.type === "timed" && !timeIsUp(rules, stored)) continue;
+    close(dailyStore, stored, giveUpStatus(rules), engine.describeAnswer(engine.createChallenge(dateKey).answer));
+  }
+}
+
 /** Jogos com tempo: cria a partida e começa o relógio. */
 export async function beginPlay(slug: string, dateKey: string, practice = false): Promise<PlayView> {
   const store = storeFor(practice);

@@ -12,7 +12,8 @@ export const ROUNDS = 5;
 /** Largura ÷ altura do desenho. */
 export const aspectOf = (shape: Shape) => (shape.kind === "image" ? shape.aspect : shape.box[2] / shape.box[3]);
 
-const usesWidth = (measure: Measure) => measure === "comprimento";
+/** A medida é a largura do desenho (comprimento, envergadura), não a altura. */
+export const usesWidth = (measure: Measure) => measure === "comprimento" || measure === "envergadura";
 
 /** Largura e altura de verdade, em metros, de algo com `size` no lado perguntado. */
 export function dims(measure: Measure, size: number, aspect: number): [w: number, h: number] {

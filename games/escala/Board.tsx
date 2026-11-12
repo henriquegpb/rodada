@@ -8,8 +8,8 @@ import type { BoardProps, PointsRules } from "../types";
 import { COLOR, REFERENCE_COLOR } from "./color";
 import { Figure } from "./Figure";
 import { RoundBars } from "./Recap";
-import { ROUNDS, SCENE, aspectOf, formatSize, layout, pointsColor } from "./scene";
-import type { EscalaFeedback, EscalaPuzzle, EscalaRound } from "./types";
+import { ROUNDS, SCENE, aspectOf, formatSize, layout, pointsColor, usesWidth } from "./scene";
+import type { EscalaFeedback, EscalaPuzzle, EscalaRound, Measure } from "./types";
 
 const { W, H, GROUND, LEFT } = SCENE;
 
@@ -18,7 +18,7 @@ function sceneOf(round: EscalaRound) {
   const targetAspect = aspectOf(round.target.shape);
   const L = layout({ measure: round.reference.measure, size: round.reference.size, aspect: refAspect }, { measure: round.target.measure, aspect: targetAspect });
   /** Altura em pixels de algo com `size` metros no lado perguntado. */
-  const heightOf = (size: number, measure: string, aspect: number) => (measure === "comprimento" ? size / aspect : size) * L.ppm;
+  const heightOf = (size: number, measure: Measure, aspect: number) => (usesWidth(measure) ? size / aspect : size) * L.ppm;
   return {
     ...L,
     refHeight: heightOf(round.reference.size, round.reference.measure, refAspect),

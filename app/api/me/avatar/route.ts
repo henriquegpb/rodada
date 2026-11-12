@@ -22,7 +22,7 @@ export async function POST(request: Request) {
       contentType: file.type,
       addRandomSuffix: true,
     });
-    await deleteAvatar(await setImage(getDb(), accountId, blob.url));
+    await deleteAvatar(await setImage(getDb(), accountId, blob.url), accountId);
     return { image: blob.url };
   });
 }

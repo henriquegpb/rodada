@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import type { AttemptRules, BoardProps } from "../../types";
 import { ACTIVE_ROW_SCROLL, FLIP_STAGGER_MS, Keyboard, MARK_RANK, Tile, useWordEntry } from "../../palavra/kit";
 import type { LetterMark } from "../../palavra/types";
-import { solvedBoards } from "./engine";
+import { solvedBoards } from "./solved";
 import type { MultiWordFeedback, MultiWordPuzzle } from "./types";
 
 /**

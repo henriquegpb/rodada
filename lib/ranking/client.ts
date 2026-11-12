@@ -24,8 +24,10 @@ export interface Me {
   name: string;
   handle: string;
   image: string | null;
-  /** Tem `dev` no banco: vê as ferramentas de Dev, como excluir Contas pelo ranking. */
+  /** Tem `dev` no banco: ganha a pílula Dev. */
   dev: boolean;
+  /** Tem `admin` no banco: vê as ferramentas de Admin, como excluir Contas pelo Perfil. */
+  admin: boolean;
 }
 
 export interface InvitePreview {
@@ -123,8 +125,8 @@ export function useMe(): Me | null | undefined {
   if (mock) return MOCK_ME;
   if (isPending) return undefined;
   if (!data) return null;
-  const { id, name, handle, image, dev } = data.user;
-  return { id, name, handle: handle ?? "", image: image ?? null, dev: dev === true };
+  const { id, name, handle, image, dev, admin } = data.user;
+  return { id, name, handle: handle ?? "", image: image ?? null, dev: dev === true, admin: admin === true };
 }
 
 /** O ranking de um dia ou a Média dos últimos 30 dias. */
@@ -220,7 +222,7 @@ export async function uploadAvatar(file: File) {
 }
 
 /**
- * Exclui a Conta de outra pessoa, com tudo dela (só Dev). Não busca os rankings de novo: quem chama
+ * Exclui a Conta de outra pessoa, com tudo dela (só Admin). Não busca os rankings de novo: quem chama
  * faz isso com `refreshAll` quando a tela estiver pronta para a linha sumir.
  */
 export async function deleteAccount(id: string): Promise<void> {
