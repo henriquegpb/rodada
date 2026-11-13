@@ -16,6 +16,7 @@
     "data:rainhas": "tsx scripts/build-rainhas.ts",
     "data:ordem": "tsx scripts/build-ordem.ts",
     "data:escala": "tsx scripts/build-escala.ts",
+    "data:trilha": "tsx scripts/build-trilha.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:recompute": "tsx scripts/recompute-scores.ts"

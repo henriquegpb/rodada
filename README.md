@@ -20,6 +20,7 @@ Jogos diários curtos num lugar só. Todo dia sai um desafio novo de cada jogo, 
 | **Grau**     | Dois ângulos por dia, 7 tentativas para os dois: diga quantos graus tem o primeiro e desenhe o segundo arrastando o braço. Vale errar por até 2°; cada erro diz se é maior ou menor e quão perto ficou (Fervendo a Gelado). |
 | **Escala**   | 5 rodadas: um bicho aparece no tamanho de verdade, com a altura ou o comprimento, e você arrasta o outro até o tamanho certo ao lado dele. Até 100 pontos por rodada. O modo **Países** faz o mesmo com as silhuetas do mapa, de norte a sul. |
 | **Ordem**    | 5 países por dia para pôr em ordem de área, do maior para o menor, em 5 tentativas. Cada tentativa trava os que estão no lugar certo e mostra a área deles; os outros não dizem se sobem ou descem. |
+| **Trilha**   | Um caminho só que passa pelas 49 casas do tabuleiro 7×7, ligando os números em ordem, sem andar na diagonal nem atravessar paredes. Cada trecho é conferido ao chegar no próximo número: errado, custa uma das 3 vidas. Há 3 dicas, e todo tabuleiro tem solução única que sai trecho a trecho, sem chute. |
 
 O foco do produto é a camada social: grupos, ranking diário e sequências. As partidas ficam salvas no navegador e, com login, também no servidor, que mantém Contas, Grupos, Rankings e Conquistas. Veja [Backend](#backend) para subir o login e os Rankings.
 
@@ -44,6 +45,7 @@ pnpm data:colmeia # regenera as colmeias do dia
 pnpm data:rainhas # regenera os tabuleiros das Rainhas (alguns minutos)
 pnpm data:ordem   # baixa população, PIB e expectativa de vida do Banco Mundial para o Ordem
 pnpm data:escala  # baixa e recorta as silhuetas novas do Escala (scripts/escala-list.ts)
+pnpm data:trilha  # regenera os tabuleiros da Trilha
 pnpm db:migrate   # aplica as migrações do banco no DATABASE_URL
 pnpm db:generate  # gera uma migração depois de mudar server/db/schema.ts
 ```
@@ -79,7 +81,7 @@ scripts/build-data.ts gera os dados dos jogos a partir das fontes abertas
 
 **Engine e UI separadas.** Cada jogo tem uma `engine.ts`, que gera o desafio e valida as tentativas, e um `index.ts` com a interface. A UI nunca importa a engine: ela fala com `lib/plays/service.ts`, que chama a engine no próprio navegador. Ao terminar, a partida do dia vai para o servidor, que refaz cada chute com a mesma engine antes de dar a Nota. **A resposta ainda chega ao navegador, então quem abrir o DevTools consegue achá-la.** O próximo passo é gerar o desafio só no servidor.
 
-**Tipos de jogo.** Cada jogo declara suas regras (`meta.rules`): **por tentativas** (Palavra, País, Mosaico, Rota, Grau, Ordem: acertar em até N chutes), **sem limite** (Calor, Elo e Sentido: chutar até acertar, ou desistir), **por tempo** (Mundo: achar o máximo antes do relógio zerar) **quiz** (Capital e Bandeira: 10 perguntas seguidas, uma resposta cada) ou **por pontos** (Colmeia e Escala: cada achado vale pontos, até achar tudo ou encerrar) ou **por vidas** (Rainhas: montar a solução peça por peça; cada peça errada custa uma vida). No jogo por tempo, o relógio começa ao clicar em "Começar" e continua correndo mesmo se a pessoa fechar a página.
+**Tipos de jogo.** Cada jogo declara suas regras (`meta.rules`): **por tentativas** (Palavra, País, Mosaico, Rota, Grau, Ordem: acertar em até N chutes), **sem limite** (Calor, Elo e Sentido: chutar até acertar, ou desistir), **por tempo** (Mundo: achar o máximo antes do relógio zerar) **quiz** (Capital e Bandeira: 10 perguntas seguidas, uma resposta cada) ou **por pontos** (Colmeia e Escala: cada achado vale pontos, até achar tudo ou encerrar) ou **por vidas** (Rainhas e Trilha: montar a solução peça por peça, rainha a rainha ou trecho a trecho; cada peça errada custa uma vida). No jogo por tempo, o relógio começa ao clicar em "Começar" e continua correndo mesmo se a pessoa fechar a página.
 
 **Pontuação**: nos jogos por tentativas, `tentativas máximas + 1 − tentativas usadas` (ou a curva do jogo, como no Grau, em que 2 tentativas é o mínimo e vale 100), e derrota vale 0. No jogo por tempo, um ponto por item achado; no quiz, um por acerto; por pontos, os do próprio jogo; por vidas, um por vida que sobrou. Para os Rankings, esse Score bruto vira a **Nota** (0–100 do máximo possível no desafio), e o **Score diário** é a soma das Notas dos jogos da Rodada.
 
