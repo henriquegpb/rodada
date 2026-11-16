@@ -5,7 +5,7 @@ import { Eraser, Flag, Heart, Lightbulb, Undo2, Waypoints } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import type { BoardProps, LivesRules } from "../types";
-import { TrilhaGrid, type Stroke } from "./Grid";
+import { TrilhaGrid, type Stroke, type Tail } from "./Grid";
 import { COLOR, HINT, HINTS, encodeSegment, hintsOf, lockedPath, mistakesOf, nextNumber, solutionPath } from "./rules";
 import { colOf, linksOf, numberIndex, rowOf } from "./solver";
 import type { TrilhaFeedback, TrilhaPuzzle } from "./types";
@@ -103,8 +103,15 @@ export function TrilhaBoard({ play, rules, submitGuess, finish }: BoardProps<Tri
   });
   // O mesmo rascunho, sem esperar o render: o soltar do dedo lê o que o último arrasto deixou.
   const draftRef = useRef(draft);
+  // Quantas tentativas havia quando a pessoa voltou a desenhar: o trecho errado some e não volta (nem
+  // treme de novo) se o rascunho voltar ao número, só no próximo erro.
+  const [dismissed, setDismissed] = useState(() => (draft.length ? play.guesses.length : -1));
   const [busy, setBusy] = useState(false);
+  // O mesmo `busy`, sem esperar o render: dois movimentos seguidos não mandam o trecho duas vezes.
+  const busyRef = useRef(false);
   const dragging = useRef<number | null>(null);
+  /** Onde o dedo está, em casas, enquanto arrasta: a ponta do traço vai até ele. */
+  const [pointer, setPointer] = useState<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     try {
@@ -115,7 +122,12 @@ export function TrilhaBoard({ play, rules, submitGuess, finish }: BoardProps<Tri
     }
   }, [key, draft]);
 
+  // O último trecho mandado, enquanto o rascunho não muda: o dedo parado no número não manda de novo.
+  const sent = useRef<string | null>(null);
+
   function change(cells: number[]) {
+    if (encodeSegment(cells) !== sent.current) sent.current = null;
+    if (cells.length) setDismissed(play.guesses.length);
     draftRef.current = cells;
     setDraft(cells);
   }
@@ -150,9 +162,11 @@ export function TrilhaBoard({ play, rules, submitGuess, finish }: BoardProps<Tri
   }
 
   async function send(input: string) {
-    if (busy) return;
+    if (busyRef.current) return;
+    busyRef.current = true;
     setBusy(true);
     const error = await submitGuess(input);
+    busyRef.current = false;
     setBusy(false);
     if (error) return toast(error);
     change([]);
@@ -161,13 +175,20 @@ export function TrilhaBoard({ play, rules, submitGuess, finish }: BoardProps<Tri
   /** Conferir: só quando o rascunho chegou no próximo número. */
   function commit() {
     const cells = draftRef.current;
-    if (cells.length && cells[cells.length - 1] === target) void send(encodeSegment(cells));
+    if (!cells.length || cells[cells.length - 1] !== target) return;
+    const segment = encodeSegment(cells);
+    if (segment === sent.current) return;
+    sent.current = segment;
+    void send(segment);
+  }
+
+  function pointAt(e: PointerEvent<SVGSVGElement>) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    return { x: ((e.clientX - rect.left) / rect.width) * size, y: ((e.clientY - rect.top) / rect.height) * size };
   }
 
   function cellAt(e: PointerEvent<SVGSVGElement>): number | null {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * size;
-    const y = ((e.clientY - rect.top) / rect.height) * size;
+    const { x, y } = pointAt(e);
     const col = Math.floor(x);
     const row = Math.floor(y);
     if (col < 0 || row < 0 || col >= size || row >= size) return null;
@@ -175,6 +196,22 @@ export function TrilhaBoard({ play, rules, submitGuess, finish }: BoardProps<Tri
     if (dragging.current !== null && inner < EDGE) return null;
     return row * size + col;
   }
+
+  /**
+   * Arrastando, o trecho é conferido assim que chega no próximo número, sem soltar: se estiver certo,
+   * o dedo segue dali para o trecho seguinte; se estiver errado, o arrasto para.
+   */
+  function drag(cell: number) {
+    change(moveTo(draftRef.current, cell));
+    commit();
+  }
+
+  // Trecho errado no meio do arrasto: o caminho volta ao número de onde saiu, e o dedo não continua
+  // desenhando de lá.
+  const latest = play.guesses.at(-1)?.feedback;
+  useEffect(() => {
+    if (latest && !latest.correct) dragging.current = null;
+  }, [latest]);
 
   // Começa a arrastar na ponta, em qualquer casa do rascunho (volta até ela) ou numa vizinha da ponta.
   function onPointerDown(e: PointerEvent<SVGSVGElement>) {
@@ -184,18 +221,19 @@ export function TrilhaBoard({ play, rules, submitGuess, finish }: BoardProps<Tri
     if (cell !== start && !cells.includes(cell) && !canEnter(cells, cell)) return;
     e.currentTarget.setPointerCapture(e.pointerId);
     dragging.current = e.pointerId;
-    change(moveTo(cells, cell));
+    setPointer(pointAt(e));
+    drag(cell);
   }
   function onPointerMove(e: PointerEvent<SVGSVGElement>) {
     if (dragging.current !== e.pointerId) return;
+    setPointer(pointAt(e));
     const cell = cellAt(e);
-    if (cell !== null) change(moveTo(draftRef.current, cell));
+    if (cell !== null) drag(cell);
   }
-  // Soltar o dedo no próximo número confere o trecho.
-  function onPointerUp(e: PointerEvent<SVGSVGElement>) {
-    if (dragging.current !== e.pointerId) return;
+  // Soltar sempre apaga a ponta, até depois de um erro, quando o arrasto já tinha parado.
+  function onPointerUp() {
     dragging.current = null;
-    commit();
+    setPointer(null);
   }
 
   // Teclado: as setas andam (voltar por cima apaga), Enter confere e Backspace apaga uma casa.
@@ -227,17 +265,43 @@ export function TrilhaBoard({ play, rules, submitGuess, finish }: BoardProps<Tri
 
   // Trecho errado: o caminho volta ao número de onde saiu, o trecho fica tracejado em vermelho até a
   // pessoa voltar a desenhar e o tabuleiro treme (a animação roda quando a classe entra).
-  const latest = play.guesses.at(-1)?.feedback;
-  const wrong = playing && latest && !latest.correct && !draft.length ? latest.cells : null;
+  const wrong = playing && latest && !latest.correct && dismissed !== play.guesses.length ? latest.cells : null;
   // Quem perde ou desiste vê o resto da solução.
   const solution = playing ? [] : solutionPath(play.answerLabel).slice(locked.length - 1);
+  const head = draft.length ? draft[draft.length - 1] : start;
+  // Depois de um erro o arrasto para: a ponta só volta quando a pessoa desenhar de novo.
+  const tail = playing && !wrong ? tailOf() : undefined;
   const strokes: Stroke[] = [
     { cells: locked, tone: "locked" },
     ...(solution.length > 1 ? [{ cells: solution, tone: "solution" as const }] : []),
     ...(wrong ? [{ cells: [start, ...wrong], tone: "wrong" as const }] : []),
-    ...(playing && draft.length ? [{ cells: [start, ...draft], tone: "draft" as const }] : []),
+    ...(playing && (draft.length || tail) ? [{ cells: [start, ...draft], tone: "draft" as const, tail }] : []),
   ];
-  const head = draft.length ? draft[draft.length - 1] : start;
+
+  /**
+   * A ponta do traço segue o dedo: sai do centro da ponta do rascunho na direção de uma vizinha onde
+   * dá para entrar (estica) ou da casa de antes (encolhe), primeiro no eixo em que o dedo mais se
+   * afastou. Contra parede ou casa ocupada, fica parada no centro.
+   */
+  function tailOf(): Tail | undefined {
+    if (!pointer) return;
+    const hx = colOf(size, head) + 0.5;
+    const hy = rowOf(size, head) + 0.5;
+    const dx = pointer.x - hx;
+    const dy = pointer.y - hy;
+    const previous = draft.length > 1 ? draft[draft.length - 2] : draft.length ? start : -1;
+    const axes = Math.abs(dx) >= Math.abs(dy) ? (["x", "y"] as const) : (["y", "x"] as const);
+    for (const axis of axes) {
+      const d = axis === "x" ? dx : dy;
+      if (Math.abs(d) < 0.01) continue;
+      const cell = head + Math.sign(d) * (axis === "x" ? 1 : size);
+      if (!links[head].includes(cell)) continue;
+      const back = cell === previous;
+      if (!back && !canEnter(draft, cell)) continue;
+      const t = Math.sign(d) * Math.min(Math.abs(d), 1);
+      return { x: axis === "x" ? hx + t : hx, y: axis === "y" ? hy + t : hy, back };
+    }
+  }
   const covered = playing ? locked.length + draft.length : locked.length;
 
   return (
@@ -255,8 +319,8 @@ export function TrilhaBoard({ play, rules, submitGuess, finish }: BoardProps<Tri
         ))}
       </ul>
       <p className="-mt-2 text-center text-xs text-muted-foreground sm:text-[13px]">
-        Arraste a partir do <strong className="font-semibold text-foreground">1</strong>, de casa em casa. Ao chegar no próximo
-        número, <strong className="font-semibold text-foreground">solte</strong> para conferir o trecho.
+        Arraste a partir do <strong className="font-semibold text-foreground">1</strong>, de casa em casa. Cada trecho é
+        conferido ao chegar no próximo número, e dá para seguir sem soltar.
       </p>
 
       <div className="flex items-center justify-between">
@@ -279,6 +343,7 @@ export function TrilhaBoard({ play, rules, submitGuess, finish }: BoardProps<Tri
           puzzle={play.puzzle}
           strokes={strokes}
           head={playing ? head : undefined}
+          tip={tail}
           next={playing ? target : undefined}
           pop={latest?.correct ? latest.cells[latest.cells.length - 1] : undefined}
           tabIndex={playing ? 0 : -1}
@@ -288,7 +353,7 @@ export function TrilhaBoard({ play, rules, submitGuess, finish }: BoardProps<Tri
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
-          onPointerCancel={() => (dragging.current = null)}
+          onPointerCancel={onPointerUp}
           onKeyDown={onKeyDown}
         />
       </div>

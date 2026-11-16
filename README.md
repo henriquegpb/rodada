@@ -20,7 +20,7 @@ Jogos diários curtos num lugar só. Todo dia sai um desafio novo de cada jogo, 
 | **Grau**     | Dois ângulos por dia, 7 tentativas para os dois: diga quantos graus tem o primeiro e desenhe o segundo arrastando o braço. Vale errar por até 2°; cada erro diz se é maior ou menor e quão perto ficou (Fervendo a Gelado). |
 | **Escala**   | 5 rodadas: um bicho aparece no tamanho de verdade, com a altura ou o comprimento, e você arrasta o outro até o tamanho certo ao lado dele. Até 100 pontos por rodada. O modo **Países** faz o mesmo com as silhuetas do mapa, de norte a sul. |
 | **Ordem**    | 5 países por dia para pôr em ordem de área, do maior para o menor, em 5 tentativas. Cada tentativa trava os que estão no lugar certo e mostra a área deles; os outros não dizem se sobem ou descem. |
-| **Trilha**   | Um caminho só que passa pelas 49 casas do tabuleiro 7×7, ligando os números em ordem, sem andar na diagonal nem atravessar paredes. Cada trecho é conferido ao chegar no próximo número: errado, custa uma das 3 vidas. Há 3 dicas, e todo tabuleiro tem solução única que sai trecho a trecho, sem chute. |
+| **Trilha**   | Um caminho só que passa pelas 49 casas do tabuleiro 7×7, ligando os números em ordem, sem andar na diagonal nem atravessar paredes. Cada trecho é conferido ao chegar no próximo número, sem soltar o dedo: errado, custa uma das 5 vidas, e quanto mais vidas sobram, maior a Nota. Há 3 dicas, e todo tabuleiro tem solução única que sai trecho a trecho, sem chute. |
 
 O foco do produto é a camada social: grupos, ranking diário e sequências. As partidas ficam salvas no navegador e, com login, também no servidor, que mantém Contas, Grupos, Rankings e Conquistas. Veja [Backend](#backend) para subir o login e os Rankings.
 

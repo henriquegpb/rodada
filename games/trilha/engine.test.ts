@@ -80,8 +80,11 @@ describe("engine Trilha", () => {
     expect(replay).toMatchObject({ ok: true, status: "won", count: 0 });
     expect(playCount(RULES, previous)).toBe(0);
     expect(formatResult(RULES, "won", 0)).toBe("Sem erros");
+    // Cada vida que sobra vale: 5 vidas → 100, cada erro tira 20.
     expect(gradePlay(RULES, "won", 0)).toBe(100);
-    expect(scorePlay(RULES, "won", 1)).toBe(2);
+    expect(gradePlay(RULES, "won", 1)).toBe(80);
+    expect(gradePlay(RULES, "won", 4)).toBe(20);
+    expect(scorePlay(RULES, "won", 1)).toBe(4);
   });
 
   it("trecho errado custa vida e não mexe no caminho; desistir perde", () => {
@@ -100,9 +103,9 @@ describe("engine Trilha", () => {
     expect(formatResult(RULES, "lost", 1)).toBe("X");
   });
 
-  it("três trechos errados acabam com as vidas", () => {
-    // Acha um dia em que há pelo menos três jeitos errados de ir do 1 ao 2 (perto de um canto pode
-    // haver menos).
+  it("um trecho errado por vida acaba com as vidas", () => {
+    // Acha um dia em que há jeitos errados de ir do 1 ao 2 para gastar todas as vidas (perto de um
+    // canto pode haver menos).
     for (let d = 0; d < 60; d++) {
       const { answer } = engine.createChallenge(addDays(DAY, d));
       const right = encodeSegment(segments(answer)[0]);
@@ -113,11 +116,11 @@ describe("engine Trilha", () => {
         tried.push(encodeSegment(other));
       }
       if (tried.length < RULES.lives) continue;
-      expect(replayPlay(engine, RULES, answer, tried, false)).toMatchObject({ ok: true, status: "lost", count: 3 });
+      expect(replayPlay(engine, RULES, answer, tried, false)).toMatchObject({ ok: true, status: "lost", count: RULES.lives });
       expect(replayPlay(engine, RULES, answer, [...tried, right], false)).toMatchObject({ ok: false });
       return;
     }
-    throw new Error("nenhum dia com três trechos errados do 1 ao 2");
+    throw new Error("nenhum dia com trechos errados do 1 ao 2 para todas as vidas");
   });
 
   it("recusa, sem gastar vida, trecho que não segue as regras", () => {
@@ -169,7 +172,7 @@ describe("engine Trilha", () => {
     expect(previous.every((g) => g.feedback.correct && g.feedback.hint)).toBe(true);
     expect(engine.checkGuess(HINT, answer, previous)).toMatchObject({ ok: false });
     const view = { slug: "trilha", dateKey: DAY, number: 1, puzzle: { size: SIZE, numbers: [], walls: [] }, guesses: previous, status: "won" as const };
-    expect(shareGrid(view)).toBe("❤️❤️❤️\n💡 3 dicas");
+    expect(shareGrid(view)).toBe("❤️❤️❤️❤️❤️\n💡 3 dicas");
   });
 
   it("a resposta revelada no fim é o caminho inteiro", () => {

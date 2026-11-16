@@ -10,7 +10,11 @@ export const COLOR = "#22c3a6";
 /** Lado do tabuleiro: 7×7, 49 casas. */
 export const SIZE = 7;
 
-export const RULES: LivesRules = { type: "lives", lives: 3 };
+/**
+ * 5 vidas. A Nota é a parte das vidas que sobrou (sem errar → 100, cada erro tira 20), então quem
+ * termina com mais vidas fica na frente no Ranking.
+ */
+export const RULES: LivesRules = { type: "lives", lives: 5 };
 
 /** Tentativa que pede uma dica em vez de mandar um trecho desenhado. */
 export const HINT = "?";

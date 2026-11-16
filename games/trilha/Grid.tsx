@@ -14,6 +14,15 @@ import type { TrilhaPuzzle } from "./types";
 export interface Stroke {
   cells: readonly number[];
   tone: "locked" | "draft" | "solution" | "wrong";
+  /** Onde o traço termina de fato, entre casas: segue o dedo. `back` encolhe o último pedaço em vez de esticar. */
+  tail?: Tail;
+}
+
+/** A ponta do traço enquanto o dedo arrasta, em casas. */
+export interface Tail {
+  x: number;
+  y: number;
+  back: boolean;
 }
 
 const TONES: Record<Stroke["tone"], { line: number; fill: number }> = {
@@ -28,21 +37,29 @@ const GAP = 0.08;
 
 const center = (n: number, i: number) => `${colOf(n, i) + 0.5},${rowOf(n, i) + 0.5}`;
 
+function pointsOf(n: number, { cells, tail }: Stroke): string[] {
+  const points = cells.map((i) => center(n, i));
+  if (!tail) return points;
+  const end = `${tail.x},${tail.y}`;
+  return tail.back ? [...points.slice(0, -1), end] : [...points, end];
+}
+
 /**
  * O tabuleiro da Trilha em SVG, uma unidade por casa: casas, paredes, traços e números. Serve ao
  * tabuleiro de jogo (com os eventos de ponteiro e teclado no `<svg>`) e ao resumo do resultado.
  * `head` é a ponta do caminho, `next` a casa do próximo número a alcançar e `pop` a do número que
- * acabou de ser alcançado.
+ * acabou de ser alcançado. `tip`, enquanto o dedo arrasta, é onde a bolinha da ponta está.
  */
 export function TrilhaGrid({
   puzzle,
   strokes,
   head,
+  tip,
   next,
   pop,
   className,
   ...props
-}: { puzzle: TrilhaPuzzle; strokes: Stroke[]; head?: number; next?: number; pop?: number } & ComponentProps<"svg">) {
+}: { puzzle: TrilhaPuzzle; strokes: Stroke[]; head?: number; tip?: Tail; next?: number; pop?: number } & ComponentProps<"svg">) {
   const { size: n, numbers, walls } = puzzle;
   return (
     <svg viewBox={`0 0 ${n} ${n}`} className={cn("block aspect-square w-full select-none", className)} {...props}>
@@ -96,11 +113,13 @@ export function TrilhaGrid({
         );
       })}
 
-      {strokes.map(({ cells, tone }, s) =>
-        cells.length > 1 ? (
+      {strokes.map((stroke, s) => {
+        const { tone } = stroke;
+        const points = pointsOf(n, stroke);
+        return points.length > 1 ? (
           <polyline
             key={s}
-            points={cells.map((i) => center(n, i)).join(" ")}
+            points={points.join(" ")}
             fill="none"
             stroke={tone === "wrong" ? "var(--destructive)" : COLOR}
             // O trecho errado vira uma fila de pontos: com a ponta redonda, um tracejado comum
@@ -111,11 +130,13 @@ export function TrilhaGrid({
             strokeDasharray={tone === "wrong" ? "0 0.34" : undefined}
             opacity={TONES[tone].line}
           />
-        ) : null,
-      )}
+        ) : null;
+      })}
 
-      {head !== undefined && !numbers.includes(head) && (
-        <circle cx={colOf(n, head) + 0.5} cy={rowOf(n, head) + 0.5} r={0.22} fill={COLOR} />
+      {tip ? (
+        <circle cx={tip.x} cy={tip.y} r={0.22} fill={COLOR} />
+      ) : (
+        head !== undefined && !numbers.includes(head) && <circle cx={colOf(n, head) + 0.5} cy={rowOf(n, head) + 0.5} r={0.22} fill={COLOR} />
       )}
 
       {numbers.map((cell, k) => {
