@@ -1,0 +1,1898 @@
+[
+ {
+  "id": "cidade-sp",
+  "title": "Cidade do estado de São Paulo com 50 mil+ habitantes",
+  "total": 137,
+  "obvious": "São Paulo",
+  "rare": [
+   "Lençóis Paulista",
+   "Monte Mor",
+   "Bertioga"
+  ],
+  "v": "5b08f588da"
+ },
+ {
+  "id": "cidade-mg",
+  "title": "Cidade de Minas Gerais com 50 mil+ habitantes",
+  "total": 72,
+  "obvious": "Belo Horizonte",
+  "rare": [
+   "Pedro Leopoldo",
+   "Mariana",
+   "Frutal"
+  ],
+  "v": "62d0b881a3"
+ },
+ {
+  "id": "cidade-rj",
+  "title": "Cidade do estado do Rio com 50 mil+ habitantes",
+  "total": 37,
+  "obvious": "Rio de Janeiro",
+  "rare": [
+   "Barra do Piraí",
+   "Saquarema",
+   "Seropédica"
+  ],
+  "v": "947dff642c"
+ },
+ {
+  "id": "cidade-ba",
+  "title": "Cidade da Bahia com 50 mil+ habitantes",
+  "total": 42,
+  "obvious": "Salvador",
+  "rare": [
+   "Euclides da Cunha",
+   "Cruz das Almas",
+   "Itamaraju"
+  ],
+  "v": "e4d4e002cb"
+ },
+ {
+  "id": "cidade-rs",
+  "title": "Cidade do Rio Grande do Sul com 50 mil+ habitantes",
+  "total": 43,
+  "obvious": "Porto Alegre",
+  "rare": [
+   "Campo Bom",
+   "Camaquã",
+   "Carazinho"
+  ],
+  "v": "01be4541fb"
+ },
+ {
+  "id": "cidade-pr",
+  "title": "Cidade do Paraná com 50 mil+ habitantes",
+  "total": 35,
+  "obvious": "Curitiba",
+  "rare": [
+   "Castro",
+   "Rolândia",
+   "Irati"
+  ],
+  "v": "88ad4b10e8"
+ },
+ {
+  "id": "cidade-sc",
+  "title": "Cidade de Santa Catarina com 50 mil+ habitantes",
+  "total": 32,
+  "obvious": "Joinville",
+  "rare": [
+   "Videira",
+   "Mafra",
+   "Canoinhas"
+  ],
+  "v": "90499ae79a"
+ },
+ {
+  "id": "cidade-pe",
+  "title": "Cidade de Pernambuco com 50 mil+ habitantes",
+  "total": 33,
+  "obvious": "Recife",
+  "rare": [
+   "Bezerros",
+   "Escada",
+   "Paudalho"
+  ],
+  "v": "5a0ae68c7d"
+ },
+ {
+  "id": "cidade-ce",
+  "title": "Cidade do Ceará com 50 mil+ habitantes",
+  "total": 37,
+  "obvious": "Fortaleza",
+  "rare": [
+   "Viçosa do Ceará",
+   "Limoeiro do Norte",
+   "Trairi"
+  ],
+  "v": "85850a4c2e"
+ },
+ {
+  "id": "cidade-go",
+  "title": "Cidade de Goiás com 30 mil+ habitantes",
+  "total": 40,
+  "obvious": "Goiânia",
+  "rare": [
+   "Padre Bernardo",
+   "Niquelândia",
+   "Posse"
+  ],
+  "v": "df04083cfc"
+ },
+ {
+  "id": "cidade-pa",
+  "title": "Cidade do Pará com 50 mil+ habitantes",
+  "total": 42,
+  "obvious": "Belém",
+  "rare": [
+   "Dom Eliseu",
+   "Capitão Poço",
+   "Rondon do Pará"
+  ],
+  "v": "4dae9c6a29"
+ },
+ {
+  "id": "cidade-brasil-300mil",
+  "title": "Cidade brasileira com 300 mil+ habitantes",
+  "total": 93,
+  "obvious": "São Paulo",
+  "rare": [
+   "Franca",
+   "Olinda",
+   "Praia Grande"
+  ],
+  "v": "30f572c2fd"
+ },
+ {
+  "id": "novela-brasileira",
+  "title": "Novela brasileira",
+  "total": 602,
+  "obvious": "Terra e Paixão",
+  "rare": [
+   "A Gordinha",
+   "A Idade da Loba",
+   "A Leoa"
+  ],
+  "v": "080d66b4f4"
+ },
+ {
+  "id": "programa-tv-brasileiro",
+  "title": "Programa de TV brasileiro",
+  "total": 1731,
+  "obvious": "Terra e Paixão",
+  "rare": [
+   "Questão de Família",
+   "Quintal da Cultura",
+   "Ratinho Livre"
+  ],
+  "v": "0eb9ae5041"
+ },
+ {
+  "id": "filme-brasileiro",
+  "title": "Filme brasileiro",
+  "total": 2790,
+  "obvious": "Cidade de Deus",
+  "rare": [
+   "O Cangaceiro Trapalhão",
+   "O Cantor das Multidões",
+   "O Caseiro"
+  ],
+  "v": "b108109671"
+ },
+ {
+  "id": "cantor-brasileiro",
+  "title": "Cantor ou cantora brasileira",
+  "total": 1805,
+  "obvious": "Hebe Camargo",
+  "rare": [
+   "Prêntice",
+   "Ravel",
+   "Ravel Andrade"
+  ],
+  "v": "609ac34de8"
+ },
+ {
+  "id": "banda-brasileira",
+  "title": "Banda ou grupo musical brasileiro",
+  "total": 1141,
+  "obvious": "Sepultura",
+  "rare": [
+   "Picassos Falsos",
+   "Pife Muderno",
+   "Pique Novo"
+  ],
+  "v": "016be1ba2b"
+ },
+ {
+  "id": "ator-brasileiro",
+  "title": "Ator ou atriz brasileira",
+  "total": 3000,
+  "obvious": "Pelé",
+  "rare": [
+   "Cléa Simões",
+   "Cleiton Morais",
+   "Clemente Viscaíno"
+  ],
+  "v": "5b39b47122"
+ },
+ {
+  "id": "humorista-brasileiro",
+  "title": "Humorista brasileiro",
+  "total": 75,
+  "obvious": "Ronald Golias",
+  "rare": [
+   "Rita von Hunty",
+   "Victor Lamoglia",
+   "Caike Luna"
+  ],
+  "v": "72f7001d33"
+ },
+ {
+  "id": "youtuber-brasileiro",
+  "title": "Youtuber ou influenciador brasileiro",
+  "total": 137,
+  "obvious": "Pedrinho Matador",
+  "rare": [
+   "Fefe Schneider",
+   "Games EduUu",
+   "Guilherme Zaiden"
+  ],
+  "v": "b1ea65e02d"
+ },
+ {
+  "id": "apresentador-brasileiro",
+  "title": "Apresentador ou apresentadora de TV brasileira",
+  "total": 328,
+  "obvious": "Hebe Camargo",
+  "rare": [
+   "Geraldo Luís",
+   "Giovanna Nader",
+   "Gontijo Teodoro"
+  ],
+  "v": "4a921bf8be"
+ },
+ {
+  "id": "escritor-brasileiro",
+  "title": "Escritor ou poeta brasileiro",
+  "total": 3000,
+  "obvious": "Paulo Coelho",
+  "rare": [
+   "Artur Pinto da Rocha",
+   "Artur Rodrigues da Rocha",
+   "Ascânio Lopes"
+  ],
+  "v": "e8cf6f5a64"
+ },
+ {
+  "id": "sertanejo",
+  "title": "Cantor ou dupla de sertanejo",
+  "total": 411,
+  "obvious": "Paula Fernandes",
+  "rare": [
+   "Original",
+   "Orquestra da Terra",
+   "Orquestra Paulistana de Viola Caipira"
+  ],
+  "v": "5c054be6f2"
+ },
+ {
+  "id": "funk",
+  "title": "Artista de funk",
+  "total": 81,
+  "obvious": "Anitta",
+  "rare": [
+   "Lia",
+   "MC Alandim",
+   "MC Beth"
+  ],
+  "v": "2a7c399b22"
+ },
+ {
+  "id": "mpb",
+  "title": "Artista de MPB",
+  "total": 1535,
+  "obvious": "Gilberto Gil",
+  "rare": [
+   "Mauro Almeida",
+   "Medo de Amar",
+   "Mel"
+  ],
+  "v": "e36bc9aef8"
+ },
+ {
+  "id": "forro-axe",
+  "title": "Artista de forró ou axé",
+  "total": 181,
+  "obvious": "Ivete Sangalo",
+  "rare": [
+   "Lino de França",
+   "Luiz Wanderley",
+   "Messias Holanda"
+  ],
+  "v": "f9a4c44679"
+ },
+ {
+  "id": "escola-de-samba",
+  "title": "Escola de samba",
+  "total": 876,
+  "obvious": "Estação Primeira de Mangueira",
+  "rare": [
+   "Rebeldes do Samba",
+   "Recreio de Ramos",
+   "Recreio de São Carlos"
+  ],
+  "v": "cd68d339a3"
+ },
+ {
+  "id": "jogador-selecao",
+  "title": "Jogador que já jogou pela Seleção Brasileira",
+  "total": 806,
+  "obvious": "Pelé",
+  "rare": [
+   "Celso Roth",
+   "Chico Netto",
+   "Delém"
+  ],
+  "v": "c6ffe09143"
+ },
+ {
+  "id": "time-brasileiro",
+  "title": "Time de futebol brasileiro",
+  "total": 1533,
+  "obvious": "Coritiba Foot Ball Club",
+  "rare": [
+   "Ipojuca Atlético Clube",
+   "Ipojuca Futebol Clube",
+   "Irajá Atlético Clube"
+  ],
+  "v": "c7d734bc2b"
+ },
+ {
+  "id": "empresa-brasileira",
+  "title": "Empresa ou marca brasileira",
+  "total": 292,
+  "obvious": "Embraer",
+  "rare": [
+   "Matte Leão",
+   "Minerva Foods",
+   "Mitsubishi Motors Brasil"
+  ],
+  "v": "c89c8db03f"
+ },
+ {
+  "id": "praia-brasileira",
+  "title": "Praia brasileira",
+  "total": 523,
+  "obvious": "Copacabana",
+  "rare": [
+   "Praia de Cidreira",
+   "Praia de Dentro",
+   "Praia de Geremias"
+  ],
+  "v": "a47d6f6a57"
+ },
+ {
+  "id": "rio-brasileiro",
+  "title": "Rio brasileiro",
+  "total": 609,
+  "obvious": "Rio Amazonas",
+  "rare": [
+   "Rio Itapocuzinho",
+   "Rio Ituim",
+   "Rio Jacaré"
+  ],
+  "v": "d0f7a86d95"
+ },
+ {
+  "id": "bairro-rio",
+  "title": "Bairro da cidade do Rio de Janeiro",
+  "total": 168,
+  "obvious": "Copacabana",
+  "rare": [
+   "Moneró",
+   "Paciência",
+   "Padre Miguel"
+  ],
+  "v": "1aedb30e24"
+ },
+ {
+  "id": "universidade-brasileira",
+  "title": "Universidade brasileira",
+  "total": 300,
+  "obvious": "Universidade Federal da Bahia",
+  "rare": [
+   "Centro Universitário Fluminense",
+   "Centro Universitário Geraldo Di Biase",
+   "Centro Universitário Moura Lacerda"
+  ],
+  "v": "1f16d2d98d"
+ },
+ {
+  "id": "comida-brasileira",
+  "title": "Comida típica brasileira",
+  "total": 91,
+  "obvious": "Doce de leite",
+  "rare": [
+   "Unha de caranguejo",
+   "Xis",
+   "Afogado"
+  ],
+  "v": "86b72d318d"
+ },
+ {
+  "id": "prato-nordeste",
+  "title": "Prato típico do Nordeste",
+  "total": 99,
+  "obvious": "Caranguejada",
+  "rare": [
+   "Chambaril",
+   "Cocada de forno",
+   "Doce de leite de cabra"
+  ],
+  "v": "ee48491fb7"
+ },
+ {
+  "id": "pais",
+  "title": "País (qualquer um)",
+  "total": 201,
+  "obvious": "Estados Unidos",
+  "rare": [
+   "Essuatíni",
+   "Guiana",
+   "Nicarágua"
+  ],
+  "v": "b401fd682e"
+ },
+ {
+  "id": "pais-europa",
+  "title": "País da Europa",
+  "total": 52,
+  "obvious": "Rússia",
+  "rare": [
+   "Vaticano",
+   "Montenegro",
+   "Liechtenstein"
+  ],
+  "v": "eb3d8b8205"
+ },
+ {
+  "id": "pais-africa",
+  "title": "País da África",
+  "total": 54,
+  "obvious": "Nigéria",
+  "rare": [
+   "Libéria",
+   "Serra Leoa",
+   "Cabo Verde"
+  ],
+  "v": "d4b6a06e32"
+ },
+ {
+  "id": "pais-asia",
+  "title": "País da Ásia",
+  "total": 48,
+  "obvious": "Índia",
+  "rare": [
+   "Butão",
+   "Tajiquistão",
+   "Kuwait"
+  ],
+  "v": "ff5d2b9a98"
+ },
+ {
+  "id": "capital-mundo",
+  "title": "Capital de país",
+  "total": 206,
+  "obvious": "Paris",
+  "rare": [
+   "Lilongué",
+   "Nepiedó",
+   "Sucre"
+  ],
+  "v": "63dbe58fc4"
+ },
+ {
+  "id": "cidade-1-milhao",
+  "title": "Cidade do mundo com 1 milhão+ de habitantes",
+  "total": 555,
+  "obvious": "Paris",
+  "rare": [
+   "Taizhou",
+   "Xubra el-Kheima",
+   "Yancheng"
+  ],
+  "v": "1833e9cec0"
+ },
+ {
+  "id": "rio-mundo",
+  "title": "Rio com mais de 1.000 km",
+  "total": 207,
+  "obvious": "Rio Nilo",
+  "rare": [
+   "Rio Napo",
+   "Rio Canadian",
+   "Rio Han"
+  ],
+  "v": "4a2d94c506"
+ },
+ {
+  "id": "montanha",
+  "title": "Montanha ou pico",
+  "total": 1241,
+  "obvious": "Monte Evereste",
+  "rare": [
+   "Romeral",
+   "Rondoy",
+   "Serra da Coroa"
+  ],
+  "v": "59547a3f3b"
+ },
+ {
+  "id": "vulcao",
+  "title": "Vulcão",
+  "total": 176,
+  "obvious": "Monte Ararate",
+  "rare": [
+   "Kuwaé",
+   "Pico Mascarin",
+   "Pular"
+  ],
+  "v": "ac5cb5fd97"
+ },
+ {
+  "id": "ilha",
+  "title": "Ilha",
+  "total": 1365,
+  "obvious": "Guam",
+  "rare": [
+   "Ilha Drygalski",
+   "Ilha Gau",
+   "Ilha Jemo"
+  ],
+  "v": "ffb89a4c53"
+ },
+ {
+  "id": "deserto",
+  "title": "Deserto",
+  "total": 93,
+  "obvious": "Deserto do Saara",
+  "rare": [
+   "Caoco",
+   "Deserto de Escalante",
+   "Deserto de Mu Us"
+  ],
+  "v": "385636adda"
+ },
+ {
+  "id": "cachoeira",
+  "title": "Cachoeira ou catarata",
+  "total": 126,
+  "obvious": "Cataratas do Niágara",
+  "rare": [
+   "Cascata do Véu da Noiva",
+   "Cataratas de Wilberforce",
+   "Millaa Millaa Falls"
+  ],
+  "v": "29b2097870"
+ },
+ {
+  "id": "lago",
+  "title": "Lago",
+  "total": 311,
+  "obvious": "Mar Cáspio",
+  "rare": [
+   "Lago Adams",
+   "Lago Baldegg",
+   "Lago Ellsworth"
+  ],
+  "v": "77f68f0250"
+ },
+ {
+  "id": "idioma",
+  "title": "Idioma (língua)",
+  "total": 1155,
+  "obvious": "Língua inglesa",
+  "rare": [
+   "Língua dong",
+   "Língua fataluco",
+   "Língua gestual portuguesa"
+  ],
+  "v": "9bde350bd8"
+ },
+ {
+  "id": "moeda",
+  "title": "Moeda de algum país",
+  "total": 286,
+  "obvious": "Euro",
+  "rare": [
+   "Libra tornesa",
+   "SUCRE",
+   "Aes grave"
+  ],
+  "v": "5eedc27f50"
+ },
+ {
+  "id": "estado-eua",
+  "title": "Estado dos EUA",
+  "total": 50,
+  "obvious": "Califórnia",
+  "rare": [
+   "Montana",
+   "Delaware",
+   "Carolina do Sul"
+  ],
+  "v": "053b3c0e9e"
+ },
+ {
+  "id": "patrimonio-unesco",
+  "title": "Patrimônio Mundial da UNESCO",
+  "total": 972,
+  "obvious": "Vaticano",
+  "rare": [
+   "Arte rupestre na região de Hail",
+   "Conjunto Arquitetônico da Pampulha",
+   "Conjuntos de petroglifos do Altai mongol"
+  ],
+  "v": "9fa174b542"
+ },
+ {
+  "id": "museu",
+  "title": "Museu",
+  "total": 907,
+  "obvious": "Museu do Louvre",
+  "rare": [
+   "Koldinghus",
+   "Los Pinos",
+   "Lutherhaus"
+  ],
+  "v": "84fb53ed7a"
+ },
+ {
+  "id": "castelo",
+  "title": "Castelo ou palácio",
+  "total": 932,
+  "obvious": "Palácio de Versalhes",
+  "rare": [
+   "Palácio do Abade",
+   "Palácio do Catete",
+   "Palácio do Partal"
+  ],
+  "v": "fb627b5e88"
+ },
+ {
+  "id": "companhia-aerea",
+  "title": "Companhia aérea",
+  "total": 974,
+  "obvious": "Lufthansa",
+  "rare": [
+   "Intercontinental de Aviación",
+   "JETGO Australia",
+   "Johnsons Air"
+  ],
+  "v": "cf974b0bed"
+ },
+ {
+  "id": "raca-cachorro",
+  "title": "Raça de cachorro",
+  "total": 464,
+  "obvious": "Pastor-alemão",
+  "rare": [
+   "Olde English Bulldogge",
+   "Sabujo de Hygen",
+   "Sabujo-austríaco-preto-e-castanho"
+  ],
+  "v": "bed7e6755f"
+ },
+ {
+  "id": "raca-gato",
+  "title": "Raça de gato",
+  "total": 47,
+  "obvious": "Siamês",
+  "rare": [
+   "Gato de pelo curto brasileiro",
+   "LaPerm",
+   "Mist australiano"
+  ],
+  "v": "c5fe2db82e"
+ },
+ {
+  "id": "raca-cavalo",
+  "title": "Raça de cavalo",
+  "total": 61,
+  "obvious": "Cavalo árabe",
+  "rare": [
+   "Monterufolino",
+   "Pampa",
+   "Árabo-frísio"
+  ],
+  "v": "3cfe3168af"
+ },
+ {
+  "id": "mamifero",
+  "title": "Mamífero",
+  "total": 3000,
+  "obvious": "Cachorro",
+  "rare": [
+   "Ctenomys brasiliensis",
+   "Cynopterus minutus",
+   "Dactylopsila tatei"
+  ],
+  "v": "6b30327ee4"
+ },
+ {
+  "id": "ave",
+  "title": "Ave",
+  "total": 3000,
+  "obvious": "Galinha",
+  "rare": [
+   "Oriolus crassirostris",
+   "Otus ireneae",
+   "Panterpe insignis"
+  ],
+  "v": "b3a0329003"
+ },
+ {
+  "id": "peixe",
+  "title": "Peixe",
+  "total": 3000,
+  "obvious": "Tubarão",
+  "rare": [
+   "Ctenogobiops feroculus",
+   "Ctenolucius hujeta",
+   "Ctenopharynx pictus"
+  ],
+  "v": "aa48bd1077"
+ },
+ {
+  "id": "reptil",
+  "title": "Réptil (cobra, lagarto, tartaruga...)",
+  "total": 927,
+  "obvious": "Tartaruga",
+  "rare": [
+   "Cyclodina lichenigera",
+   "Draco maximus",
+   "Egernia kintorei"
+  ],
+  "v": "0083645d69"
+ },
+ {
+  "id": "anfibio",
+  "title": "Anfíbio (sapo, rã, salamandra...)",
+  "total": 3000,
+  "obvious": "Salamandra",
+  "rare": [
+   "Rhinatrema nigrum",
+   "Rhinella acrolopha",
+   "Rhinella dorbignyi"
+  ],
+  "v": "3c4554bcbe"
+ },
+ {
+  "id": "inseto",
+  "title": "Inseto",
+  "total": 58,
+  "obvious": "Formiga",
+  "rare": [
+   "Mosca-branca",
+   "Esperança",
+   "Mosquito-palha"
+  ],
+  "v": "214e0e69bc"
+ },
+ {
+  "id": "dinossauro",
+  "title": "Dinossauro",
+  "total": 79,
+  "obvious": "Tiranossauro",
+  "rare": [
+   "Struthiomimus",
+   "Suchomimus",
+   "Ouranossauro"
+  ],
+  "v": "be4aaefd48"
+ },
+ {
+  "id": "arvore-frutifera",
+  "title": "Árvore frutífera que existe no Brasil",
+  "total": 358,
+  "obvious": "Maçã",
+  "rare": [
+   "Canela-preta",
+   "Couma utilis",
+   "Daphnopsis"
+  ],
+  "v": "ea4605f93d"
+ },
+ {
+  "id": "verdura-legume",
+  "title": "Verdura ou legume",
+  "total": 70,
+  "obvious": "Milho",
+  "rare": [
+   "Bertalha",
+   "Broto de bambu",
+   "Mostarda"
+  ],
+  "v": "0cef658016"
+ },
+ {
+  "id": "tempero-erva",
+  "title": "Tempero ou erva",
+  "total": 112,
+  "obvious": "Tomate",
+  "rare": [
+   "Ginseng",
+   "Erva aromática",
+   "Gomásio"
+  ],
+  "v": "e7d0c40b95"
+ },
+ {
+  "id": "pedra-preciosa",
+  "title": "Pedra preciosa ou mineral",
+  "total": 289,
+  "obvious": "Diamante",
+  "rare": [
+   "Lechatelierite",
+   "Okenita",
+   "Schreibersita"
+  ],
+  "v": "a60c2d4732"
+ },
+ {
+  "id": "constelacao",
+  "title": "Constelação",
+  "total": 87,
+  "obvious": "Ursa Maior",
+  "rare": [
+   "Horologium",
+   "Indus",
+   "Musca"
+  ],
+  "v": "0eee7c6b66"
+ },
+ {
+  "id": "lua",
+  "title": "Lua de algum planeta",
+  "total": 54,
+  "obvious": "S/2015 (136472) 1",
+  "rare": [
+   "S/2009 (2002 VF130) 1",
+   "S/2009 (612141) 1",
+   "S/2009 (612733) 1"
+  ],
+  "v": "e77268bb6c"
+ },
+ {
+  "id": "filme-ficcao-cientifica",
+  "title": "Filme de ficção científica com 100 mil+ avaliações no IMDb",
+  "total": 326,
+  "obvious": "A Origem",
+  "rare": [
+   "Hollow Man",
+   "Aliens vs. Predator: Requiem",
+   "Tron"
+  ],
+  "v": "92ef17a3b4"
+ },
+ {
+  "id": "filme-terror",
+  "title": "Filme de terror com 50 mil+ avaliações no IMDb",
+  "total": 609,
+  "obvious": "O Silêncio dos Inocentes",
+  "rare": [
+   "Halloween II",
+   "Scary Movie",
+   "Queen of the Damned"
+  ],
+  "v": "d44bae5a7a"
+ },
+ {
+  "id": "filme-comedia",
+  "title": "Filme de comédia com 100 mil+ avaliações no IMDb",
+  "total": 882,
+  "obvious": "O Lobo de Wall Street",
+  "rare": [
+   "Seeking a Friend for the End of the World",
+   "Uncle Buck",
+   "Violent Night"
+  ],
+  "v": "dce59ffc56"
+ },
+ {
+  "id": "filme-animacao",
+  "title": "Filme de animação com 30 mil+ avaliações no IMDb",
+  "total": 375,
+  "obvious": "WALL-E",
+  "rare": [
+   "Abominável",
+   "Pinóquio",
+   "Ron's Gone Wrong"
+  ],
+  "v": "f04ffc1310"
+ },
+ {
+  "id": "filme-acao",
+  "title": "Filme de ação com 150 mil+ avaliações no IMDb",
+  "total": 682,
+  "obvious": "Matrix",
+  "rare": [
+   "Battle: Los Angeles",
+   "Resident Evil: Afterlife",
+   "The Heat"
+  ],
+  "v": "e696f14f1f"
+ },
+ {
+  "id": "filme-romance",
+  "title": "Filme de romance com 50 mil+ avaliações no IMDb",
+  "total": 627,
+  "obvious": "Forrest Gump",
+  "rare": [
+   "The Light Between Oceans",
+   "The War of the Roses",
+   "Último Tango em Paris"
+  ],
+  "v": "71294c81fa"
+ },
+ {
+  "id": "filme-guerra",
+  "title": "Filme de guerra com 30 mil+ avaliações no IMDb",
+  "total": 123,
+  "obvious": "Inglourious Basterds",
+  "rare": [
+   "A Grande Ilusão",
+   "They Shall Not Grow Old",
+   "Sisu: Road to Revenge"
+  ],
+  "v": "f632ac1309"
+ },
+ {
+  "id": "filme-faroeste",
+  "title": "Filme de faroeste com 20 mil+ avaliações no IMDb",
+  "total": 76,
+  "obvious": "Django Unchained",
+  "rare": [
+   "Da Terra Nascem os Homens",
+   "Winchester '73",
+   "Pat Garrett and Billy the Kid"
+  ],
+  "v": "cf23560881"
+ },
+ {
+  "id": "filme-musical",
+  "title": "Filme musical com 20 mil+ avaliações no IMDb",
+  "total": 108,
+  "obvious": "Sweeney Todd: The Demon Barber of Fleet Street",
+  "rare": [
+   "Os Amantes Passageiros",
+   "Gigi",
+   "Tommy"
+  ],
+  "v": "6e538ffbe3"
+ },
+ {
+  "id": "filme-policial",
+  "title": "Filme policial ou de crime com 100 mil+ avaliações no IMDb",
+  "total": 543,
+  "obvious": "The Dark Knight",
+  "rare": [
+   "The Warriors",
+   "Tropa de Elite",
+   "The Purge: Election Year"
+  ],
+  "v": "019d8c826e"
+ },
+ {
+  "id": "filme-fantasia",
+  "title": "Filme de fantasia com 75 mil+ avaliações no IMDb",
+  "total": 331,
+  "obvious": "The Lord of the Rings: The Fellowship of the Ring",
+  "rare": [
+   "Thirteen Ghosts",
+   "A Nightmare on Elm Street 3: Dream Warriors",
+   "Ghosts of Girlfriends Past"
+  ],
+  "v": "7486cded9d"
+ },
+ {
+  "id": "serie-100mil",
+  "title": "Série com 100 mil+ avaliações no IMDb",
+  "total": 373,
+  "obvious": "Breaking Bad",
+  "rare": [
+   "Titans",
+   "Chilling Adventures of Sabrina",
+   "Dept. Q"
+  ],
+  "v": "e983c5a084"
+ },
+ {
+  "id": "serie-comedia",
+  "title": "Série de comédia com 30 mil+ avaliações no IMDb",
+  "total": 362,
+  "obvious": "Friends",
+  "rare": [
+   "Vice Principals",
+   "Why Women Kill",
+   "Red Dwarf"
+  ],
+  "v": "6c75091b5c"
+ },
+ {
+  "id": "serie-animada",
+  "title": "Desenho ou série animada com 15 mil+ avaliações no IMDb",
+  "total": 316,
+  "obvious": "Shingeki no Kyojin",
+  "rare": [
+   "Highschool of the Dead",
+   "The Bugs Bunny/Looney Tunes Comedy Hour",
+   "Zankyō no Terror"
+  ],
+  "v": "77de648916"
+ },
+ {
+  "id": "serie-policial",
+  "title": "Série policial com 30 mil+ avaliações no IMDb",
+  "total": 313,
+  "obvious": "Breaking Bad",
+  "rare": [
+   "Unforgotten on Masterpiece",
+   "The Capture",
+   "O Mecanismo"
+  ],
+  "v": "79aed76c19"
+ },
+ {
+  "id": "boy-band-girl-group",
+  "title": "Boy band ou girl group",
+  "total": 1561,
+  "obvious": "BTS",
+  "rare": [
+   "P.Y.T.",
+   "P9",
+   "Pajama Party"
+  ],
+  "v": "6d9f4a450a"
+ },
+ {
+  "id": "banda-rock",
+  "title": "Banda de rock",
+  "total": 379,
+  "obvious": "Paramore",
+  "rare": [
+   "Circa Waves",
+   "Divinyls",
+   "Larkin Poe"
+  ],
+  "v": "b3ccef67c2"
+ },
+ {
+  "id": "cantora-pop",
+  "title": "Cantora pop internacional",
+  "total": 1376,
+  "obvious": "Shakira",
+  "rare": [
+   "Yui Yatyer",
+   "Amelia Lily",
+   "Baby K"
+  ],
+  "v": "02b7b46c9c"
+ },
+ {
+  "id": "rapper",
+  "title": "Rapper (de qualquer país)",
+  "total": 970,
+  "obvious": "Eminem",
+  "rare": [
+   "Beomgyu",
+   "Brotha Lynch Hung",
+   "Cage"
+  ],
+  "v": "5d6cb454a8"
+ },
+ {
+  "id": "dj",
+  "title": "DJ",
+  "total": 493,
+  "obvious": "Basshunter",
+  "rare": [
+   "Unk",
+   "Virtual Riot",
+   "Zight"
+  ],
+  "v": "bfbbda7daf"
+ },
+ {
+  "id": "genero-musical",
+  "title": "Gênero musical",
+  "total": 836,
+  "obvious": "Jazz",
+  "rare": [
+   "Urban contemporary",
+   "West Coast Jazz",
+   "Bardcore"
+  ],
+  "v": "6bd48280d1"
+ },
+ {
+  "id": "instrumento-musical",
+  "title": "Instrumento musical",
+  "total": 754,
+  "obvious": "Guitarra",
+  "rare": [
+   "Afoxé",
+   "Assor",
+   "Chelys"
+  ],
+  "v": "986dd8d798"
+ },
+ {
+  "id": "pintor",
+  "title": "Pintor ou pintora",
+  "total": 2039,
+  "obvious": "Leonardo da Vinci",
+  "rare": [
+   "Louise Catherine Breslau",
+   "Luis Eduardo Aute",
+   "Maria Cosway"
+  ],
+  "v": "bb0dafeb9b"
+ },
+ {
+  "id": "arquiteto",
+  "title": "Arquiteto ou arquiteta",
+  "total": 821,
+  "obvious": "Leonardo da Vinci",
+  "rare": [
+   "Riccardo Morandi",
+   "Richard Norman Shaw",
+   "Salomon de Brosse"
+  ],
+  "v": "958e985373"
+ },
+ {
+  "id": "compositor-classico",
+  "title": "Compositor de música clássica",
+  "total": 1133,
+  "obvious": "Leonardo da Vinci",
+  "rare": [
+   "Pedro Georgievich de Oldemburgo",
+   "Pierre Attaingnant",
+   "Robert de Visée"
+  ],
+  "v": "a343973bdc"
+ },
+ {
+  "id": "diretor-cinema",
+  "title": "Diretor ou diretora de cinema",
+  "total": 3000,
+  "obvious": "Charlie Chaplin",
+  "rare": [
+   "Víctor Erice",
+   "Woodkid",
+   "Zach King"
+  ],
+  "v": "734caa3166"
+ },
+ {
+  "id": "livro",
+  "title": "Livro (romance ou clássico)",
+  "total": 1858,
+  "obvious": "Alcorão",
+  "rare": [
+   "Bibliotheca historica",
+   "Blood Meridian",
+   "By the Pricking of My Thumbs"
+  ],
+  "v": "62edbcec0f"
+ },
+ {
+  "id": "videogame",
+  "title": "Videogame",
+  "total": 2521,
+  "obvious": "Minecraft",
+  "rare": [
+   "Sonic Rush",
+   "Sonic the Fighters",
+   "Sonic the Hedgehog 4: Episode II"
+  ],
+  "v": "b4693204d2"
+ },
+ {
+  "id": "console",
+  "title": "Console de videogame",
+  "total": 117,
+  "obvious": "PlayStation 4",
+  "rare": [
+   "VTech CreatiVision",
+   "Evercade",
+   "Nuon"
+  ],
+  "v": "0318813224"
+ },
+ {
+  "id": "pokemon",
+  "title": "Pokémon",
+  "total": 1234,
+  "obvious": "Pikachu",
+  "rare": [
+   "Brute Bonnet",
+   "Buzzwole",
+   "Capsakid"
+  ],
+  "v": "e41e57dc98"
+ },
+ {
+  "id": "super-heroi",
+  "title": "Super-herói ou super-heroína",
+  "total": 117,
+  "obvious": "Batman",
+  "rare": [
+   "Fogo",
+   "Psylocke",
+   "Invencível"
+  ],
+  "v": "d7c83d00f8"
+ },
+ {
+  "id": "personagem-desenho",
+  "title": "Personagem de desenho animado",
+  "total": 911,
+  "obvious": "Mickey Mouse",
+  "rare": [
+   "OMAC",
+   "Penelope Pitstop",
+   "Penelope Pussycat"
+  ],
+  "v": "433550f1fb"
+ },
+ {
+  "id": "personagem-videogame",
+  "title": "Personagem de videogame",
+  "total": 517,
+  "obvious": "Mickey Mouse",
+  "rare": [
+   "Sheng Long",
+   "Urien",
+   "Wallace Breen"
+  ],
+  "v": "72be41935b"
+ },
+ {
+  "id": "personagem-quadrinhos",
+  "title": "Personagem de quadrinhos",
+  "total": 1297,
+  "obvious": "Mickey Mouse",
+  "rare": [
+   "Hot Stuff the Little Devil",
+   "Huey Freeman",
+   "Imediato P.A. Tinhas"
+  ],
+  "v": "ab3539dda0"
+ },
+ {
+  "id": "anime",
+  "title": "Anime ou mangá",
+  "total": 1362,
+  "obvious": "One Piece",
+  "rare": [
+   "Kaze Tachinu",
+   "Kyō, Koi o Hajimemasu",
+   "Manyuu Hikenchou"
+  ],
+  "v": "f4a252a527"
+ },
+ {
+  "id": "deus-mitologia",
+  "title": "Deus ou deusa de alguma mitologia",
+  "total": 620,
+  "obvious": "Deus",
+  "rare": [
+   "Enódia",
+   "Éolo",
+   "Fames"
+  ],
+  "v": "283304dbbd"
+ },
+ {
+  "id": "criatura-mitologica",
+  "title": "Criatura mitológica ou lendária",
+  "total": 1164,
+  "obvious": "Anjo",
+  "rare": [
+   "Telo",
+   "Tralalero Tralala",
+   "Valravn"
+  ],
+  "v": "fc52b5233d"
+ },
+ {
+  "id": "personagem-biblico",
+  "title": "Personagem da Bíblia",
+  "total": 161,
+  "obvious": "Jesus",
+  "rare": [
+   "Priscila e Áquila",
+   "Balaão",
+   "Amom de Judá"
+  ],
+  "v": "93b89775d8"
+ },
+ {
+  "id": "santo",
+  "title": "Santo ou santa",
+  "total": 1092,
+  "obvious": "Agostinho de Hipona",
+  "rare": [
+   "Helena de Skövde",
+   "Inês da Boêmia",
+   "Ingrid de Skänninge"
+  ],
+  "v": "b9ab5cabee"
+ },
+ {
+  "id": "papa",
+  "title": "Papa",
+  "total": 269,
+  "obvious": "Papa Francisco",
+  "rare": [
+   "Papa João XIV",
+   "Papa Leão V",
+   "Papa Marcelo I"
+  ],
+  "v": "fcd79ce3ff"
+ },
+ {
+  "id": "imperador-romano",
+  "title": "Imperador romano",
+  "total": 104,
+  "obvious": "Augusto",
+  "rare": [
+   "Macriano",
+   "Esponsiano",
+   "Jotapiano"
+  ],
+  "v": "707bde1adb"
+ },
+ {
+  "id": "presidente-eua",
+  "title": "Presidente dos EUA",
+  "total": 46,
+  "obvious": "Donald Trump",
+  "rare": [
+   "Warren G. Harding",
+   "William McKinley",
+   "Zachary Taylor"
+  ],
+  "v": "1d34bce0a8"
+ },
+ {
+  "id": "farao",
+  "title": "Faraó do Egito",
+  "total": 275,
+  "obvious": "Alexandre, o Grande",
+  "rare": [
+   "Ameni Quemau",
+   "Elefante",
+   "Hedju-Hor"
+  ],
+  "v": "0e8010a503"
+ },
+ {
+  "id": "filosofo",
+  "title": "Filósofo ou filósofa",
+  "total": 2156,
+  "obvious": "Albert Einstein",
+  "rare": [
+   "Gilbert Cesbron",
+   "Hwang Jin-yi",
+   "Ibne Alcátibe"
+  ],
+  "v": "a9cd35679f"
+ },
+ {
+  "id": "cientista",
+  "title": "Cientista famoso",
+  "total": 2478,
+  "obvious": "Albert Einstein",
+  "rare": [
+   "Andreas Sigismund Marggraf",
+   "Annie Maunder",
+   "August Ludwig von Schlözer"
+  ],
+  "v": "12ae5395d1"
+ },
+ {
+  "id": "astronauta",
+  "title": "Astronauta",
+  "total": 666,
+  "obvious": "Neil Armstrong",
+  "rare": [
+   "Reinhold Ewald",
+   "Robert Gilruth",
+   "Sherwood Spring"
+  ],
+  "v": "6bda237260"
+ },
+ {
+  "id": "inventor",
+  "title": "Inventor ou inventora",
+  "total": 920,
+  "obvious": "Albert Einstein",
+  "rare": [
+   "Rudolf Hell",
+   "Sarah E. Goode",
+   "Thomas Eugene Kurtz"
+  ],
+  "v": "e58f167dda"
+ },
+ {
+  "id": "explorador",
+  "title": "Explorador ou navegador",
+  "total": 838,
+  "obvious": "Charles Darwin",
+  "rare": [
+   "Nicolás de Ovando",
+   "Robert Dudley",
+   "Sixto de Bourbon-Parma"
+  ],
+  "v": "8b23870d82"
+ },
+ {
+  "id": "religiao",
+  "title": "Religião",
+  "total": 99,
+  "obvious": "Cristianismo",
+  "rare": [
+   "Religião minoica",
+   "Vodu da Luisiana",
+   "Cruz coroada"
+  ],
+  "v": "fcf268c346"
+ },
+ {
+  "id": "danca-do-mundo",
+  "title": "Dança do mundo (sem brasileiras)",
+  "total": 1580,
+  "obvious": "Balé",
+  "rare": [
+   "Dança do cavalo-marinho",
+   "Dança dos Países Baixos",
+   "Dança profética"
+  ],
+  "v": "626ec539ea"
+ },
+ {
+  "id": "esporte",
+  "title": "Esporte",
+  "total": 398,
+  "obvious": "Futebol",
+  "rare": [
+   "Esqui de montanha",
+   "Haidong gumdo",
+   "IQFoil"
+  ],
+  "v": "77324636e1"
+ },
+ {
+  "id": "arte-marcial",
+  "title": "Arte marcial ou luta",
+  "total": 166,
+  "obvious": "Judo",
+  "rare": [
+   "Jidokwan",
+   "Jigen-ryu",
+   "Shukokai"
+  ],
+  "v": "bb18a3baf5"
+ },
+ {
+  "id": "jogador-estrangeiro",
+  "title": "Jogador de futebol estrangeiro",
+  "total": 3000,
+  "obvious": "Lionel Messi",
+  "rare": [
+   "Dixie Dean",
+   "Dominic Adiyiah",
+   "Eran Zahavi"
+  ],
+  "v": "e4e3e7de11"
+ },
+ {
+  "id": "basquete",
+  "title": "Jogador ou jogadora de basquete",
+  "total": 1993,
+  "obvious": "Michael Jordan",
+  "rare": [
+   "Ian Vougioukas",
+   "Isaïa Cordinier",
+   "Işıl Alben"
+  ],
+  "v": "9f4a79b23c"
+ },
+ {
+  "id": "tenista",
+  "title": "Tenista",
+  "total": 1630,
+  "obvious": "Roger Federer",
+  "rare": [
+   "Eustace Miles",
+   "Gail Chanfreau",
+   "George Lott"
+  ],
+  "v": "e6768d367c"
+ },
+ {
+  "id": "piloto-f1",
+  "title": "Piloto de Fórmula 1",
+  "total": 884,
+  "obvious": "Michael Schumacher",
+  "rare": [
+   "Tony Settember",
+   "Albert Scherrer",
+   "Aldo Gordini"
+  ],
+  "v": "b4cca34048"
+ },
+ {
+  "id": "lutador-mma",
+  "title": "Lutador ou lutadora de MMA",
+  "total": 676,
+  "obvious": "Andrew Tate",
+  "rare": [
+   "Valérie Létourneau",
+   "Yan Xiaonan",
+   "Adriano Martins"
+  ],
+  "v": "8bbdd89054"
+ },
+ {
+  "id": "time-europeu",
+  "title": "Time de futebol europeu",
+  "total": 156,
+  "obvious": "Barcelona",
+  "rare": [
+   "Málaga",
+   "Getafe",
+   "Girona"
+  ],
+  "v": "f7c9a4472f"
+ },
+ {
+  "id": "estadio",
+  "title": "Estádio",
+  "total": 1163,
+  "obvious": "Coliseu",
+  "rare": [
+   "Estádio Suphachalasai",
+   "Estádio Taïeb Mhiri",
+   "Estádio Ticha"
+  ],
+  "v": "c0daa7e952"
+ },
+ {
+  "id": "jogo-tabuleiro",
+  "title": "Jogo de tabuleiro ou de cartas",
+  "total": 181,
+  "obvious": "Xadrez",
+  "rare": [
+   "Afrika Korps",
+   "Anachronism",
+   "Béstia"
+  ],
+  "v": "9032da7122"
+ },
+ {
+  "id": "especialidade-medica",
+  "title": "Especialidade médica (como \"dermatologia\")",
+  "total": 55,
+  "obvious": "Psiquiatria",
+  "rare": [
+   "Patologia Clínica",
+   "Cirurgia da Mão",
+   "Cirurgia do Aparelho Digestivo"
+  ],
+  "v": "c832078fa2"
+ },
+ {
+  "id": "profissao",
+  "title": "Profissão",
+  "total": 781,
+  "obvious": "Ator",
+  "rare": [
+   "Köçek",
+   "Moralistas franceses",
+   "Neurocientista"
+  ],
+  "v": "0545eb72ee"
+ },
+ {
+  "id": "doenca",
+  "title": "Doença",
+  "total": 377,
+  "obvious": "Síndrome da imunodeficiência adquirida",
+  "rare": [
+   "Miosite por corpúsculos de inclusão",
+   "Neoplasia endócrina múltipla do tipo 1",
+   "Síndrome de Aicardi-Goutières"
+  ],
+  "v": "681d6651bb"
+ },
+ {
+  "id": "fobia",
+  "title": "Fobia",
+  "total": 102,
+  "obvious": "Agorafobia",
+  "rare": [
+   "Mirmecofobia",
+   "Ancraofobia",
+   "Parcopresis"
+  ],
+  "v": "281b6fa1eb"
+ },
+ {
+  "id": "osso",
+  "title": "Osso do corpo humano",
+  "total": 98,
+  "obvious": "Costela",
+  "rare": [
+   "Osso dos Libombos",
+   "Tibiotarso",
+   "Penghu 1"
+  ],
+  "v": "5992fed1a7"
+ },
+ {
+  "id": "musculo",
+  "title": "Músculo do corpo humano",
+  "total": 202,
+  "obvious": "Músculo diafragma",
+  "rare": [
+   "Músculo semiespinal da cabeça",
+   "Músculo vasto intermédio",
+   "Músculo bulbocavernoso"
+  ],
+  "v": "cfca01995b"
+ },
+ {
+  "id": "orgao",
+  "title": "Órgão do corpo humano",
+  "total": 927,
+  "obvious": "Olho",
+  "rare": [
+   "Músculo transverso profundo do períneo",
+   "Músculo transverso superficial do períneo",
+   "Nervo cutâneo medial do antebraço"
+  ],
+  "v": "e55f9ae7dc"
+ },
+ {
+  "id": "elemento-quimico",
+  "title": "Elemento químico",
+  "total": 124,
+  "obvious": "Ferro",
+  "rare": [
+   "Itérbio",
+   "Nobélio",
+   "Seabórgio"
+  ],
+  "v": "c0d67e82c5"
+ },
+ {
+  "id": "remedio",
+  "title": "Remédio (nome do princípio ativo)",
+  "total": 142,
+  "obvious": "Ácido acetilsalicílico",
+  "rare": [
+   "Glibenclamida",
+   "Sitagliptina",
+   "Dapagliflozina"
+  ],
+  "v": "9b0d66b6f6"
+ },
+ {
+  "id": "marca-carro",
+  "title": "Marca de carro",
+  "total": 325,
+  "obvious": "Toyota",
+  "rare": [
+   "Shineray",
+   "Thames Ironworks and Shipbuilding Company",
+   "Thomas Built Buses"
+  ],
+  "v": "ecded7d4a0"
+ },
+ {
+  "id": "modelo-carro",
+  "title": "Modelo de carro",
+  "total": 2300,
+  "obvious": "Ford Model T",
+  "rare": [
+   "Mercury Marauder",
+   "Mercury Montego",
+   "MG ZS"
+  ],
+  "v": "dde6144070"
+ },
+ {
+  "id": "fast-food",
+  "title": "Rede de fast-food",
+  "total": 99,
+  "obvious": "McDonald's",
+  "rare": [
+   "China in Box",
+   "Fuzzy's Taco Shop",
+   "Juice It Up!"
+  ],
+  "v": "1717df05a6"
+ },
+ {
+  "id": "coquetel",
+  "title": "Drinque ou coquetel",
+  "total": 76,
+  "obvious": "Mojito",
+  "rare": [
+   "Jagertee",
+   "Tamagozake",
+   "Tuxedo"
+  ],
+  "v": "bb0614ac17"
+ },
+ {
+  "id": "queijo",
+  "title": "Queijo",
+  "total": 155,
+  "obvious": "Mozarela",
+  "rare": [
+   "Queijo Sardo",
+   "Zefati",
+   "Queijo canastra"
+  ],
+  "v": "858dfcce02"
+ },
+ {
+  "id": "pao",
+  "title": "Tipo de pão",
+  "total": 147,
+  "obvious": "Rosquinha",
+  "rare": [
+   "Mola salsa",
+   "Rosca",
+   "Tebirkes"
+  ],
+  "v": "497263ac8f"
+ },
+ {
+  "id": "sobremesa",
+  "title": "Sobremesa ou doce",
+  "total": 191,
+  "obvious": "Sorvete",
+  "rare": [
+   "Cream cracker",
+   "Goldfish",
+   "Mantecado"
+  ],
+  "v": "4e6585bfdc"
+ },
+ {
+  "id": "bebida-alcoolica",
+  "title": "Bebida alcoólica",
+  "total": 394,
+  "obvious": "Cerveja",
+  "rare": [
+   "Amontillado",
+   "Bagaceira",
+   "Bee's knees"
+  ],
+  "v": "1611a011b1"
+ },
+ {
+  "id": "rede-social",
+  "title": "Rede social ou aplicativo",
+  "total": 211,
+  "obvious": "Facebook",
+  "rare": [
+   "Gettr",
+   "Google Jamboard",
+   "Mixi"
+  ],
+  "v": "a7bfcd8268"
+ },
+ {
+  "id": "linguagem-programacao",
+  "title": "Linguagem de programação",
+  "total": 182,
+  "obvious": "JavaScript",
+  "rare": [
+   "Modelica",
+   "Pike",
+   "Portlet"
+  ],
+  "v": "b10cb6320c"
+ },
+ {
+  "id": "roupa",
+  "title": "Peça de roupa",
+  "total": 1651,
+  "obvious": "Sapato",
+  "rare": [
+   "Confraria de Belchite",
+   "Coroa de Coroação de Jorge IV",
+   "Coroa de Estado de Jorge I"
+  ],
+  "v": "da14c60627"
+ },
+ {
+  "id": "movel",
+  "title": "Móvel (de casa)",
+  "total": 293,
+  "obvious": "Cadeira",
+  "rare": [
+   "Banco ritual taíno",
+   "Globo de Matelica",
+   "Mesa de camilha"
+  ],
+  "v": "0d90575cd6"
+ },
+ {
+  "id": "utensilio-cozinha",
+  "title": "Utensílio de cozinha",
+  "total": 181,
+  "obvious": "Colher",
+  "rare": [
+   "Tangia",
+   "Cálice de Derrynaflan",
+   "Guampa"
+  ],
+  "v": "7bbde9b00c"
+ },
+ {
+  "id": "ferramenta",
+  "title": "Ferramenta",
+  "total": 87,
+  "obvious": "Machado",
+  "rare": [
+   "Escada",
+   "Roçadeira",
+   "Micrômetro"
+  ],
+  "v": "ad17cbc3f7"
+ },
+ {
+  "id": "cor",
+  "title": "Cor",
+  "total": 149,
+  "obvious": "Vermelho",
+  "rare": [
+   "Gema",
+   "Azul-ultramar",
+   "Nude"
+  ],
+  "v": "8e6aa160fc"
+ },
+ {
+  "id": "unidade-medida",
+  "title": "Unidade de medida",
+  "total": 83,
+  "obvious": "Dia",
+  "rare": [
+   "Decibel",
+   "Lúmen",
+   "Tesla"
+  ],
+  "v": "775c358f71"
+ },
+ {
+  "id": "grife",
+  "title": "Grife ou marca de moda",
+  "total": 148,
+  "obvious": "Adidas",
+  "rare": [
+   "Reserva",
+   "Dudalina",
+   "Ellus"
+  ],
+  "v": "b7dda1592e"
+ }
+]

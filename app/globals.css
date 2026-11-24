@@ -210,6 +210,73 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* Incomum: um brilho correndo pelos pontos da faixa Raríssima. */
+.shimmer-text {
+  background: linear-gradient(100deg, #fff 30%, #a5f3fc 44%, #fde047 50%, #fff 64%) 0 0 / 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 1.6s linear infinite;
+}
+@keyframes shimmer {
+  to { background-position: -250% 0; }
+}
+/* Incomum: o mar. Algas e raios de sol balançando, ondas correndo, luzinhas piscando no fundo. */
+.animate-sway {
+  animation: sway 5s ease-in-out infinite alternate;
+}
+@keyframes sway {
+  from { rotate: -4deg; }
+  to { rotate: 4deg; }
+}
+.animate-waves {
+  animation: waves 7s linear infinite;
+}
+@keyframes waves {
+  to { transform: translateX(-50%); }
+}
+.animate-twinkle {
+  animation: twinkle 2.4s ease-in-out infinite;
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.25; scale: 0.7; }
+  50% { opacity: 1; scale: 1.15; }
+}
+.animate-glow {
+  animation: glow 1.6s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes glow {
+  0%, 100% { opacity: 0.6; scale: 0.9; }
+  50% { opacity: 1; scale: 1.12; }
+}
+/* O submarino boiando; `--tilt` inclina o nariz no mergulho. */
+.animate-bob {
+  animation: bob 3.2s ease-in-out infinite;
+}
+@keyframes bob {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -8px; }
+}
+.animate-swim-in {
+  animation: swim-in 700ms cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes swim-in {
+  from { opacity: 0; translate: 80px 10px; scale: 0.7; }
+  to { opacity: 1; translate: 0 0; scale: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shimmer-text,
+  .animate-sway,
+  .animate-waves,
+  .animate-twinkle,
+  .animate-glow,
+  .animate-bob,
+  .animate-swim-in { animation: none; }
+}
+
 /*
  * Troca de painel (components/ui/glide-swap.tsx), do Microkit · Blur Glide Menu: o que sai desliza
  * para um lado desfocando, o que entra vem do outro e foca. `--swap-dir`: 1 para a direita, -1 para

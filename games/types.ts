@@ -85,6 +85,13 @@ export interface GameEngine<P = unknown, A = unknown, F = unknown> {
   describeAnswer(answer: A): string;
   /** Jogos por pontos: o total que o desafio vale, base da Nota (veja `gradePlay`). */
   maxPoints?(puzzle: P): number;
+  /**
+   * Baixa o que o desafio do dia precisa para `checkGuess` (jogo com respostas grandes demais para
+   * irem todas no bundle). O serviço de partidas espera por ele antes de abrir a partida.
+   */
+  prepare?(dateKey: string): Promise<void>;
+  /** Se `prepare` já terminou para o dia; enquanto não, a partida não abre durante o render. */
+  isReady?(dateKey: string): boolean;
 }
 
 export interface GameMeta<R extends GameRules = GameRules> {
@@ -107,6 +114,12 @@ export interface GameMeta<R extends GameRules = GameRules> {
   modeLabel?: string;
   /** O tabuleiro já mostra a resposta no fim; o resultado não repete o "Era …". */
   hideAnswer?: boolean;
+  /** Frase do resultado de quem termina, no lugar da padrão do tipo de jogo ("Achou todas!"). */
+  wonHeadline?: string;
+  /** Cabeçalho da página numa linha só e menor, para o tabuleiro ocupar a tela (ex.: Incomum). */
+  compactHeader?: boolean;
+  /** Quanto esperar a última jogada animar antes de abrir o resultado (padrão: 1,7 s). */
+  resultDelayMs?: number;
   /** Dia em que o jogo entrou no site (YYYY-MM-DD). Sem ele, a estreia do Rodada (EPOCH_DATE). */
   launchedOn?: string;
   howToPlay: string[];

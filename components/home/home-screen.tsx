@@ -9,7 +9,7 @@ import type { GameMeta } from "@/games/types";
 import { GameVideo } from "@/components/game/game-preview";
 import { HoverGlideGroup } from "@/components/microkit/hover-glide-cards";
 import { StreakFlame } from "@/components/streak/streak-flame";
-import { challengeNumber } from "@/lib/daily/date";
+import { challengeNumber, daysBetween } from "@/lib/daily/date";
 import { useRound } from "@/lib/plays/hooks";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
@@ -38,6 +38,8 @@ export function HomeScreen() {
           <StreakFlame />
         </div>
 
+        {today && <NewGameHero metas={round.map((r) => r.meta)} today={today} className="mt-8" />}
+
         <HoverGlideGroup label={t.nav.games} className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {round.map(({ meta }) => (
             <GameTile key={meta.slug} meta={meta} />
@@ -46,6 +48,63 @@ export function HomeScreen() {
       </section>
 
     </div>
+  );
+}
+
+/** Por quantos dias depois da estreia o jogo novo fica em destaque na home. */
+const NEW_GAME_DAYS = 21;
+
+/**
+ * Destaque do jogo mais novo, nas primeiras semanas depois da estreia: o nome e a chamada à esquerda
+ * e o vídeo do jogo tocando à direita, na cor do jogo. Sem jogo novo, não aparece.
+ */
+function NewGameHero({ metas, today, className }: { metas: GameMeta[]; today: string; className?: string }) {
+  const meta = metas
+    .filter((m) => m.launchedOn && m.launchedOn <= today && daysBetween(m.launchedOn, today) < NEW_GAME_DAYS)
+    .sort((a, b) => b.launchedOn!.localeCompare(a.launchedOn!))[0];
+  if (!meta) return null;
+  return (
+    <Link
+      href={`/${meta.slug}`}
+      onPointerEnter={() => preloadEngine(meta.slug)}
+      className={cn(
+        "group grid items-center gap-5 overflow-hidden rounded-2xl border-2 bg-background p-5 outline-none sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] sm:p-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,400px)] lg:gap-8",
+        "transition-shadow duration-500 focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        className,
+      )}
+      // Fundo da página, contorno na cor do jogo e um brilho dela atrás, mais forte com o mouse em cima.
+      style={{
+        borderColor: meta.color,
+        boxShadow: `0 0 48px -14px ${meta.color}`,
+      }}
+    >
+      <div className="flex flex-col items-start gap-3">
+        <span
+          className="rounded-full px-2.5 py-0.5 text-[11px] font-bold tracking-wider text-white uppercase"
+          style={{ background: meta.color }}
+        >
+          {t.home.newGame}
+        </span>
+        <div>
+          <h2 className="font-display text-4xl leading-[0.95] sm:text-5xl" style={{ color: meta.color }}>
+            {meta.name}
+          </h2>
+          <p className="mt-2 font-semibold leading-snug">{meta.tagline}</p>
+          <p className="mt-1.5 max-w-[46ch] text-sm leading-relaxed text-muted-foreground">{meta.description}</p>
+        </div>
+        <span
+          className="inline-flex items-center gap-2 rounded-full py-2 pr-3.5 pl-4 text-sm font-bold text-white transition-transform duration-300 group-hover:translate-x-0.5"
+          style={{ background: meta.color }}
+        >
+          {t.home.playNow} <ArrowRight size={16} />
+        </span>
+      </div>
+      <GameVideo
+        slug={meta.slug}
+        playing
+        className="rounded-xl shadow-2xl shadow-black/30 ring-1 ring-border transition-transform duration-500 ease-[cubic-bezier(.22,1,.36,1)] group-hover:-rotate-1 group-hover:scale-[1.02]"
+      />
+    </Link>
   );
 }
 

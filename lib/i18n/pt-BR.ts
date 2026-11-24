@@ -23,6 +23,8 @@ export const ptBR = {
     streakDays: (n: number) => (n === 1 ? "dia seguido" : "dias seguidos"),
     play: "Jogar",
     history: "Últimos 14 dias",
+    newGame: "Novo jogo",
+    playNow: "Jogar agora",
   },
   status: {
     play: "Jogar",

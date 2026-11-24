@@ -118,8 +118,15 @@ function openPlay(engine: GameEngine, slug: string, dateKey: string, practice: b
   return toView(slug, dateKey, puzzle, practice, stored);
 }
 
+/** A engine, com o que o desafio do dia precisa já baixado (veja `GameEngine.prepare`). */
+async function engineFor(slug: string, dateKey: string): Promise<GameEngine> {
+  const engine = await loadEngine(slug);
+  await engine.prepare?.(dateKey);
+  return engine;
+}
+
 export async function startPlay(slug: string, dateKey: string, practice = false): Promise<PlayView> {
-  return openPlay(await loadEngine(slug), slug, dateKey, practice);
+  return openPlay(await engineFor(slug, dateKey), slug, dateKey, practice);
 }
 
 /**
@@ -128,7 +135,9 @@ export async function startPlay(slug: string, dateKey: string, practice = false)
  */
 export function peekPlay(slug: string, dateKey: string, practice = false): PlayView | null {
   const engine = peekEngine(slug);
-  return engine ? openPlay(engine, slug, dateKey, practice, false) : null;
+  // Sem as respostas do dia, refazer as jogadas salvas falharia: espera o `startPlay`.
+  if (!engine || engine.isReady?.(dateKey) === false) return null;
+  return openPlay(engine, slug, dateKey, practice, false);
 }
 
 /**
@@ -144,7 +153,7 @@ export async function closeStalePlays(today: string): Promise<void> {
   for (const { slug, dateKey } of stale) {
     const game = getGame(slug);
     if (!game) continue;
-    const engine = await loadEngine(slug);
+    const engine = await engineFor(slug, dateKey);
     // Relê depois do await: outra aba (ou a própria tela) pode ter fechado a partida nesse meio-tempo.
     const stored = dailyStore.getPlay(slug, dateKey);
     if (stored?.status !== "playing") continue;
@@ -157,7 +166,7 @@ export async function closeStalePlays(today: string): Promise<void> {
 /** Jogos com tempo: cria a partida e começa o relógio. */
 export async function beginPlay(slug: string, dateKey: string, practice = false): Promise<PlayView> {
   const store = storeFor(practice);
-  const engine = await loadEngine(slug);
+  const engine = await engineFor(slug, dateKey);
   const { puzzle } = engine.createChallenge(dateKey);
   const existing = store.getPlay(slug, dateKey);
   if (existing) return toView(slug, dateKey, puzzle, practice, existing);
@@ -170,7 +179,7 @@ export async function beginPlay(slug: string, dateKey: string, practice = false)
 /** Encerra a partida antes da hora: tempo esgotado (jogos com tempo), parar de jogar (pontos) ou desistência. */
 export async function finishPlay(slug: string, dateKey: string, practice = false): Promise<PlayView> {
   const store = storeFor(practice);
-  const engine = await loadEngine(slug);
+  const engine = await engineFor(slug, dateKey);
   const { puzzle, answer } = engine.createChallenge(dateKey);
   const rules = rulesOf(slug);
   const status = giveUpStatus(rules);
@@ -187,7 +196,7 @@ export async function submitGuess(
 ): Promise<{ error: string } | { play: PlayView }> {
   const store = storeFor(practice);
   const rules = rulesOf(slug);
-  const engine = await loadEngine(slug);
+  const engine = await engineFor(slug, dateKey);
   const { puzzle, answer } = engine.createChallenge(dateKey);
   const existing = store.getPlay(slug, dateKey);
   if (rules.type === "timed" && !existing) return { error: "O relógio ainda não começou" };

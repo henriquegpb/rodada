@@ -17,6 +17,7 @@
     "data:ordem": "tsx scripts/build-ordem.ts",
     "data:escala": "tsx scripts/build-escala.ts",
     "data:trilha": "tsx scripts/build-trilha.ts",
+    "data:incomum": "tsx scripts/build-incomum.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:recompute": "tsx scripts/recompute-scores.ts"
