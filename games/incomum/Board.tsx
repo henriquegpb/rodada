@@ -1,7 +1,7 @@
 "use client";
 
 import { type CSSProperties, useEffect, useEffectEvent, useRef, useState } from "react";
-import { ArrowDown, Check, SkipForward } from "lucide-react";
+import { ArrowDown, Check, Play, SkipForward } from "lucide-react";
 import { toast } from "sonner";
 import { FocusInput } from "@/components/microkit/focus-input";
 import { cn } from "@/lib/utils";
@@ -71,6 +71,15 @@ function clockStart(key: string): number {
   }
 }
 
+/** O relógio da categoria já começou (a pessoa recarregou a página no meio da partida)? */
+function clockStarted(key: string): boolean {
+  try {
+    return Number(localStorage.getItem(key)) > 0;
+  } catch {
+    return false;
+  }
+}
+
 function clearClock(key: string) {
   try {
     localStorage.removeItem(key);
@@ -102,10 +111,16 @@ export function IncomumBoard({ play, submitGuess }: BoardProps<IncomumPuzzle, In
   } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const nextRef = useRef<HTMLButtonElement>(null);
+  const startRef = useRef<HTMLButtonElement>(null);
+  /**
+   * Como no Mundo, a partida só começa no "Começar": até lá o oxigênio não corre e a primeira
+   * categoria fica borrada. Quem já respondeu ou já tinha começado (e recarregou) não vê de novo.
+   */
+  const [started, setStarted] = useState(() => play.guesses.length > 0 || clockStarted(clockKey(play, 0)));
   const timedOut = useRef(-1);
   usePreloadNotes();
 
-  const timing = playing && reveal === null && current < categories.length;
+  const timing = started && playing && reveal === null && current < categories.length;
   const key = clockKey(play, current);
 
   // Começa (ou retoma) o relógio da categoria da vez e bate a cada 100 ms.
@@ -177,6 +192,10 @@ export function IncomumBoard({ play, submitGuess }: BoardProps<IncomumPuzzle, In
   function next() {
     setReveal(null);
   }
+
+  useEffect(() => {
+    if (!started) startRef.current?.focus({ preventScroll: true });
+  }, [started]);
 
   // Foco sem rolar a página: no campo quando a categoria começa, no "Próximo" quando o mergulho acaba.
   useEffect(() => {
@@ -342,6 +361,27 @@ export function IncomumBoard({ play, submitGuess }: BoardProps<IncomumPuzzle, In
         )}
 
         <TrenchRuler points={pointsHere} className="absolute top-44 right-3 bottom-6 z-10 w-6 sm:right-6 sm:w-36" />
+
+        {!started && playing && (
+          <div className="absolute inset-0 z-30 grid place-items-center bg-black/35 px-6 text-center backdrop-blur-xl">
+            <div>
+              <p className="font-display text-3xl">
+                {categories.length} categorias · {SECONDS} s cada
+              </p>
+              <p className="mt-2 text-sm opacity-85">O oxigênio começa a contar quando você clicar.</p>
+              <button
+                ref={startRef}
+                type="button"
+                onClick={() => setStarted(true)}
+                className="mt-5 inline-flex h-12 items-center gap-2 rounded-md px-6 font-semibold text-white outline-offset-2 transition-[filter,transform] hover:brightness-110 focus-visible:outline-2 active:scale-[0.98]"
+                // Contorno de foco na cor do jogo, um pouco mais clara para aparecer no fundo escuro.
+                style={{ background: COLOR, outlineColor: `color-mix(in oklab, ${COLOR} 60%, white)` }}
+              >
+                <Play size={18} className="fill-current" /> Começar
+              </button>
+            </div>
+          </div>
+        )}
       </Ocean>
 
       <div className="flex flex-col gap-1">
@@ -388,12 +428,13 @@ export function IncomumBoard({ play, submitGuess }: BoardProps<IncomumPuzzle, In
                 autoCorrect="off"
                 spellCheck={false}
                 enterKeyHint="go"
+                disabled={!started}
                 className="h-14 text-lg"
                 style={{ "--focus-color": COLOR } as CSSProperties}
               />
               <button
                 type="submit"
-                disabled={!typed.trim() || busy}
+                disabled={!typed.trim() || busy || !started}
                 className="flex h-14 shrink-0 items-center gap-2 rounded-xl px-4 font-bold text-white transition-opacity disabled:opacity-50 sm:px-6"
                 style={{ background: COLOR }}
               >
@@ -432,8 +473,8 @@ export function IncomumBoard({ play, submitGuess }: BoardProps<IncomumPuzzle, In
               <button
                 type="button"
                 onClick={() => send(SKIP)}
-                disabled={busy}
-                className="flex h-10 shrink-0 items-center gap-1.5 rounded-md px-3 text-sm font-semibold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                disabled={busy || !started}
+                className="flex h-10 shrink-0 items-center gap-1.5 rounded-md px-3 text-sm font-semibold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground disabled:opacity-50"
               >
                 <SkipForward size={15} /> Pular
                 <span className={cn(suggestion && "hidden sm:inline")}>(vale 0)</span>
