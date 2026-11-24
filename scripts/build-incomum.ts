@@ -264,14 +264,23 @@ async function entities(ids: string[]): Promise<Map<string, Entity>> {
 async function ofClasses(ids: string[], classes: string[]): Promise<Set<string>> {
   const out = new Set<string>();
   const values = classes.map((c) => `wd:${c}`).join(" ");
-  await mapLimit(chunk([...new Set(ids)], 150), 2, async (batch) => {
-    const rows = await sparql(
-      `SELECT DISTINCT ?x WHERE { VALUES ?x { ${batch.map((id) => `wd:${id}`).join(" ")} }
-         VALUES ?c { ${values} }
-         { ?x wdt:P31/wdt:P279* ?c } UNION { ?x wdt:P279+ ?c } }`,
-    );
-    for (const row of rows) out.add(qidOf(row.x));
-  });
+  const check = async (batch: string[]): Promise<void> => {
+    try {
+      const rows = await sparql(
+        `SELECT DISTINCT ?x WHERE { VALUES ?x { ${batch.map((id) => `wd:${id}`).join(" ")} }
+           VALUES ?c { ${values} }
+           { ?x wdt:P31/wdt:P279* ?c } UNION { ?x wdt:P279+ ?c } }`,
+      );
+      for (const row of rows) out.add(qidOf(row.x));
+    } catch (err) {
+      // Lote que estoura o tempo (personagem de ficção tem árvore de tipos funda): metade de cada vez.
+      if (batch.length <= 20) throw err;
+      const half = Math.ceil(batch.length / 2);
+      await check(batch.slice(0, half));
+      await check(batch.slice(half));
+    }
+  };
+  await mapLimit(chunk([...new Set(ids)], 150), 2, check);
   return out;
 }
 
@@ -639,12 +648,21 @@ async function buildCategory(spec: CategorySpec) {
     // Item sem nome em português nem inglês: ninguém vai digitar.
     if (!name) return [];
     const pt = e?.sitelinks.ptwiki;
-    const raw = [
+    const all = [
       name,
       ...(c.extraNames ?? []),
       ...(e ? [...LANGS.map((l) => e.labels[l]), ...e.aliases] : []),
       ...(pt ? [pt] : []),
     ];
+    // Nomes curtos da categoria ("Rio Tietê" → "Tietê"), como respostas exatas. Vêm logo depois do
+    // nome: o arquivo só guarda os primeiros apelidos, e o curto é o que o povo digita.
+    const shorts = all.flatMap((full) =>
+      (spec.shortNames ?? []).flatMap((rule) => {
+        const short = full?.replace(rule, "").trim();
+        return short && short !== full && short.length >= 3 ? [short] : [];
+      }),
+    );
+    const raw = [name, ...shorts, ...all.slice(1)];
     const seen = new Set<string>();
     const names = raw.filter((n): n is string => {
       if (!n) return false;
@@ -667,8 +685,15 @@ async function buildCategory(spec: CategorySpec) {
   if (spec.ordered) {
     // Lista escrita da mais comum à menos comum: vale o mais comum entre a posição na lista e a fama
     // (serrote tem pouca Wikipédia, mas todo mundo fala; tesoura vem tarde na lista, mas é famosa).
+    // Com "list", a lista inteira vem antes, na ordem dela, e o resto depois, pela fama: a Xuxa tem
+    // canal e muita Wikipédia, mas ninguém lembra dela como youtuber.
     const fameRank = new Map([...items].sort(byFame).map((item, i) => [item, i]));
-    const score = (item: (typeof items)[number]) => Math.min(item.listIndex, fameRank.get(item)!);
+    const score = (item: (typeof items)[number]) =>
+      spec.ordered === "list"
+        ? item.listIndex !== Infinity
+          ? item.listIndex
+          : items.length + fameRank.get(item)!
+        : Math.min(item.listIndex, fameRank.get(item)!);
     items.sort((a, b) => score(a) - score(b) || fameRank.get(a)! - fameRank.get(b)!);
   } else {
     // Nome da lista à mão é o que todo mundo fala: nunca passa do recife (os primeiros 15%). Pesa
@@ -726,6 +751,7 @@ function writeIndex() {
       rare: items.slice(first, first + 3).map((i) => i[0]),
       // Muda quando o arquivo muda: o navegador não usa a versão velha do cache.
       v: createHash("sha1").update(text).digest("hex").slice(0, 10),
+      ...(spec.since && { since: spec.since }),
     });
   }
   // Categoria tirada da lista: o arquivo sai junto.
