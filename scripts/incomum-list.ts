@@ -6,6 +6,58 @@
  * Wikipédias com artigo sobre o item, para ficar no que alguém pode lembrar.
  */
 
+import {
+  BEBIDAS_SEM_ALCOOL,
+  BISCOITOS_SALGADINHOS,
+  CERVEJAS,
+  COMIDAS_BRASILEIRAS,
+  DANCAS,
+  DOCES_DE_MARCA,
+  FAST_FOOD,
+  FESTA_JUNINA,
+  FRUTAS,
+  SOBREMESAS,
+} from "./incomum-lists/consumo";
+import { MEDALHISTAS_OLIMPICOS, TECNICOS_FUTEBOL, TIMES_BRASILEIROS } from "./incomum-lists/esporte";
+import {
+  APPS,
+  BANCOS,
+  DOENCAS,
+  EMPRESAS_BRASILEIRAS,
+  LOJAS,
+  MARCAS_TECNOLOGIA,
+  PROFISSOES,
+  PROGRAMAS_TV,
+} from "./incomum-lists/geral";
+import {
+  ESTADOS_BRASIL,
+  FILMES_DISNEY_PIXAR,
+  FLORES,
+  MUSICAS_BRASILEIRAS,
+  PONTOS_TURISTICOS_BRASIL,
+  PONTOS_TURISTICOS_MUNDO,
+  PRAIAS_EXTRA,
+  PRESIDENTES_BRASIL,
+  TIMES_NBA,
+} from "./incomum-lists/lugares";
+import {
+  APRESENTADORES,
+  ATORES_HOLLYWOOD,
+  FUNK,
+  HARRY_POTTER,
+  HUMORISTAS,
+  JOGADORES_SELECAO,
+  PARTICIPANTES_BBB,
+  PERSONAGENS_DISNEY,
+  PINTORES,
+  SERTANEJO,
+  SIMPSONS,
+  SITIO_PICAPAU,
+  TURMA_DA_MONICA,
+  VILOES,
+  YOUTUBERS,
+} from "./incomum-lists/pessoas";
+
 export type Source =
   /** Consulta ao Wikidata; devolve ?x e, se quiser, ?pop (popularidade no lugar das visitas). */
   | { kind: "sparql"; query: string; optional?: boolean }
@@ -51,9 +103,20 @@ export interface CategorySpec {
   anyRank?: boolean;
   /**
    * A lista à mão vem da mais comum à menos comum, e a ordem conta junto com a fama na Wikipédia
-   * (que erra em coisa do dia a dia: serrote quase não tem artigo pelo mundo).
+   * (que erra em coisa do dia a dia: serrote quase não tem artigo pelo mundo). "list": a lista vem
+   * inteira antes, na ordem dela, e o que veio de outra fonte fica depois, pela fama.
    */
-  ordered?: boolean;
+  ordered?: boolean | "list";
+  /**
+   * Nomes curtos que valem como resposta exata, tirando do nome o que a categoria já diz: "Rio
+   * Tietê" vale "Tietê", "Esporte Clube Bahia" vale "Bahia". Cada expressão é apagada do nome.
+   */
+  shortNames?: RegExp[];
+  /**
+   * Primeiro dia no sorteio (AAAA-MM-DD), para categoria criada depois da estreia do jogo: o sorteio
+   * usa a lista inteira, e uma categoria a mais mudaria os dias que já foram jogados.
+   */
+  since?: string;
 }
 
 // ---------- atalhos para as consultas ----------
@@ -107,8 +170,11 @@ function animal(id: string, title: string, common: string[][], ...sources: Sourc
   };
 }
 
-const BRAZILIAN = `?x wdt:P27 wd:Q155.`;
+/** Brasileiro: cidadão ou nascido no Brasil (o Wikidata dá ao Felipe Neto só a cidadania portuguesa). */
+const BRAZILIAN = `{ ?x wdt:P27 wd:Q155. } UNION { ?x wdt:P19/wdt:P17 wd:Q155. }`;
 const FOREIGN = `FILTER NOT EXISTS { ?x wdt:P27 wd:Q155 }`;
+/** Fora quem também tem uma destas profissões (o jogador que escreveu autobiografia não é escritor). */
+const NOT_ALSO = (...jobs: string[]) => `FILTER NOT EXISTS { ?x wdt:P106 ?also. VALUES ?also { ${values(jobs)} } }`;
 const FROM_BRAZIL = `?x wdt:P495|wdt:P17 wd:Q155.`;
 const IN_BRAZIL = `?x wdt:P17 wd:Q155.`;
 
@@ -147,12 +213,45 @@ const series = (id: string, title: string, genre: string | undefined, minVotes: 
 
 const simple = (id: string, title: string, ...sources: Source[]): CategorySpec => ({ id, title, sources });
 
+/** Estreia das categorias criadas depois do lançamento: os dias antes dela não mudam. */
+const SECOND_BATCH = "2026-11-25";
+const HUMAN = "Q5";
+const CHARACTER = "Q95074";
+const BRAND = ["Q431289", "Q43229", "Q2424752"];
+
+/**
+ * Gente: a lista à mão (da mais lembrada à menos) com as fontes do Wikidata e da Wikipédia. A lista
+ * vem antes: quem tem muita Wikipédia mas não é lembrado pela categoria (a Xuxa youtuber) fica raro.
+ */
+const people = (id: string, title: string, list: string, ...sources: Source[]): CategorySpec => ({
+  id,
+  title,
+  sources: [{ kind: "manual", items: n(list) }, ...sources],
+  // As categorias da Wikipédia também guardam canal, programa e edição de reality: só gente e banda.
+  classes: [HUMAN, Q.musicalGroup],
+  ordered: "list",
+});
+
+/** Categoria só da lista à mão, na ordem dela; `classes` escolhe o artigo certo ("Brahma" é o deus). */
+const listOnly = (id: string, title: string, list: string, classes?: string[]): CategorySpec => ({
+  id,
+  title,
+  sources: [{ kind: "manual", items: n(list) }],
+  ordered: "list",
+  since: SECOND_BATCH,
+  ...(classes && { classes }),
+});
+
 // ---------- bichos: os nomes do dia a dia ----------
 // No Wikidata os bichos são espécies com nome científico; "baleia", "macaco" e "cobra" são grupos, e
 // "cachorro" é subespécie. Aqui vão os nomes comuns (o primeiro aparece na tela; os outros, inclusive
 // o título do artigo na Wikipédia, também valem).
 
-const n = (list: string) => list.split(";").map((item) => item.split("|").map((name) => name.trim()));
+const n = (list: string) =>
+  list
+    .split(";")
+    .map((item) => item.split("|").map((name) => name.trim()))
+    .filter((item) => item[0]);
 
 const MAMIFEROS = n(
   "Cachorro|Cão;Gato;Cavalo;Vaca|Boi|Gado bovino;Porco|Suíno;Ovelha|Carneiro;Cabra|Bode;Coelho;Rato;Camundongo;Hamster;" +
@@ -439,6 +538,34 @@ const CRIATURAS = n(
     "Bruxa;Anjo;Demônio;Querubim;Serafim;Tritão (mitologia)|Tritão;Cila|Cila (mitologia);Caríbdis;Equidna (mitologia)",
 );
 
+/** Peças de roupa e calçados (o Wikidata mistura medalha, anel e guarda-chuva com roupa). */
+const ROUPAS = n(
+  "Camiseta|Camisa de malha|T-shirt;Calça|Calças;Camisa;Saia;Vestido;Bermuda;Short|Shorts;Jaqueta;Casaco;Blusa;" +
+    "Moletom;Meia|Meias;Cueca;Calcinha;Sutiã;Pijama;Biquíni;Sunga;Maiô;Terno;Gravata;Paletó;Blazer;Colete;Suéter|Pulôver;" +
+    "Cardigã|Casaquinho;Regata;Cropped;Body;Macacão;Jardineira;Legging;Calça jeans|Jeans;Calça de moletom;Agasalho;" +
+    "Corta-vento;Capa de chuva;Sobretudo;Sobretudo trench|Trench coat;Parka;Poncho;Cachecol;Luva|Luvas;Gorro;Boné;" +
+    "Chapéu;Touca;Boina;Lenço;Echarpe;Xale;Cinto;Suspensório;Avental;Jaleco;Uniforme;Farda;Toga;Batina;Hábito;" +
+    "Sapato;Tênis;Chinelo;Sandália;Bota;Galocha;Pantufa;Mocassim;Sapatilha;Salto alto;Scarpin;Rasteirinha;Tamanco;" +
+    "Alpargata;Coturno;Sapatênis;Crocs;Havaianas;Kimono|Quimono;Sári;Kilt;Burca;Hijab;Turbante;Sombreiro;Bata;" +
+    "Bombacha;Gibão;Collant;Tutu;Saia lápis;Minissaia;Saia longa;Vestido de noiva;Smoking;Fraque;Colete salva-vidas;" +
+    "Roupão;Camisola;Baby-doll;Ceroula;Samba-canção;Fio dental|Fio-dental;Meia-calça;Polaina;Anágua;Espartilho|Corset;" +
+    "Corpete;Combinação;Túnica;Caftan;Pareô;Saída de praia;Canga;Camisa polo|Polo;Camisa social;Jaqueta jeans;" +
+    "Jaqueta de couro;Moletom com capuz|Hoodie;Colete à prova de balas;Macaquinho;Saruel;Pantalona;Calça cargo;Bermuda cargo",
+);
+
+/** Órgãos e partes do corpo humano (o Wikidata chama fruta de "órgão" de planta). */
+const ORGAOS = n(
+  "Coração;Pulmão|Pulmões;Fígado;Rim|Rins;Estômago;Cérebro;Pâncreas;Intestino;Intestino delgado;Intestino grosso;" +
+    "Baço;Bexiga;Pele;Esôfago;Útero;Ovário;Próstata;Testículo;Tireoide|Glândula tireoide;Vesícula biliar|Vesícula;" +
+    "Olho;Língua;Apêndice|Apêndice vermiforme;Laringe;Faringe;Traqueia;Brônquio|Brônquios;Diafragma;Cerebelo;" +
+    "Medula espinhal;Medula óssea;Hipotálamo;Hipófise;Glândula suprarrenal|Suprarrenal|Adrenal;Timo;Amígdala|Amígdalas;" +
+    "Adenoide;Duodeno;Cólon;Reto;Ânus;Uretra;Ureter;Vagina;Pênis;Mama|Seio;Orelha|Ouvido;Nariz;Boca;Gengiva;Dente;" +
+    "Glândula salivar;Glândula pineal|Pineal;Paratireoide;Bulbo raquidiano|Bulbo;Tronco encefálico;Placenta;" +
+    "Vaso sanguíneo;Artéria;Veia;Aorta;Linfonodo|Gânglio linfático;Trompa de Falópio|Tuba uterina;Epidídimo;" +
+    "Vesícula seminal;Cóclea;Retina;Córnea;Íris;Cristalino;Pupila;Tímpano;Epiglote;Palato;Úvula;Músculo;Osso;" +
+    "Cartilagem;Tendão;Ligamento;Unha;Cabelo;Neurônio",
+);
+
 // ---------- listas à mão ----------
 
 /** As 55 especialidades reconhecidas pelo CFM, com os nomes curtos que as pessoas usam. */
@@ -603,47 +730,120 @@ export const CATEGORIES: CategorySpec[] = [
     "Novela brasileira",
     wd(`{ ${isA("Q23745")} } UNION { ?x wdt:P136 wd:Q23745. } ${FROM_BRAZIL}`),
   ),
-  simple(
-    "programa-tv-brasileiro",
-    "Programa de TV brasileiro",
-    wd(`${isA("Q5398426", "Q15416", "Q182415")} ${FROM_BRAZIL}`),
-  ),
+  {
+    id: "programa-tv-brasileiro",
+    title: "Programa de TV brasileiro",
+    sources: [
+      { kind: "manual", items: n(PROGRAMAS_TV) },
+      wd(`${isA("Q5398426", "Q15416", "Q182415")} ${FROM_BRAZIL}`),
+      // Só o primeiro nível: descendo mais, a montagem passava de 15 minutos.
+      { kind: "category", titles: ["Categoria:Programas da TV Globo", "Categoria:Programas do SBT"] },
+    ],
+    // As categorias das emissoras também guardam apresentador e personagem.
+    classes: ["Q15416", "Q5398426"],
+    ordered: "list",
+  },
   simple("filme-brasileiro", "Filme brasileiro", wd(`${isA("Q11424")} ${FROM_BRAZIL}`)),
-  simple("cantor-brasileiro", "Cantor ou cantora brasileira", wd(`${person("Q177220", "Q488205")} ${BRAZILIAN}`)),
+  {
+    ...simple("cantor-brasileiro", "Cantor ou cantora brasileira", wd(`${person("Q177220", "Q488205")} ${BRAZILIAN}`)),
+    // O Wikidata dá a ela cidadania brasileira por engano.
+    exclude: [{ kind: "manual", items: [["Melanie Martinez"]] }],
+  },
   simple("banda-brasileira", "Banda ou grupo musical brasileiro", wd(`${isA("Q215380", "Q5741069")} ${FROM_BRAZIL}`)),
   simple(
     "ator-brasileiro",
     "Ator ou atriz brasileira",
-    wd(`${person("Q33999", "Q10798782", "Q10800557")} ${BRAZILIAN}`),
+    // Jogador que fez ponta em filme (Pelé) não conta.
+    wd(`${person("Q33999", "Q10798782", "Q10800557")} ${BRAZILIAN} ${NOT_ALSO("Q937857")}`),
   ),
-  simple("humorista-brasileiro", "Humorista brasileiro", wd(`${person("Q245068")} ${BRAZILIAN}`)),
-  simple("youtuber-brasileiro", "Youtuber ou influenciador brasileiro", wd(`${person("Q17125263")} ${BRAZILIAN}`)),
-  simple(
+  people("humorista-brasileiro", "Humorista brasileiro", HUMORISTAS, wd(`${person("Q245068")} ${BRAZILIAN}`), {
+    kind: "category",
+    titles: ["Categoria:Humoristas do Brasil"],
+    depth: 2,
+  }),
+  people(
+    "youtuber-brasileiro",
+    "Youtuber ou influenciador brasileiro",
+    YOUTUBERS,
+    wd(`${person("Q17125263")} ${BRAZILIAN}`),
+    {
+      kind: "category",
+      titles: ["Categoria:Youtubers do Brasil", "Categoria:Influenciadores digitais do Brasil"],
+      depth: 2,
+    },
+  ),
+  people(
     "apresentador-brasileiro",
     "Apresentador ou apresentadora de TV brasileira",
+    APRESENTADORES,
     wd(`${person("Q947873")} ${BRAZILIAN}`),
+    { kind: "category", titles: ["Categoria:Apresentadores de televisão do Brasil"], depth: 2 },
   ),
   simple(
     "escritor-brasileiro",
     "Escritor ou poeta brasileiro",
-    wd(`${person("Q36180", "Q49757", "Q6625963")} ${BRAZILIAN}`),
+    // Jogador e modelo com autobiografia (Ronaldinho, Kaká, Gisele) não contam.
+    wd(`${person("Q36180", "Q49757", "Q6625963")} ${BRAZILIAN} ${NOT_ALSO("Q937857", "Q4610556")}`),
   ),
-  simple("sertanejo", "Cantor ou dupla de sertanejo", wd(`?x wdt:P136 wd:Q1958273.`)),
-  simple("funk", "Artista de funk", wd(`?x wdt:P136 wd:Q1931130.`)),
+  people("sertanejo", "Cantor ou dupla de sertanejo", SERTANEJO, wd(`?x wdt:P136 wd:Q1958273.`), {
+    kind: "category",
+    titles: ["Categoria:Cantores de música sertaneja"],
+    depth: 2,
+  }),
+  people("funk", "Artista de funk", FUNK, wd(`?x wdt:P136 wd:Q1931130.`)),
   simple("mpb", "Artista de MPB", wd(`?x wdt:P136 wd:Q1046768.`)),
   simple("forro-axe", "Artista de forró ou axé", wd(`?x wdt:P136 ?g. VALUES ?g { wd:Q586110 wd:Q1435485 }.`)),
-  simple("escola-de-samba", "Escola de samba", wd(isA("Q2641403"))),
-  simple("jogador-selecao", "Jogador que já jogou pela Seleção Brasileira", wd(`?x wdt:P54 wd:Q83459.`)),
-  simple("time-brasileiro", "Time de futebol brasileiro", wd(`${isA("Q476028")} ${IN_BRAZIL}`)),
-  simple(
-    "empresa-brasileira",
-    "Empresa ou marca brasileira",
-    wd(`${isA("Q4830453", "Q6881511", "Q891723", "Q431289")} ${IN_BRAZIL}`, {
-      minLinks: 4,
-    }),
+  {
+    ...simple("escola-de-samba", "Escola de samba", wd(isA("Q2641403"))),
+    shortNames: [/^(Grêmio Recreativo\s+)?Escola de Samba\s+/i, /^G\.?R\.?E\.?S\.?\s+/i],
+  },
+  people(
+    "jogador-selecao",
+    "Jogador ou jogadora da Seleção Brasileira",
+    JOGADORES_SELECAO,
+    wd(`?x wdt:P54 wd:Q83459.`),
+    { kind: "category", titles: ["Categoria:Jogadores da Seleção Brasileira de Futebol"] },
   ),
-  simple("praia-brasileira", "Praia brasileira", wd(`${isA("Q40080")} ${IN_BRAZIL}`)),
-  simple("rio-brasileiro", "Rio brasileiro", wd(`${isA("Q4022")} ${IN_BRAZIL}`, { minLinks: 5 })),
+  {
+    ...simple(
+      "time-brasileiro",
+      "Time de futebol brasileiro",
+      { kind: "manual", items: n(TIMES_BRASILEIROS) },
+      wd(`${isA("Q476028")} ${IN_BRAZIL}`),
+    ),
+    // "Bahia" é o estado e "São Paulo" a cidade: vale o artigo do clube.
+    classes: ["Q476028"],
+    ordered: "list",
+    shortNames: [
+      /\s+(Futebol Clube|Football Club|Foot[- ]?Ball Club|Esporte Clube|Sport Club|Sporting Club|Futebol e Regatas|Atlético Clube|de Futebol|F\.?C\.?|S\.?C\.?|E\.?C\.?)(\s*\(.*\))?$/i,
+      /^(Esporte Clube|Sport Club|Clube de Regatas( do| de)?|Club de Regatas( do)?|Associação Atlética|Sociedade Esportiva|Associação Desportiva|Clube Náutico|Grêmio Esportivo)\s+/i,
+    ],
+  },
+  {
+    id: "empresa-brasileira",
+    title: "Empresa ou marca brasileira",
+    sources: [
+      { kind: "manual", items: n(EMPRESAS_BRASILEIRAS) },
+      wd(`${isA("Q4830453", "Q6881511", "Q891723", "Q431289")} ${IN_BRAZIL}`, { minLinks: 4 }),
+    ],
+    // "Vale" e "Gol" são palavras: vale o artigo da empresa.
+    classes: BRAND,
+    ordered: "list",
+  },
+  {
+    ...simple(
+      "praia-brasileira",
+      "Praia brasileira",
+      { kind: "manual", items: n(PRAIAS_EXTRA) },
+      wd(`${isA("Q40080")} ${IN_BRAZIL}`),
+    ),
+    ordered: "list",
+    shortNames: [/^Praia\s+(d[aoe]s?\s+)?/i],
+  },
+  {
+    ...simple("rio-brasileiro", "Rio brasileiro", wd(`${isA("Q4022")} ${IN_BRAZIL}`, { minLinks: 5 })),
+    shortNames: [/^Rio\s+(d[aoe]s?\s+)?/i],
+  },
   {
     id: "bairro-rio",
     title: "Bairro da cidade do Rio de Janeiro",
@@ -655,7 +855,21 @@ export const CATEGORIES: CategorySpec[] = [
     classes: ["Q123705"],
   },
   simple("universidade-brasileira", "Universidade brasileira", wd(`?x wdt:P31/wdt:P279* wd:Q3918; wdt:P17 wd:Q155.`)),
-  simple("comida-brasileira", "Comida típica brasileira", wd(`?x wdt:P495 wd:Q155. ${kindOf(Q.food)}`)),
+  listOnly("ponto-turistico-brasil", "Ponto turístico do Brasil", PONTOS_TURISTICOS_BRASIL),
+  // "Rio de Janeiro" e "São Paulo" são também cidades: vale o artigo do estado.
+  listOnly("estado-brasil", "Estado brasileiro (ou o DF)", ESTADOS_BRASIL, ["Q485258"]),
+  listOnly("presidente-brasil", "Presidente do Brasil", PRESIDENTES_BRASIL, [HUMAN]),
+  listOnly("musica-brasileira", "Música brasileira (o nome da canção)", MUSICAS_BRASILEIRAS, ["Q7366", "Q2188189"]),
+  listOnly("banco", "Banco ou carteira digital", BANCOS, BRAND),
+  listOnly("loja", "Loja ou rede de lojas", LOJAS, BRAND),
+  {
+    id: "comida-brasileira",
+    title: "Comida típica brasileira",
+    sources: [{ kind: "manual", items: n(COMIDAS_BRASILEIRAS) }, wd(`?x wdt:P495 wd:Q155. ${kindOf(Q.food)}`)],
+    // "Brigadeiro" é a patente militar; "Brigadeiro (doce)" é o doce.
+    classes: [Q.food, Q.dish],
+    ordered: "list",
+  },
   {
     id: "prato-nordeste",
     title: "Prato típico do Nordeste",
@@ -690,19 +904,36 @@ export const CATEGORIES: CategorySpec[] = [
     "Cidade do mundo com 1 milhão+ de habitantes",
     wd(`?x wdt:P31/wdt:P279* wd:Q515; wdt:P1082 ?people. FILTER(?people >= 1000000)`),
   ),
-  simple("rio-mundo", "Rio com mais de 1.000 km", wd(`${isA("Q4022")} ?x wdt:P2043 ?length. FILTER(?length >= 1000)`)),
-  simple("montanha", "Montanha ou pico", wd(isA("Q8502"), { minLinks: 10 })),
-  simple("vulcao", "Vulcão", wd(isA("Q8072"), { minLinks: 5 })),
-  simple("ilha", "Ilha", wd(isA("Q23442"), { minLinks: 15 })),
-  simple("deserto", "Deserto", wd(isA("Q8514"))),
-  simple("cachoeira", "Cachoeira ou catarata", wd(isA("Q34038"), { minLinks: 3 })),
-  simple("lago", "Lago", wd(isA("Q23397"), { minLinks: 15 })),
+  {
+    ...simple(
+      "rio-mundo",
+      "Rio com mais de 1.000 km",
+      wd(`${isA("Q4022")} ?x wdt:P2043 ?length. FILTER(?length >= 1000)`),
+    ),
+    shortNames: [/^Rio\s+(d[aoe]s?\s+)?/i],
+  },
+  {
+    ...simple("montanha", "Montanha ou pico", wd(isA("Q8502"), { minLinks: 10 })),
+    shortNames: [/^(Monte|Pico|Serra|Morro|Mount|Mont)\s+(d[aoe]s?\s+)?/i],
+  },
+  { ...simple("vulcao", "Vulcão", wd(isA("Q8072"), { minLinks: 5 })), shortNames: [/^(Vulcão|Monte|Mount)\s+/i] },
+  { ...simple("ilha", "Ilha", wd(isA("Q23442"), { minLinks: 15 })), shortNames: [/^Ilhas?\s+(d[aoe]s?\s+)?/i] },
+  { ...simple("deserto", "Deserto", wd(isA("Q8514"))), shortNames: [/^Deserto\s+(d[aoe]s?\s+)?/i] },
+  {
+    ...simple("cachoeira", "Cachoeira ou catarata", wd(isA("Q34038"), { minLinks: 3 })),
+    shortNames: [/^(Cachoeiras?|Cataratas?|Salto|Queda)\s+(d[aoe]s?\s+)?/i],
+  },
+  { ...simple("lago", "Lago", wd(isA("Q23397"), { minLinks: 15 })), shortNames: [/^Lag(o|oa)\s+(d[aoe]s?\s+)?/i] },
   simple("idioma", "Idioma (língua)", wd(isA("Q34770", "Q1288568", "Q33742"), { minLinks: 15 })),
   simple("moeda", "Moeda de algum país", wd(isA("Q8142"))),
   simple("estado-eua", "Estado dos EUA", wd(isA("Q35657"))),
   simple("patrimonio-unesco", "Patrimônio Mundial da UNESCO", wd(`?x wdt:P1435 wd:Q9259.`)),
+  listOnly("ponto-turistico-mundo", "Ponto turístico fora do Brasil", PONTOS_TURISTICOS_MUNDO),
   simple("museu", "Museu", wd(isA("Q33506", "Q207694", "Q17431399"), { minLinks: 10 })),
-  simple("castelo", "Castelo ou palácio", wd(isA("Q23413", "Q16560"), { minLinks: 8 })),
+  {
+    ...simple("castelo", "Castelo ou palácio", wd(isA("Q23413", "Q16560"), { minLinks: 8 })),
+    shortNames: [/^(Castelo|Palácio)\s+(d[aoe]s?\s+)?/i],
+  },
   simple("companhia-aerea", "Companhia aérea", wd(isA("Q46970"), { minLinks: 3 })),
 
   // --- Natureza ---
@@ -789,6 +1020,7 @@ export const CATEGORIES: CategorySpec[] = [
   ),
   simple("constelacao", "Constelação", wd(isA("Q8928"))),
   simple("lua", "Lua de algum planeta", wd(isA("Q2537"))),
+  listOnly("flor", "Flor", FLORES, [Q.taxon, "Q756", "Q506"]),
 
   // --- Filmes e séries (IMDb) ---
   movies("filme-ficcao-cientifica", "Filme de ficção científica com 100 mil+ avaliações no IMDb", "Sci-Fi", 100_000),
@@ -861,7 +1093,24 @@ export const CATEGORIES: CategorySpec[] = [
   simple("dj", "DJ", wd(person("Q130857"), { minLinks: 8 })),
   simple("genero-musical", "Gênero musical", wd(isA("Q188451"), { minLinks: 10 })),
   simple("instrumento-musical", "Instrumento musical", wd(kindOf("Q34379"))),
-  simple("pintor", "Pintor ou pintora", wd(person("Q1028181"), { minLinks: 20 })),
+  // "Pintor" no Wikidata pega quem pintou nas horas vagas (George W. Bush, Goethe, Walt Disney): fica
+  // quem tem quadro no Wikidata ou não é conhecido por outra coisa (política, livros, empresa, cinema).
+  {
+    ...people(
+      "pintor",
+      "Pintor ou pintora",
+      PINTORES,
+      wd(
+        `${person("Q1028181")}
+      FILTER(EXISTS { ?work wdt:P170 ?x; wdt:P31 wd:Q3305213. } || NOT EXISTS {
+        ?x wdt:P106 ?other. VALUES ?other { ${values(["Q82955", "Q36180", "Q49757", "Q43845", "Q3282637", "Q266569", "Q28389", "Q4964182"])} }
+      })`,
+        { minLinks: 20 },
+      ),
+    ),
+    // Tem quadro no Wikidata, mas é lembrado pelos desenhos animados.
+    exclude: [{ kind: "manual", items: [["Walt Disney"]] }],
+  },
   simple("arquiteto", "Arquiteto ou arquiteta", wd(person("Q42973"), { minLinks: 15 })),
   simple(
     "compositor-classico",
@@ -939,21 +1188,28 @@ export const CATEGORIES: CategorySpec[] = [
   simple("explorador", "Explorador ou navegador", wd(person("Q11900058"), { minLinks: 15 })),
   simple("religiao", "Religião", wd(isA("Q9174"), { minLinks: 5 })),
   {
+    // O id ficou do tempo em que só valia dança de fora; agora vale qualquer uma.
     id: "danca-do-mundo",
-    title: "Dança do mundo (sem brasileiras)",
+    title: "Dança ou ritmo de dança",
     sources: [
+      { kind: "manual", items: n(DANCAS) },
       {
         kind: "sparql",
         query: `SELECT DISTINCT ?x WHERE { ?x wdt:P31 wd:${Q.typeOfDance}. }`,
       },
       { kind: "links", titles: ["Lista de danças"] },
-      { kind: "category", titles: ["Categoria:Danças por país"], depth: 2 },
+      { kind: "category", titles: ["Categoria:Danças por país", "Categoria:Danças do Brasil"], depth: 2 },
     ],
     classes: [Q.dance, Q.typeOfDance],
-    exclude: [{ kind: "category", titles: ["Categoria:Danças do Brasil"], depth: 3 }],
-    excludeCountry: Q.brazil,
     allowEnglishOnly: true,
+    ordered: "list",
   },
+  listOnly("vilao", "Vilão ou vilã (de filme, desenho, novela ou jogo)", VILOES, [CHARACTER]),
+  listOnly("personagem-disney", "Personagem da Disney ou da Pixar", PERSONAGENS_DISNEY, [CHARACTER]),
+  listOnly("turma-da-monica", "Personagem da Turma da Mônica", TURMA_DA_MONICA, [CHARACTER]),
+  listOnly("harry-potter", "Personagem de Harry Potter", HARRY_POTTER, [CHARACTER]),
+  listOnly("simpsons", "Personagem de Os Simpsons", SIMPSONS, [CHARACTER]),
+  listOnly("sitio-picapau", "Personagem do Sítio do Picapau Amarelo", SITIO_PICAPAU, [CHARACTER]),
 
   // --- Esporte ---
   simple("esporte", "Esporte", wd(`?x wdt:P31|wdt:P279 ?class. VALUES ?class { wd:Q349 wd:Q31629 }.`)),
@@ -964,9 +1220,54 @@ export const CATEGORIES: CategorySpec[] = [
     wd(`${person("Q937857")} ${FOREIGN}`, { minLinks: 30 }),
   ),
   simple("basquete", "Jogador ou jogadora de basquete", wd(person("Q3665646"), { minLinks: 15 })),
+  listOnly("time-nba", "Time da NBA", TIMES_NBA, ["Q43229"]),
   simple("tenista", "Tenista", wd(person("Q10833314"), { minLinks: 15 })),
   simple("piloto-f1", "Piloto de Fórmula 1", wd(person("Q10841764"))),
   simple("lutador-mma", "Lutador ou lutadora de MMA", wd(person("Q11607585"), { minLinks: 8 })),
+  {
+    // A categoria também tem as edições do programa: `people` deixa só gente.
+    ...people("participante-bbb", "Participante do Big Brother Brasil", PARTICIPANTES_BBB, {
+      kind: "category",
+      titles: ["Categoria:Participantes do Big Brother Brasil"],
+      depth: 2,
+    }),
+    since: SECOND_BATCH,
+  },
+  {
+    ...people("medalhista-olimpico-brasileiro", "Medalhista olímpico brasileiro", MEDALHISTAS_OLIMPICOS, {
+      kind: "category",
+      titles: ["Categoria:Medalhistas olímpicos do Brasil"],
+      depth: 2,
+    }),
+    since: SECOND_BATCH,
+  },
+  {
+    ...simple("jogador-volei", "Jogador ou jogadora de vôlei brasileira", wd(`${person("Q15117302")} ${BRAZILIAN}`)),
+    since: SECOND_BATCH,
+  },
+  {
+    ...people(
+      "tecnico-futebol",
+      "Técnico ou técnica de futebol",
+      TECNICOS_FUTEBOL,
+      wd(person("Q628099"), { minLinks: 15 }),
+    ),
+    since: SECOND_BATCH,
+  },
+  {
+    // A consulta de todos os atores americanos estoura o tempo do Wikidata às vezes: é extra.
+    ...people(
+      "ator-hollywood",
+      "Ator ou atriz de Hollywood",
+      ATORES_HOLLYWOOD,
+      optional(wd(`${person("Q33999", "Q10800557")} ?x wdt:P27 wd:Q30.`, { minLinks: 40 })),
+    ),
+    since: SECOND_BATCH,
+  },
+  {
+    ...simple("modelo-brasileira", "Modelo brasileira ou brasileiro", wd(`${person("Q4610556")} ${BRAZILIAN}`)),
+    since: SECOND_BATCH,
+  },
   {
     id: "time-europeu",
     title: "Time de futebol europeu",
@@ -982,7 +1283,10 @@ export const CATEGORIES: CategorySpec[] = [
     // Clube de futebol: "Roma" é a cidade, "AS Roma" é o time.
     classes: ["Q476028"],
   },
-  simple("estadio", "Estádio", wd(isA("Q1154710", "Q483110"), { minLinks: 10 })),
+  {
+    ...simple("estadio", "Estádio", wd(isA("Q1154710", "Q483110"), { minLinks: 10 })),
+    shortNames: [/^(Estádio|Arena)\s+(d[aoe]s?\s+)?/i],
+  },
   simple("jogo-tabuleiro", "Jogo de tabuleiro ou de cartas", wd(isA("Q131436", "Q142714"))),
 
   // --- Dia a dia e conhecimento ---
@@ -991,12 +1295,26 @@ export const CATEGORIES: CategorySpec[] = [
     title: 'Especialidade médica (como "dermatologia")',
     sources: [{ kind: "manual", items: CFM_SPECIALTIES }],
   },
-  simple("profissao", "Profissão", wd(isA("Q28640", "Q12737077"), { minLinks: 10 })),
-  simple("doenca", "Doença", wd(isA("Q12136", "Q18123741", "Q929833"), { minLinks: 10 })),
+  {
+    id: "profissao",
+    title: "Profissão",
+    sources: [{ kind: "manual", items: n(PROFISSOES) }, wd(isA("Q28640", "Q12737077"), { minLinks: 10 })],
+    // "Advogado" e "Caixa" têm artigo de outra coisa: vale o de profissão.
+    classes: ["Q28640", "Q12737077"],
+    ordered: "list",
+  },
+  {
+    id: "doenca",
+    title: "Doença",
+    sources: [{ kind: "manual", items: n(DOENCAS) }, wd(isA("Q12136", "Q18123741", "Q929833"), { minLinks: 10 })],
+    classes: ["Q12136", "Q18123741", "Q929833"],
+    ordered: "list",
+  },
   simple("fobia", "Fobia", wd(kindOf("Q175854"))),
   simple("osso", "Osso do corpo humano", wd(kindOf("Q265868"))),
   simple("musculo", "Músculo do corpo humano", wd(kindOf("Q7365"))),
-  simple("orgao", "Órgão do corpo humano", wd(kindOf("Q712378"))),
+  // Só a lista: "órgão" no Wikidata inclui fruta (órgão de planta) e cada músculo do corpo.
+  { ...simple("orgao", "Órgão ou parte do corpo humano", { kind: "manual", items: ORGAOS }), ordered: "list" },
   simple("elemento-quimico", "Elemento químico", wd(isA("Q11344"))),
   {
     id: "remedio",
@@ -1008,15 +1326,42 @@ export const CATEGORIES: CategorySpec[] = [
   },
   simple("marca-carro", "Marca de carro", wd(isA("Q786820"), { minLinks: 5 })),
   simple("modelo-carro", "Modelo de carro", wd(isA("Q3231690"), { minLinks: 5 })),
-  simple("fast-food", "Rede de fast-food", wd(isA("Q18509232"))),
+  {
+    id: "fast-food",
+    title: "Rede de fast-food",
+    sources: [{ kind: "manual", items: n(FAST_FOOD) }, wd(isA("Q18509232"))],
+    // "Subway" é o metrô de Londres; vale o artigo da empresa.
+    classes: BRAND,
+    ordered: "list",
+  },
   simple("coquetel", "Drinque ou coquetel", wd(kindOf("Q134768"))),
   simple("queijo", "Queijo", wd(kindOf("Q10943"))),
   simple("pao", "Tipo de pão", wd(kindOf("Q7802"))),
-  simple("sobremesa", "Sobremesa ou doce", wd(kindOf("Q182940"), { minLinks: 3 })),
+  {
+    id: "sobremesa",
+    title: "Sobremesa ou doce",
+    sources: [{ kind: "manual", items: n(SOBREMESAS) }, wd(kindOf("Q182940"), { minLinks: 3 })],
+    classes: [Q.food, Q.dish],
+    ordered: "list",
+  },
+  listOnly("fruta", "Fruta", FRUTAS, [Q.fruit, Q.food, Q.taxon]),
+  listOnly("festa-junina", "Comida ou bebida de festa junina", FESTA_JUNINA, [Q.food, Q.dish, Q.beverage]),
+  listOnly("cerveja", "Marca de cerveja", CERVEJAS, [...BRAND, "Q44"]),
+  listOnly("bebida-sem-alcool", "Bebida sem álcool (refrigerante, suco, marca...)", BEBIDAS_SEM_ALCOOL, [
+    ...BRAND,
+    Q.beverage,
+    Q.food,
+  ]),
+  listOnly("doce-de-marca", "Chocolate, bala ou doce de marca", DOCES_DE_MARCA, [...BRAND, Q.food]),
+  listOnly("biscoito-salgadinho", "Biscoito ou salgadinho de pacote", BISCOITOS_SALGADINHOS, [...BRAND, Q.food]),
   simple("bebida-alcoolica", "Bebida alcoólica", wd(kindOf("Q154"), { minLinks: 5 })),
   simple("rede-social", "Rede social ou aplicativo", wd(isA("Q3220391", "Q620615"), { minLinks: 10 })),
   simple("linguagem-programacao", "Linguagem de programação", wd(isA("Q9143"), { minLinks: 10 })),
-  simple("roupa", "Peça de roupa", wd(kindOf("Q11460"))),
+  listOnly("app", "Aplicativo, site ou jogo de celular", APPS, ["Q7397", "Q35127", "Q7889", ...BRAND]),
+  listOnly("marca-tecnologia", "Marca de tecnologia ou eletrônicos", MARCAS_TECNOLOGIA, BRAND),
+  listOnly("filme-disney", "Filme da Disney ou da Pixar", FILMES_DISNEY_PIXAR, ["Q11424"]),
+  // Só a lista: "vestuário" no Wikidata inclui medalha, anel, tatuagem e guarda-chuva.
+  { ...simple("roupa", "Peça de roupa ou calçado", { kind: "manual", items: ROUPAS }), ordered: "list" },
   simple("movel", "Móvel (de casa)", wd(kindOf("Q14745"))),
   simple("utensilio-cozinha", "Utensílio de cozinha", wd(kindOf("Q1521410"))),
   // A árvore de "ferramenta" no Wikidata pega roupa, arma e instrumento musical: só a lista.

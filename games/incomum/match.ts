@@ -17,6 +17,35 @@ export function answerKey(text: string): string {
     .replace(/ /g, "");
 }
 
+/** Palavras que não identificam nada sozinhas ("Rio", "de", "the"): fora da busca por parte do nome. */
+const STOPWORDS = new Set(["dos", "das", "del", "der", "the", "and", "von", "van", "san", "santa", "santo", "sao"]);
+
+/**
+ * As palavras de um nome que servem para achá-lo pela metade ("Cocielo" em "Júlio Cocielo"): sem
+ * acento, com 4 letras ou mais e fora das que aparecem em tudo.
+ */
+export function nameWords(text: string): string[] {
+  return normalize(text)
+    .replace(/\([^)]*\)/g, " ")
+    .split(/[^a-z0-9]+/)
+    .filter((w) => w.length >= 4 && !STOPWORDS.has(w));
+}
+
+/** Palavras que só ligam outras ("da", "de"): não contam na busca por parte do nome. */
+const PARTICLES = new Set(["a", "o", "e", "y", "da", "de", "do", "di", "du", "la", "le", "el", "of"]);
+
+/**
+ * Todas as palavras de um nome, até as curtas ("Bia", "Zé", "MC"), sem as que só ligam outras. Na
+ * busca por parte do nome, cada uma tem que estar no nome achado: "Bia Ferreira" não é o Rivaldo
+ * (Rivaldo Vítor Borba Ferreira), só porque "Bia" é curta demais para procurar.
+ */
+export function allWords(text: string): string[] {
+  return normalize(text)
+    .replace(/\([^)]*\)/g, " ")
+    .split(/[^a-z0-9]+/)
+    .filter((w) => w && !PARTICLES.has(w));
+}
+
 /** Distância de edição (Levenshtein) com limite: devolve `max + 1` assim que passa dele. */
 export function editDistance(a: string, b: string, max: number): number {
   if (Math.abs(a.length - b.length) > max) return max + 1;
