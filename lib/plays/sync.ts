@@ -76,6 +76,25 @@ export async function flushPending() {
   for (const report of readPending()) await send(report);
 }
 
+const RESEND_KEY = "rodada:resend:incomum-estreia";
+
+/**
+ * Reenvio, uma vez só, das partidas do Incomum guardadas no navegador. Na estreia o servidor recusava
+ * todas (ainda não lia as respostas do dia) e o navegador não manda de novo uma partida recusada.
+ * O servidor só aceita o dia aberto e devolve o que já tiver gravado, então reenviar é seguro. Pode
+ * sair daqui a alguns dias, quando não houver mais partida da estreia aberta.
+ */
+export async function resendIncomumOnce() {
+  try {
+    if (localStorage.getItem(RESEND_KEY)) return;
+    localStorage.setItem(RESEND_KEY, "1");
+  } catch {
+    return;
+  }
+  const done = Object.values(dailyStore.getPlays()).filter((p) => p.slug === "incomum" && p.status !== "playing");
+  for (const play of done) await reportPlay(play);
+}
+
 /** Jogos com tempo: avisa o servidor que o relógio começou. */
 export function startClockOnServer(slug: string, dateKey: string) {
   void post("/api/plays/start", { slug, dateKey });
