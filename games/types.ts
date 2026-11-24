@@ -107,6 +107,12 @@ export interface GameMeta<R extends GameRules = GameRules> {
   modeLabel?: string;
   /** O tabuleiro já mostra a resposta no fim; o resultado não repete o "Era …". */
   hideAnswer?: boolean;
+  /** Frase do resultado de quem termina, no lugar da padrão do tipo de jogo ("Achou todas!"). */
+  wonHeadline?: string;
+  /** Cabeçalho da página numa linha só e menor, para o tabuleiro ocupar a tela (ex.: Incomum). */
+  compactHeader?: boolean;
+  /** Quanto esperar a última jogada animar antes de abrir o resultado (padrão: 1,7 s). */
+  resultDelayMs?: number;
   /** Dia em que o jogo entrou no site (YYYY-MM-DD). Sem ele, a estreia do Rodada (EPOCH_DATE). */
   launchedOn?: string;
   howToPlay: string[];

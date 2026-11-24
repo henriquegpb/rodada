@@ -73,7 +73,7 @@ export function GameScreen({ slug }: { slug: string }) {
     if (firstGuess) trackEvent("game_started", { game: slug, practice });
     if (result.play.status !== "playing") {
       trackFinished(result.play);
-      window.setTimeout(() => setDialog("result"), RESULT_DELAY_MS);
+      window.setTimeout(() => setDialog("result"), meta.resultDelayMs ?? RESULT_DELAY_MS);
     }
     return null;
   }
@@ -131,13 +131,16 @@ export function GameScreen({ slug }: { slug: string }) {
   return (
     // Palco estreito por padrão; o jogo com tempo precisa de espaço para mapa e tabela.
     <div ref={rootRef} className={cn("mx-auto", meta.wide || rules.type === "timed" ? "max-w-5xl" : "max-w-[620px]")}>
-      <header className="flex flex-wrap items-end justify-between gap-x-4 gap-y-3">
-        <div>
-          <p className="h-5 text-sm text-muted-foreground">
+      <header className={cn("flex flex-wrap justify-between gap-x-4 gap-y-3", meta.compactHeader ? "items-center" : "items-end")}>
+        {/* Compacto: título e número na mesma linha, menores, para o tabuleiro ganhar a tela. */}
+        <div className={cn(meta.compactHeader && "flex flex-row-reverse items-baseline justify-end gap-2.5")}>
+          <p className={cn("text-sm text-muted-foreground", !meta.compactHeader && "h-5")}>
             {practice ? t.practice.label : play && `Nº ${play.number}`}
           </p>
           {/* Nos modos (Dupla, Quadra) o título é o do jogo pai; o modo aparece nas abas. */}
-          <h1 className="font-display text-4xl leading-none sm:text-5xl">{rootGame(slug)?.meta.name ?? meta.name}</h1>
+          <h1 className={cn("font-display leading-none", meta.compactHeader ? "text-2xl sm:text-3xl" : "text-4xl sm:text-5xl")}>
+            {rootGame(slug)?.meta.name ?? meta.name}
+          </h1>
         </div>
         <div className="flex items-center gap-5 pb-1">
           {rules.type === "attempts" && (
@@ -183,7 +186,7 @@ export function GameScreen({ slug }: { slug: string }) {
           </div>
         )}
 
-        <div className="mt-8">
+        <div className={meta.compactHeader ? "mt-4" : "mt-8"}>
           {play ? (
             <Suspense fallback={<Loading />}>
               {/* Cada partida (hoje ou treino) começa com o tabuleiro zerado. */}
