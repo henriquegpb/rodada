@@ -1,7 +1,7 @@
 import { pickDailyMany } from "@/lib/daily/seed";
 import type { GameEngine, PublicFileReader } from "../types";
 import index from "./data/index.json";
-import { answerKey, editDistance, suggestionMessage, typoBudget } from "./match";
+import { allWords, answerKey, editDistance, nameWords, suggestionMessage, typoBudget } from "./match";
 import { ROUND, SKIP, TIERS, TIMEOUT, tierOf } from "./tiers";
 import type { IncomumCategoryRef, IncomumFeedback, IncomumPuzzle } from "./types";
 
@@ -17,6 +17,9 @@ export interface IncomumAnswer {
 
 /** O índice só tem categorias com respostas suficientes para o sorteio (veja o build). */
 export const CATEGORIES: readonly IncomumCategoryRef[] = index;
+
+/** As categorias do sorteio no dia: as novas só a partir da estreia, e os dias passados não mudam. */
+export const poolOn = (dateKey: string) => CATEGORIES.filter((c) => !c.since || c.since <= dateKey);
 
 // ---------- respostas, baixadas só para as categorias do dia ----------
 
@@ -56,6 +59,8 @@ interface Index {
   exact: Map<string, number>;
   /** Para sugerir: a chave, a posição da resposta e o nome como está na lista. */
   keys: [key: string, item: number, name: string][];
+  /** Cada palavra de um nome de várias palavras → as respostas que a têm, da mais óbvia à mais rara. */
+  words: Map<string, number[]>;
 }
 
 const indexes = new WeakMap<IncomumItems, Index>();
@@ -65,6 +70,7 @@ function indexOf(items: IncomumItems): Index {
   if (!found) {
     const exact = new Map<string, number>();
     const keys: Index["keys"] = [];
+    const words: Index["words"] = new Map();
     items.forEach((names, i) => {
       for (const name of names) {
         const key = answerKey(name);
@@ -72,8 +78,17 @@ function indexOf(items: IncomumItems): Index {
         exact.set(key, i);
         keys.push([key, i, name]);
       }
+      // Pela metade só nome de várias palavras: "Cocielo" acha "Júlio Cocielo".
+      for (const name of names) {
+        if (name.trim().split(/\s+/).length < 2) continue;
+        for (const word of nameWords(name)) {
+          const list = words.get(word) ?? [];
+          if (list[list.length - 1] !== i) list.push(i);
+          words.set(word, list);
+        }
+      }
     });
-    found = { exact, keys };
+    found = { exact, keys, words };
     indexes.set(items, found);
   }
   return found;
@@ -97,26 +112,48 @@ export function findAnswer(items: IncomumItems, input: string): Match | null {
   const { exact, keys } = indexOf(items);
   const hit = exact.get(key);
   if (hit !== undefined) return { item: hit, name: items[hit][0], exact: true };
+  // Palavras inteiras do nome valem mais que um nome inteiro com letras trocadas ("Leonardo").
+  const part = partOfName(items, input);
+  if (part) return part;
   const budget = typoBudget(key);
   if (!budget) return null;
   let best: Match | null = null;
   let bestDistance = Infinity;
-  for (const [candidate, item, name] of keys) {
+  for (const [candidate, item] of keys) {
     // Vale o limite menor dos dois: nome curto da lista ("CWB") não vira sugestão de "cwa".
     const allowed = Math.min(budget, typoBudget(candidate));
     if (!allowed) continue;
     const d = editDistance(key, candidate, allowed);
     if (d > allowed) continue;
     if (d < bestDistance || (d === bestDistance && best && item < best.item)) {
-      best = { item, name, exact: false };
+      // Sugere o nome principal ("Pablo Picasso"), não o apelido parecido ("P. Picasso").
+      best = { item, name: items[item][0], exact: false };
       bestDistance = d;
     }
   }
   return best;
 }
 
+/**
+ * Parte de um nome da lista ("Cocielo", "Da Vinci"): todas as palavras digitadas estão num mesmo
+ * nome. Sugere a resposta mais óbvia assim, que a pessoa confirma.
+ */
+function partOfName(items: IncomumItems, input: string): Match | null {
+  const typed = nameWords(input);
+  if (!typed.length) return null;
+  const every = allWords(input);
+  for (const item of indexOf(items).words.get(typed[0]) ?? []) {
+    const fits = items[item].some((name) => {
+      const own = allWords(name);
+      return own.length >= every.length && every.every((w) => own.includes(w));
+    });
+    if (fits) return { item, name: items[item][0], exact: false };
+  }
+  return null;
+}
+
 function createChallenge(dateKey: string) {
-  const categories = pickDailyMany(CATEGORIES, ROUND, {
+  const categories = pickDailyMany(poolOn(dateKey), ROUND, {
     slug: "incomum",
     dateKey,
   });

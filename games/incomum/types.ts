@@ -19,6 +19,11 @@ export interface IncomumCategoryRef {
   rare: string[];
   /** Versão do arquivo das respostas (muda quando ele muda). */
   v: string;
+  /**
+   * Primeiro dia em que a categoria entra no sorteio. Sem isso, categoria nova mudaria o sorteio dos
+   * dias que já passaram (e o de hoje, no meio das partidas).
+   */
+  since?: string;
 }
 
 export interface IncomumPuzzle {

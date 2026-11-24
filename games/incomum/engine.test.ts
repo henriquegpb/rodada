@@ -8,6 +8,7 @@ import {
   engine,
   findAnswer,
   loadCategory,
+  poolOn,
   type IncomumAnswer,
   type IncomumItems,
 } from "./engine";
@@ -88,6 +89,20 @@ describe("findAnswer", () => {
     expect(findAnswer(CITIES, "Foz do Iguasu")).toMatchObject({ item: 2, name: "Foz do Iguaçu", exact: false });
   });
 
+  it("com só parte do nome, sugere o nome inteiro mais óbvio", () => {
+    expect(findAnswer(CITIES, "Iguaçu")).toEqual({ item: 2, name: "Foz do Iguaçu", exact: false });
+    expect(findAnswer(CITIES, "iguacu foz")).toMatchObject({ item: 2, exact: false });
+    // Palavra inteira do nome vale mais que um nome com letras trocadas.
+    expect(findAnswer([["Leonardo da Vinci"], ["Leodard"]], "Leonardo")).toMatchObject({ item: 0, exact: false });
+  });
+
+  it("parte do nome só vale se todas as palavras, até as curtas, estão no nome", () => {
+    const people: IncomumItems = [["Rivaldo", "Rivaldo Vítor Borba Ferreira"], ["Bia Souza", "Beatriz Souza"]];
+    expect(findAnswer(people, "Bia Ferreira")).toBeNull();
+    expect(findAnswer(people, "Borba Ferreira")).toMatchObject({ item: 0, name: "Rivaldo", exact: false });
+    expect(findAnswer(people, "Beatriz")).toMatchObject({ item: 1, name: "Bia Souza", exact: false });
+  });
+
   it("não sugere o que não parece nada da lista nem nome curto com letra errada", () => {
     expect(findAnswer(CITIES, "Maringá")).toBeNull();
     expect(findAnswer(CITIES, "cwa")).toBeNull();
@@ -106,6 +121,33 @@ describe("sugestão", () => {
 
   it("recusa sem sugestão não tem nome", () => {
     expect(suggestionIn("Essa não está na lista. Tenta outra!")).toBeNull();
+  });
+});
+
+describe("sorteio", () => {
+  const idsOn = (dateKey: string) =>
+    (engine.createChallenge(dateKey).answer as IncomumAnswer).categories.map((c) => c.id);
+
+  it("o dia da estreia não muda quando entra categoria nova", () => {
+    // Com a semente de desenvolvimento. Se mudar, um dia já jogado mudou de categorias.
+    expect(idsOn("2026-11-24")).toEqual([
+      "cidade-brasil-300mil",
+      "marca-carro",
+      "criatura-mitologica",
+      "filme-ficcao-cientifica",
+      "explorador",
+      "pintor",
+      "filme-guerra",
+    ]);
+  });
+
+  it("categoria nova só entra no sorteio a partir da estreia dela", () => {
+    for (const c of CATEGORIES.filter((c) => c.since)) {
+      expect(c.since! > incomum.meta.launchedOn!).toBe(true);
+      const before = new Date(Date.parse(`${c.since}T12:00:00Z`) - 86_400_000).toISOString().slice(0, 10);
+      expect(poolOn(before)).not.toContain(c);
+      expect(poolOn(c.since!)).toContain(c);
+    }
   });
 });
 
