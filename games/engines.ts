@@ -28,6 +28,7 @@ const loaders: Record<string, () => Promise<{ engine: GameEngine }>> = {
   "escala-paises": () => import("./escala-paises/engine"),
   ordem: () => import("./ordem/engine"),
   trilha: () => import("./trilha/engine"),
+  incomum: () => import("./incomum/engine"),
 };
 
 export const engineSlugs = Object.keys(loaders);
