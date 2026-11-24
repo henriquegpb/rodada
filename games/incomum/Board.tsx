@@ -421,7 +421,8 @@ export function IncomumBoard({ play, submitGuess }: BoardProps<IncomumPuzzle, In
                     onClick={() => send(suggestion)}
                     disabled={busy}
                     className="font-bold underline decoration-2 underline-offset-4"
-                    style={{ color: COLOR }}
+                    // Mais claro que o azul do jogo: o texto fica no fundo da página, que pode ser escuro.
+                    style={{ color: `color-mix(in oklab, ${COLOR} 70%, white)` }}
                   >
                     “{suggestion}”
                   </button>

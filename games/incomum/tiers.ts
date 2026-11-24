@@ -1,8 +1,8 @@
 import type { PlayView } from "../types";
 import type { IncomumFeedback } from "./types";
 
-/** Cor do Incomum: o card do jogo e os botões. Azul do mar. */
-export const COLOR = "#0e7fd6";
+/** Cor do Incomum: o card do jogo e os botões. Azul do mar fundo. */
+export const COLOR = "#1645a2";
 
 /** Categorias por dia. */
 export const ROUND = 7;

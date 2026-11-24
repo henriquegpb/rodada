@@ -24,7 +24,7 @@ export const incomum: GameDefinition<IncomumPuzzle, IncomumFeedback, PointsRules
     // A última descida (até ~3 s), o bicho chega e os pontos sobem antes do resultado abrir.
     resultDelayMs: 5200,
     wide: true,
-    launchedOn: "2026-11-23",
+    launchedOn: "2026-11-24",
     howToPlay: [
       `São ${ROUND} categorias por dia: "cidade do Paraná com 50 mil+ habitantes", "raça de cachorro", "filme de terror"…`,
       `Escreva uma resposta que vale. Quanto menos óbvia, mais pontos: ${TIERS.map((t) => `${t.name} +${t.points}`).join(", ")}. Curitiba é óbvia; Cianorte é raríssima.`,
