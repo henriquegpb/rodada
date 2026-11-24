@@ -85,6 +85,13 @@ export interface GameEngine<P = unknown, A = unknown, F = unknown> {
   describeAnswer(answer: A): string;
   /** Jogos por pontos: o total que o desafio vale, base da Nota (veja `gradePlay`). */
   maxPoints?(puzzle: P): number;
+  /**
+   * Baixa o que o desafio do dia precisa para `checkGuess` (jogo com respostas grandes demais para
+   * irem todas no bundle). O serviço de partidas espera por ele antes de abrir a partida.
+   */
+  prepare?(dateKey: string): Promise<void>;
+  /** Se `prepare` já terminou para o dia; enquanto não, a partida não abre durante o render. */
+  isReady?(dateKey: string): boolean;
 }
 
 export interface GameMeta<R extends GameRules = GameRules> {
