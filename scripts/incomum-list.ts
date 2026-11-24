@@ -13,8 +13,11 @@ export type Source =
   | { kind: "category"; titles: string[]; depth?: number; lang?: string }
   /** Artigos ligados a partir das páginas (listas). */
   | { kind: "links"; titles: string[]; lang?: string }
-  /** À mão: [nome na tela, ...apelidos]; o artigo da Wikipédia é o do primeiro nome que tiver um. */
-  | { kind: "manual"; items: string[][] }
+  /**
+   * À mão: [nome na tela, ...apelidos]; o artigo da Wikipédia é o do primeiro nome que tiver um. Nome
+   * da lista nunca passa de comum; com `rare`, vale pela fama (para incluir nome pouco conhecido).
+   */
+  | { kind: "manual"; items: string[][]; rare?: boolean }
   /** Municípios do Censo 2022 (código IBGE do estado, ou "all"). */
   | { kind: "ibge"; uf: number | "all"; minPopulation: number }
   /** Filmes ou séries do IMDb por gênero e mínimo de avaliações; os votos medem o quão comum é. */
@@ -415,6 +418,25 @@ const VERDURAS = n(
     "Taioba;Ora-pro-nóbis;Bertalha;Gengibre;Feijão;Lentilha;Grão-de-bico;Soja;Fava;Tremoço;Cebolinha;Salsa;Coentro;" +
     "Cogumelo;Couve-chinesa|Acelga chinesa;Pak choi;Mostarda (planta)|Mostarda;Broto de bambu;Broto de feijão;" +
     "Pimenta;Jerimum;Moranga;Abóbora-menina;Mandioca-brava;Batata-yacon|Yacon;Tupinambo|Topinambur;Cherovia;Pastinaca",
+);
+
+/** Folclore brasileiro menos conhecido: entra pela lista, mas vale pela fama (pode ser raríssimo). */
+const CRIATURAS_RARAS = n(
+  "Mapinguari;Corpo-seco;Pisadeira;Papa-figo;Mãe do Ouro;Matinta Perera;Capelobo;Labatut (folclore)|Labatut;Bradador;" +
+    "Cabeça de cuia;Romãozinho;Boiúna;Cobra Norato;Mão de cabelo;Quibungo;Caboclo-d'água;Lobisomem (folclore brasileiro)",
+);
+
+const CRIATURAS = n(
+  "Saci|Saci-pererê;Iara|Uiara|Mãe-d'água;Curupira;Boitatá;Mula sem cabeça;Boto|Boto (lenda)|Boto-cor-de-rosa (lenda);" +
+    "Lobisomem;Cuca|Cuca (folclore);Caipora;Bicho-papão;" +
+    "Negrinho do Pastoreio;" +
+    "Dragão;Unicórnio;Fênix;Sereia;Centauro;Minotauro;Medusa|Medusa (mitologia);Pégaso;Grifo;Hidra de Lerna|Hidra;" +
+    "Ciclope;Quimera|Quimera (mitologia);Esfinge;Kraken;Vampiro;Zumbi|Zumbi (mitologia);Fada;Elfo;Duende;Gnomo;Troll;" +
+    "Ogro;Gigante|Gigante (mitologia);Yeti|Abominável homem das neves;Pé-grande;Chupa-cabra;Monstro do Lago Ness|Nessie;" +
+    "Leviatã;Basilisco;Cérbero;Harpia|Harpia (mitologia);Sátiro;Fauno;Golem;Banshee;Gárgula;Wendigo;Kitsune;Tengu;" +
+    "Djinn|Gênio;Mothman|Homem-Mariposa;Kappa (folclore)|Kappa;Valquíria;Ninfa;Náiade;Dríade;Sílfide;Salamandra (mitologia);" +
+    "Hipogrifo;Mantícora;Behemoth;Tarasca;Bunyip;Chimera;Cockatrice;Lâmia;Súcubo;Íncubo;Ghoul|Gul;Múmia;Fantasma;" +
+    "Bruxa;Anjo;Demônio;Querubim;Serafim;Tritão (mitologia)|Tritão;Cila|Cila (mitologia);Caríbdis;Equidna (mitologia)",
 );
 
 // ---------- listas à mão ----------
@@ -880,7 +902,19 @@ export const CATEGORIES: CategorySpec[] = [
     "Deus ou deusa de alguma mitologia",
     wd(isA("Q22989102", "Q11688446", "Q16513881", "Q146083", "Q178885")),
   ),
-  simple("criatura-mitologica", "Criatura mitológica ou lendária", wd(kindOf("Q2239243"))),
+  {
+    id: "criatura-mitologica",
+    title: "Criatura mitológica ou lendária",
+    // O folclore brasileiro (saci, iara, curupira) quase não aparece como "criatura lendária" no Wikidata.
+    // Só as conhecidas: nome da lista nunca passa de comum, e o folclore raro vem do Wikidata com a raridade dele.
+    sources: [
+      { kind: "manual", items: CRIATURAS },
+      { kind: "manual", items: CRIATURAS_RARAS, rare: true },
+      wd(kindOf("Q2239243")),
+    ],
+    // "Medusa" e "Hidra" também são bicho do mar: vale o artigo de criatura ou personagem.
+    classes: ["Q2239243", "Q4271324", "Q95074", "Q24334685", "Q17442446"],
+  },
   {
     id: "personagem-biblico",
     title: "Personagem da Bíblia",

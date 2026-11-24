@@ -509,7 +509,7 @@ async function collect(source: Source): Promise<Candidate[]> {
           options,
           name: stripParens(title),
           extraNames: extra,
-          fromList: true,
+          fromList: !source.rare,
           listIndex,
         };
       });

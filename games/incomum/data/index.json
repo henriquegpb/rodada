@@ -1298,14 +1298,14 @@
  {
   "id": "criatura-mitologica",
   "title": "Criatura mitológica ou lendária",
-  "total": 1133,
+  "total": 1164,
   "obvious": "Anjo",
   "rare": [
-   "Mula sem cabeça",
-   "Nechtan",
-   "Onikuma"
+   "Telo",
+   "Tralalero Tralala",
+   "Valravn"
   ],
-  "v": "c7bbb2ad68"
+  "v": "fc52b5233d"
  },
  {
   "id": "personagem-biblico",
