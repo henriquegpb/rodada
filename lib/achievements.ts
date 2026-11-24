@@ -19,8 +19,11 @@ export interface Counters {
   maxStreak: number;
   /** Dias com todos os jogos da Rodada terminados. */
   fullRounds: number;
-  /** Por slug: partidas do dia terminadas e Jogos perfeitos (Nota 100). */
-  byGame: Record<string, { plays: number; perfect: number }>;
+  /**
+   * Por slug: partidas do dia terminadas, Jogos perfeitos (Nota 100) e o melhor resultado numa
+   * partida (o maior `count`; ausente nos contadores gravados antes dele existir).
+   */
+  byGame: Record<string, { plays: number; perfect: number; best?: number }>;
 }
 
 export const EMPTY_COUNTERS: Counters = { daysPlayed: 0, maxStreak: 0, fullRounds: 0, byGame: {} };
@@ -32,6 +35,8 @@ export interface Achievement {
   /** Valor mínimo de cada Nível, de Bronze a Diamante, em ordem crescente. */
   thresholds: readonly [number, number, number, number];
   metric(counters: Counters): number;
+  /** Nome de um valor, para mostrar no lugar do número (o bicho do Incomum). */
+  label?(value: number): string;
 }
 
 const perGame = roundGames.flatMap(({ meta }): Achievement[] => [
@@ -49,6 +54,15 @@ const perGame = roundGames.flatMap(({ meta }): Achievement[] => [
     thresholds: [1, 10, 50, 150],
     metric: (c) => c.byGame[meta.slug]?.perfect ?? 0,
   },
+  // A do recorde, só nos jogos que declaram uma (o bicho mais fundo do Incomum).
+  ...(meta.bestAchievement
+    ? [
+        {
+          ...meta.bestAchievement,
+          metric: (c: Counters) => meta.bestAchievement!.metric(c.byGame[meta.slug]?.best ?? 0),
+        },
+      ]
+    : []),
 ]);
 
 /** Registro das Conquistas, na ordem em que aparecem no Perfil. */

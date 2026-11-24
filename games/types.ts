@@ -76,6 +76,9 @@ export type GuessCheck<F> =
   /** Tentativa recusada sem gastar vida; `error` é a mensagem para o jogador. */
   | { ok: false; error: string };
 
+/** Lê um arquivo JSON de public/ pelo caminho relativo ("incomum/cor.json?v=…"). */
+export type PublicFileReader = (path: string) => Promise<unknown>;
+
 export interface GameEngine<P = unknown, A = unknown, F = unknown> {
   /** Desafio do dia. Deve ser determinístico para o mesmo `dateKey`. */
   createChallenge(dateKey: string): { puzzle: P; answer: A };
@@ -86,10 +89,11 @@ export interface GameEngine<P = unknown, A = unknown, F = unknown> {
   /** Jogos por pontos: o total que o desafio vale, base da Nota (veja `gradePlay`). */
   maxPoints?(puzzle: P): number;
   /**
-   * Baixa o que o desafio do dia precisa para `checkGuess` (jogo com respostas grandes demais para
-   * irem todas no bundle). O serviço de partidas espera por ele antes de abrir a partida.
+   * Carrega o que o desafio do dia precisa para `checkGuess` (jogo com respostas grandes demais para
+   * irem todas no bundle). `read` lê um arquivo de public/: no navegador baixa, no servidor lê do
+   * disco. O serviço de partidas e o servidor (que refaz a partida) esperam por ele.
    */
-  prepare?(dateKey: string): Promise<void>;
+  prepare?(dateKey: string, read: PublicFileReader): Promise<void>;
   /** Se `prepare` já terminou para o dia; enquanto não, a partida não abre durante o render. */
   isReady?(dateKey: string): boolean;
 }
@@ -122,6 +126,19 @@ export interface GameMeta<R extends GameRules = GameRules> {
   resultDelayMs?: number;
   /** Dia em que o jogo entrou no site (YYYY-MM-DD). Sem ele, a estreia do Rodada (EPOCH_DATE). */
   launchedOn?: string;
+  /**
+   * Conquista do melhor resultado numa partida só (o maior `count`: os pontos, nos jogos por pontos),
+   * além das de todo jogo (Fiel e Perfeito). `metric` transforma esse recorde no valor medido e
+   * `label` dá nome a um valor (o Incomum mostra o bicho, em vez de um número).
+   */
+  bestAchievement?: {
+    id: string;
+    name: string;
+    description: string;
+    thresholds: readonly [number, number, number, number];
+    metric(best: number): number;
+    label?(value: number): string;
+  };
   howToPlay: string[];
   /**
    * Título e descrição para buscadores e prévias de link, com as palavras que as pessoas buscam
