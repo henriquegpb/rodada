@@ -118,10 +118,17 @@ function openPlay(engine: GameEngine, slug: string, dateKey: string, practice: b
   return toView(slug, dateKey, puzzle, practice, stored);
 }
 
+/** No navegador, os arquivos de public/ são baixados do próprio site. */
+async function readPublic(path: string): Promise<unknown> {
+  const res = await fetch(`/${path}`);
+  if (!res.ok) throw new Error(`${path}: ${res.status}`);
+  return res.json();
+}
+
 /** A engine, com o que o desafio do dia precisa já baixado (veja `GameEngine.prepare`). */
 async function engineFor(slug: string, dateKey: string): Promise<GameEngine> {
   const engine = await loadEngine(slug);
-  await engine.prepare?.(dateKey);
+  await engine.prepare?.(dateKey, readPublic);
   return engine;
 }
 

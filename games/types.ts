@@ -76,6 +76,9 @@ export type GuessCheck<F> =
   /** Tentativa recusada sem gastar vida; `error` é a mensagem para o jogador. */
   | { ok: false; error: string };
 
+/** Lê um arquivo JSON de public/ pelo caminho relativo ("incomum/cor.json?v=…"). */
+export type PublicFileReader = (path: string) => Promise<unknown>;
+
 export interface GameEngine<P = unknown, A = unknown, F = unknown> {
   /** Desafio do dia. Deve ser determinístico para o mesmo `dateKey`. */
   createChallenge(dateKey: string): { puzzle: P; answer: A };
@@ -86,10 +89,11 @@ export interface GameEngine<P = unknown, A = unknown, F = unknown> {
   /** Jogos por pontos: o total que o desafio vale, base da Nota (veja `gradePlay`). */
   maxPoints?(puzzle: P): number;
   /**
-   * Baixa o que o desafio do dia precisa para `checkGuess` (jogo com respostas grandes demais para
-   * irem todas no bundle). O serviço de partidas espera por ele antes de abrir a partida.
+   * Carrega o que o desafio do dia precisa para `checkGuess` (jogo com respostas grandes demais para
+   * irem todas no bundle). `read` lê um arquivo de public/: no navegador baixa, no servidor lê do
+   * disco. O serviço de partidas e o servidor (que refaz a partida) esperam por ele.
    */
-  prepare?(dateKey: string): Promise<void>;
+  prepare?(dateKey: string, read: PublicFileReader): Promise<void>;
   /** Se `prepare` já terminou para o dia; enquanto não, a partida não abre durante o render. */
   isReady?(dateKey: string): boolean;
 }

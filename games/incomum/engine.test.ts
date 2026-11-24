@@ -8,7 +8,6 @@ import {
   engine,
   findAnswer,
   loadCategory,
-  setItemsLoader,
   type IncomumAnswer,
   type IncomumItems,
 } from "./engine";
@@ -38,15 +37,16 @@ const ANSWER: IncomumAnswer = {
   categories: Array.from({ length: ROUND }, () => REF),
 };
 
-/** As respostas de verdade, lidas do disco em vez de baixadas. */
-const fromDisk = async (ref: IncomumCategoryRef): Promise<IncomumItems> =>
-  ref.id === REF.id
+/** As respostas de verdade, lidas do disco (como no servidor); a categoria de teste, da memória. */
+const readDisk = async (path: string): Promise<unknown> =>
+  path.startsWith(`incomum/${REF.id}.json`)
     ? CITIES
-    : JSON.parse(readFileSync(join(process.cwd(), "public/incomum", `${ref.id}.json`), "utf8"));
+    : JSON.parse(readFileSync(join(process.cwd(), "public", path.replace(/\?.*$/, "")), "utf8"));
+
+const fromDisk = async (ref: IncomumCategoryRef) => (await readDisk(`incomum/${ref.id}.json`)) as IncomumItems;
 
 beforeAll(async () => {
-  setItemsLoader(fromDisk);
-  await loadCategory(REF);
+  await loadCategory(REF, readDisk);
 });
 
 function play(inputs: string[]) {
@@ -197,7 +197,7 @@ describe("engine", () => {
   it("depois de preparar o dia, a resposta mais óbvia de cada categoria é aceita", async () => {
     const day = "2026-11-24";
     expect(engine.isReady!(day)).toBe(false);
-    await engine.prepare!(day);
+    await engine.prepare!(day, readDisk);
     expect(engine.isReady!(day)).toBe(true);
     const { answer } = engine.createChallenge(day);
     const previous: Guess<IncomumFeedback>[] = [];

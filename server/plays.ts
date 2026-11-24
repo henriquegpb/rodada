@@ -10,6 +10,7 @@ import { computeStreak } from "@/lib/stats";
 import type { Db } from "./db";
 import { accountCounters, dailyScores, plays, timedStarts, user } from "./db/schema";
 import { AppError } from "./errors";
+import { readPublicFile } from "./public-files";
 
 /**
  * Registro de partidas: recebe os chutes de uma Partida do dia terminada, refaz a partida com a
@@ -83,6 +84,8 @@ function isOpenDay(dateKey: string, now: Date): boolean {
 async function grade(game: GameDefinition, submission: PlaySubmission): Promise<RecordedPlay> {
   const { rules } = game.meta;
   const engine = await loadEngine(submission.slug);
+  // Jogo com respostas fora do bundle (Incomum): lê as do dia do disco antes de refazer a partida.
+  await engine.prepare?.(submission.dateKey, readPublicFile);
   const { puzzle, answer } = engine.createChallenge(submission.dateKey);
   const replay = replayPlay(engine, rules, answer, submission.guesses, true);
   if (!replay.ok) throw new AppError(422, "invalid_play", replay.error);

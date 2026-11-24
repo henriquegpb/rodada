@@ -1,5 +1,5 @@
 import { pickDailyMany } from "@/lib/daily/seed";
-import type { GameEngine } from "../types";
+import type { GameEngine, PublicFileReader } from "../types";
 import index from "./data/index.json";
 import { answerKey, editDistance, suggestionMessage, typoBudget } from "./match";
 import { ROUND, SKIP, TIERS, TIMEOUT, tierOf } from "./tiers";
@@ -23,26 +23,18 @@ export const CATEGORIES: readonly IncomumCategoryRef[] = index;
 const loaded = new Map<string, IncomumItems>();
 const loading = new Map<string, Promise<void>>();
 
-let fetchItems = async (ref: IncomumCategoryRef): Promise<IncomumItems> => {
-  const res = await fetch(`/incomum/${ref.id}.json?v=${ref.v}`);
-  if (!res.ok) throw new Error(`categoria ${ref.id}: ${res.status}`);
-  return res.json();
-};
-
-/** Troca de onde vêm as respostas (os testes leem do disco, sem servidor). */
-export function setItemsLoader(loader: (ref: IncomumCategoryRef) => Promise<IncomumItems>) {
-  fetchItems = loader;
-}
-
-/** Baixa as respostas da categoria (uma vez só; se falhar, tenta de novo na próxima). */
-export function loadCategory(ref: IncomumCategoryRef): Promise<void> {
+/**
+ * Carrega as respostas da categoria (uma vez só; se falhar, tenta de novo na próxima). O arquivo
+ * fica em public/incomum/; `read` baixa no navegador e lê do disco no servidor.
+ */
+export function loadCategory(ref: IncomumCategoryRef, read: PublicFileReader): Promise<void> {
   const key = `${ref.id}@${ref.v}`;
   if (loaded.has(key)) return Promise.resolve();
   let pending = loading.get(key);
   if (!pending) {
-    pending = fetchItems(ref).then(
+    pending = read(`incomum/${ref.id}.json?v=${ref.v}`).then(
       (items) => {
-        loaded.set(key, items);
+        loaded.set(key, items as IncomumItems);
       },
       (err) => {
         // Rede caiu: a próxima tentativa baixa de novo.
@@ -140,8 +132,8 @@ export const engine: GameEngine<IncomumPuzzle, IncomumAnswer, IncomumFeedback> =
   createChallenge,
 
   // As 7 categorias do dia, baixadas antes da partida abrir (umas dezenas de KB cada).
-  async prepare(dateKey) {
-    await Promise.all(createChallenge(dateKey).answer.categories.map(loadCategory));
+  async prepare(dateKey, read) {
+    await Promise.all(createChallenge(dateKey).answer.categories.map((ref) => loadCategory(ref, read)));
   },
 
   isReady: (dateKey) => createChallenge(dateKey).answer.categories.every((c) => itemsOf(c)),
