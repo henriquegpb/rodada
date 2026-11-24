@@ -6,12 +6,13 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useToday } from "@/lib/daily/hooks";
 import { closeStalePlays } from "@/lib/plays/service";
-import { flushPending } from "@/lib/plays/sync";
+import { flushPending, resendIncomumOnce } from "@/lib/plays/sync";
 import { useImportOnLogin } from "@/lib/ranking/client";
 
 export function Providers({ children }: { children: ReactNode }) {
-  // Partidas que não chegaram ao servidor (sem conexão) vão quando o app abre.
-  useEffect(() => void flushPending(), []);
+  // Partidas que não chegaram ao servidor (sem conexão) vão quando o app abre; depois, uma vez só,
+  // as do Incomum que o servidor recusou na estreia.
+  useEffect(() => void flushPending().then(resendIncomumOnce), []);
   // Quando o app abre e na virada da meia-noite: a partida de ontem que ficou no meio vira desistência.
   const today = useToday();
   useEffect(() => {
