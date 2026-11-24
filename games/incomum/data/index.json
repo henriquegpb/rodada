@@ -158,14 +158,14 @@
  {
   "id": "programa-tv-brasileiro",
   "title": "Programa de TV brasileiro",
-  "total": 1731,
-  "obvious": "Terra e Paixão",
+  "total": 1988,
+  "obvious": "Big Brother Brasil",
   "rare": [
-   "Questão de Família",
-   "Quintal da Cultura",
-   "Ratinho Livre"
+   "Quem Perde, Ganha",
+   "Quem Quer Ser um Milionário?",
+   "Queridos Amigos"
   ],
-  "v": "0eb9ae5041"
+  "v": "bf98433198"
  },
  {
   "id": "filme-brasileiro",
@@ -182,14 +182,14 @@
  {
   "id": "cantor-brasileiro",
   "title": "Cantor ou cantora brasileira",
-  "total": 1805,
+  "total": 1848,
   "obvious": "Hebe Camargo",
   "rare": [
-   "Prêntice",
-   "Ravel",
-   "Ravel Andrade"
+   "Robinson Monteiro",
+   "Rodrigo Campos",
+   "Román Laurito"
   ],
-  "v": "609ac34de8"
+  "v": "909d30a48a"
  },
  {
   "id": "banda-brasileira",
@@ -207,49 +207,49 @@
   "id": "ator-brasileiro",
   "title": "Ator ou atriz brasileira",
   "total": 3000,
-  "obvious": "Pelé",
+  "obvious": "Hebe Camargo",
   "rare": [
-   "Cléa Simões",
    "Cleiton Morais",
-   "Clemente Viscaíno"
+   "Clemente Viscaíno",
+   "Cléo de Páris"
   ],
-  "v": "5b39b47122"
+  "v": "25ddbe7383"
  },
  {
   "id": "humorista-brasileiro",
   "title": "Humorista brasileiro",
-  "total": 75,
-  "obvious": "Ronald Golias",
+  "total": 501,
+  "obvious": "Chico Anysio",
   "rare": [
-   "Rita von Hunty",
-   "Victor Lamoglia",
-   "Caike Luna"
+   "David Cunha",
+   "David Pinheiro",
+   "Dig Dutra"
   ],
-  "v": "72f7001d33"
+  "v": "aca2643e3c"
  },
  {
   "id": "youtuber-brasileiro",
   "title": "Youtuber ou influenciador brasileiro",
-  "total": 137,
-  "obvious": "Pedrinho Matador",
+  "total": 600,
+  "obvious": "Felipe Neto",
   "rare": [
-   "Fefe Schneider",
-   "Games EduUu",
-   "Guilherme Zaiden"
+   "Bruna Laynes",
+   "Bruno Formiga",
+   "Bunitinho"
   ],
-  "v": "b1ea65e02d"
+  "v": "5817f4eadb"
  },
  {
   "id": "apresentador-brasileiro",
   "title": "Apresentador ou apresentadora de TV brasileira",
-  "total": 328,
-  "obvious": "Hebe Camargo",
+  "total": 1230,
+  "obvious": "Faustão",
   "rare": [
-   "Geraldo Luís",
-   "Giovanna Nader",
-   "Gontijo Teodoro"
+   "Fábio Brasil",
+   "Fabio Turci",
+   "Fábio William"
   ],
-  "v": "4a921bf8be"
+  "v": "88a5b95041"
  },
  {
   "id": "escritor-brasileiro",
@@ -257,35 +257,35 @@
   "total": 3000,
   "obvious": "Paulo Coelho",
   "rare": [
-   "Artur Pinto da Rocha",
-   "Artur Rodrigues da Rocha",
-   "Ascânio Lopes"
+   "Antônio Hortêncio Cabral de Vasconcelos",
+   "Antônio José Gonçalves Chaves",
+   "Antônio Lopes de Sá"
   ],
-  "v": "e8cf6f5a64"
+  "v": "616847694b"
  },
  {
   "id": "sertanejo",
   "title": "Cantor ou dupla de sertanejo",
-  "total": 411,
-  "obvious": "Paula Fernandes",
+  "total": 533,
+  "obvious": "Marília Mendonça",
   "rare": [
-   "Original",
-   "Orquestra da Terra",
-   "Orquestra Paulistana de Viola Caipira"
+   "Marília Mendonça: Sentimento Louco",
+   "Marlon & Maicon",
+   "Maurício & Mauri"
   ],
-  "v": "5c054be6f2"
+  "v": "49a0c09eb9"
  },
  {
   "id": "funk",
   "title": "Artista de funk",
-  "total": 81,
+  "total": 166,
   "obvious": "Anitta",
   "rare": [
-   "Lia",
-   "MC Alandim",
-   "MC Beth"
+   "Jaula das Gostozudas",
+   "No Chão Novinha",
+   "Noitada"
   ],
-  "v": "2a7c399b22"
+  "v": "5bf400f6cf"
  },
  {
   "id": "mpb",
@@ -321,55 +321,55 @@
    "Recreio de Ramos",
    "Recreio de São Carlos"
   ],
-  "v": "cd68d339a3"
+  "v": "7c01362c26"
  },
  {
   "id": "jogador-selecao",
-  "title": "Jogador que já jogou pela Seleção Brasileira",
-  "total": 806,
+  "title": "Jogador ou jogadora da Seleção Brasileira",
+  "total": 1611,
   "obvious": "Pelé",
   "rare": [
-   "Celso Roth",
-   "Chico Netto",
-   "Delém"
+   "Ipojucan",
+   "Jancarlos",
+   "João Paulo"
   ],
-  "v": "c6ffe09143"
+  "v": "11bf9f91aa"
  },
  {
   "id": "time-brasileiro",
   "title": "Time de futebol brasileiro",
   "total": 1533,
-  "obvious": "Coritiba Foot Ball Club",
+  "obvious": "Flamengo",
   "rare": [
-   "Ipojuca Atlético Clube",
-   "Ipojuca Futebol Clube",
-   "Irajá Atlético Clube"
+   "Ipanema Tatuís",
+   "Ipiranga de Aliança Esporte Clube",
+   "Ipojuca Futebol Clube"
   ],
-  "v": "c7d734bc2b"
+  "v": "dcf88fce54"
  },
  {
   "id": "empresa-brasileira",
   "title": "Empresa ou marca brasileira",
-  "total": 292,
-  "obvious": "Embraer",
+  "total": 416,
+  "obvious": "Petrobras",
   "rare": [
-   "Matte Leão",
-   "Minerva Foods",
-   "Mitsubishi Motors Brasil"
+   "Aero Bravo",
+   "Agência Estado",
+   "Albras"
   ],
-  "v": "c89c8db03f"
+  "v": "721b783bff"
  },
  {
   "id": "praia-brasileira",
   "title": "Praia brasileira",
-  "total": 523,
+  "total": 574,
   "obvious": "Copacabana",
   "rare": [
-   "Praia de Cidreira",
-   "Praia de Dentro",
-   "Praia de Geremias"
+   "Praia de Barreta",
+   "Praia de Barrinha",
+   "Praia de Bombas"
   ],
-  "v": "a47d6f6a57"
+  "v": "57008bdd68"
  },
  {
   "id": "rio-brasileiro",
@@ -381,7 +381,7 @@
    "Rio Ituim",
    "Rio Jacaré"
   ],
-  "v": "d0f7a86d95"
+  "v": "a1561eec25"
  },
  {
   "id": "bairro-rio",
@@ -408,16 +408,94 @@
   "v": "1f16d2d98d"
  },
  {
+  "id": "ponto-turistico-brasil",
+  "title": "Ponto turístico do Brasil",
+  "total": 138,
+  "obvious": "Cristo Redentor",
+  "rare": [
+   "Instituto Ricardo Brennand",
+   "Praia dos Carneiros",
+   "Canoa Quebrada"
+  ],
+  "v": "98b84365e9",
+  "since": "2026-11-25"
+ },
+ {
+  "id": "estado-brasil",
+  "title": "Estado brasileiro (ou o DF)",
+  "total": 27,
+  "obvious": "São Paulo",
+  "rare": [
+   "Sergipe",
+   "Rondônia",
+   "Tocantins"
+  ],
+  "v": "d61ad9add3",
+  "since": "2026-11-25"
+ },
+ {
+  "id": "presidente-brasil",
+  "title": "Presidente do Brasil",
+  "total": 39,
+  "obvious": "Lula",
+  "rare": [
+   "Artur Bernardes",
+   "Delfim Moreira",
+   "Ranieri Mazzilli"
+  ],
+  "v": "bc6281edab",
+  "since": "2026-11-25"
+ },
+ {
+  "id": "musica-brasileira",
+  "title": "Música brasileira (o nome da canção)",
+  "total": 160,
+  "obvious": "Garota de Ipanema",
+  "rare": [
+   "Assum Preto",
+   "Anunciação",
+   "Eu Só Quero um Xodó"
+  ],
+  "v": "cbf3d2d7d8",
+  "since": "2026-11-25"
+ },
+ {
+  "id": "banco",
+  "title": "Banco ou carteira digital",
+  "total": 60,
+  "obvious": "Itaú",
+  "rare": [
+   "Ame",
+   "RecargaPay",
+   "PayPal"
+  ],
+  "v": "1e87a4e5cb",
+  "since": "2026-11-25"
+ },
+ {
+  "id": "loja",
+  "title": "Loja ou rede de lojas",
+  "total": 100,
+  "obvious": "Magazine Luiza",
+  "rare": [
+   "Mobly",
+   "Lojas Avenida",
+   "Forever 21"
+  ],
+  "v": "69a3a96df9",
+  "since": "2026-11-25"
+ },
+ {
   "id": "comida-brasileira",
   "title": "Comida típica brasileira",
-  "total": 91,
-  "obvious": "Doce de leite",
+  "total": 214,
+  "obvious": "Feijoada",
   "rare": [
-   "Unha de caranguejo",
-   "Xis",
-   "Afogado"
+   "Queijadinha",
+   "Queijo canastra",
+   "Romeu e Julieta"
   ],
-  "v": "86b72d318d"
+  "v": "e42b5baa0d"
  },
  {
   "id": "prato-nordeste",
@@ -513,7 +591,7 @@
    "Rio Canadian",
    "Rio Han"
   ],
-  "v": "4a2d94c506"
+  "v": "7752ba3278"
  },
  {
   "id": "montanha",
@@ -525,7 +603,7 @@
    "Rondoy",
    "Serra da Coroa"
   ],
-  "v": "59547a3f3b"
+  "v": "c48397b371"
  },
  {
   "id": "vulcao",
@@ -537,7 +615,7 @@
    "Pico Mascarin",
    "Pular"
   ],
-  "v": "ac5cb5fd97"
+  "v": "d79b490f33"
  },
  {
   "id": "ilha",
@@ -549,7 +627,7 @@
    "Ilha Gau",
    "Ilha Jemo"
   ],
-  "v": "ffb89a4c53"
+  "v": "fe0cc37814"
  },
  {
   "id": "deserto",
@@ -561,7 +639,7 @@
    "Deserto de Escalante",
    "Deserto de Mu Us"
   ],
-  "v": "385636adda"
+  "v": "0b6583eec4"
  },
  {
   "id": "cachoeira",
@@ -573,7 +651,7 @@
    "Cataratas de Wilberforce",
    "Millaa Millaa Falls"
   ],
-  "v": "29b2097870"
+  "v": "75232ab690"
  },
  {
   "id": "lago",
@@ -585,7 +663,7 @@
    "Lago Baldegg",
    "Lago Ellsworth"
   ],
-  "v": "77f68f0250"
+  "v": "13243f9b8c"
  },
  {
   "id": "idioma",
@@ -636,6 +714,19 @@
   "v": "9fa174b542"
  },
  {
+  "id": "ponto-turistico-mundo",
+  "title": "Ponto turístico fora do Brasil",
+  "total": 160,
+  "obvious": "Torre Eiffel",
+  "rare": [
+   "Catedral de São Basílio",
+   "Hermitage",
+   "Fiordes da Noruega"
+  ],
+  "v": "46267d9c8b",
+  "since": "2026-11-25"
+ },
+ {
   "id": "museu",
   "title": "Museu",
   "total": 907,
@@ -657,7 +748,7 @@
    "Palácio do Catete",
    "Palácio do Partal"
   ],
-  "v": "fb627b5e88"
+  "v": "9ce43ea1f8"
  },
  {
   "id": "companhia-aerea",
@@ -862,6 +953,19 @@
    "S/2009 (612733) 1"
   ],
   "v": "e77268bb6c"
+ },
+ {
+  "id": "flor",
+  "title": "Flor",
+  "total": 102,
+  "obvious": "Rosa",
+  "rare": [
+   "Gloxínia",
+   "Vinca",
+   "Crocus"
+  ],
+  "v": "e3881c82a0",
+  "since": "2026-11-25"
  },
  {
   "id": "filme-ficcao-cientifica",
@@ -1453,15 +1557,93 @@
  },
  {
   "id": "danca-do-mundo",
-  "title": "Dança do mundo (sem brasileiras)",
-  "total": 1580,
-  "obvious": "Balé",
+  "title": "Dança ou ritmo de dança",
+  "total": 1689,
+  "obvious": "Samba",
   "rare": [
-   "Dança do cavalo-marinho",
-   "Dança dos Países Baixos",
-   "Dança profética"
+   "Chula",
+   "Cilveloy",
+   "Comic ballet"
   ],
-  "v": "626ec539ea"
+  "v": "dcb23fa7eb"
+ },
+ {
+  "id": "vilao",
+  "title": "Vilão ou vilã (de filme, desenho, novela ou jogo)",
+  "total": 140,
+  "obvious": "Darth Vader",
+  "rare": [
+   "Dick Vigarista",
+   "João Bafo de Onça",
+   "Mancha Negra"
+  ],
+  "v": "5469ea2827",
+  "since": "2026-11-25"
+ },
+ {
+  "id": "personagem-disney",
+  "title": "Personagem da Disney ou da Pixar",
+  "total": 180,
+  "obvious": "Mickey Mouse",
+  "rare": [
+   "Dug",
+   "Remy",
+   "Mate"
+  ],
+  "v": "1ebf7498f5",
+  "since": "2026-11-25"
+ },
+ {
+  "id": "turma-da-monica",
+  "title": "Personagem da Turma da Mônica",
+  "total": 72,
+  "obvious": "Mônica",
+  "rare": [
+   "Alminha",
+   "Thuga",
+   "Tecodonte"
+  ],
+  "v": "4cb94a2dbf",
+  "since": "2026-11-25"
+ },
+ {
+  "id": "harry-potter",
+  "title": "Personagem de Harry Potter",
+  "total": 124,
+  "obvious": "Harry Potter",
+  "rare": [
+   "Dama Cinzenta",
+   "Mulher Gorda",
+   "Godrico Gryffindor"
+  ],
+  "v": "5af076a6f0",
+  "since": "2026-11-25"
+ },
+ {
+  "id": "simpsons",
+  "title": "Personagem de Os Simpsons",
+  "total": 90,
+  "obvious": "Homer",
+  "rare": [
+   "Sr. Teeny",
+   "Doris",
+   "Sr. Largo"
+  ],
+  "v": "baac7b7d93",
+  "since": "2026-11-25"
+ },
+ {
+  "id": "sitio-picapau",
+  "title": "Personagem do Sítio do Picapau Amarelo",
+  "total": 34,
+  "obvious": "Emília",
+  "rare": [
+   "Coronel Teodorico",
+   "Elias Turco",
+   "Dona Carochinha"
+  ],
+  "v": "2c23302e2f",
+  "since": "2026-11-25"
  },
  {
   "id": "esporte",
@@ -1512,6 +1694,19 @@
   "v": "9f4a79b23c"
  },
  {
+  "id": "time-nba",
+  "title": "Time da NBA",
+  "total": 31,
+  "obvious": "Lakers",
+  "rare": [
+   "Grizzlies",
+   "Pelicans",
+   "Kings"
+  ],
+  "v": "18327b4482",
+  "since": "2026-11-25"
+ },
+ {
   "id": "tenista",
   "title": "Tenista",
   "total": 1630,
@@ -1548,6 +1743,84 @@
   "v": "8bbdd89054"
  },
  {
+  "id": "participante-bbb",
+  "title": "Participante do Big Brother Brasil",
+  "total": 119,
+  "obvious": "Juliette",
+  "rare": [
+   "Jaque Khury",
+   "Lucas Chumbo",
+   "Marinalva de Almeida"
+  ],
+  "v": "2fe872555c",
+  "since": "2026-11-25"
+ },
+ {
+  "id": "medalhista-olimpico-brasileiro",
+  "title": "Medalhista olímpico brasileiro",
+  "total": 468,
+  "obvious": "Rebeca Andrade",
+  "rare": [
+   "Cintia Tuiú",
+   "Claudinha",
+   "Duda Sampaio"
+  ],
+  "v": "42adf7333b",
+  "since": "2026-11-25"
+ },
+ {
+  "id": "jogador-volei",
+  "title": "Jogador ou jogadora de vôlei brasileira",
+  "total": 562,
+  "obvious": "Giba",
+  "rare": [
+   "Eduardo Arruda",
+   "Elda Maria Pimenta",
+   "Elymara Silva"
+  ],
+  "v": "9760b0d676",
+  "since": "2026-11-25"
+ },
+ {
+  "id": "tecnico-futebol",
+  "title": "Técnico ou técnica de futebol",
+  "total": 3000,
+  "obvious": "Tite",
+  "rare": [
+   "Emmanuel Sanon",
+   "Eric Van Meir",
+   "Erich Beer"
+  ],
+  "v": "d528fe3774",
+  "since": "2026-11-25"
+ },
+ {
+  "id": "ator-hollywood",
+  "title": "Ator ou atriz de Hollywood",
+  "total": 143,
+  "obvious": "Tom Cruise",
+  "rare": [
+   "Demi Moore",
+   "Sharon Stone",
+   "Michelle Pfeiffer"
+  ],
+  "v": "e6d0c9e36e",
+  "since": "2026-11-25"
+ },
+ {
+  "id": "modelo-brasileira",
+  "title": "Modelo brasileira ou brasileiro",
+  "total": 706,
+  "obvious": "Gisele Bündchen",
+  "rare": [
+   "Bruno Mooneyhan",
+   "Camila Espinosa",
+   "Camila Trindade"
+  ],
+  "v": "5df297f8d2",
+  "since": "2026-11-25"
+ },
+ {
   "id": "time-europeu",
   "title": "Time de futebol europeu",
   "total": 156,
@@ -1569,7 +1842,7 @@
    "Estádio Taïeb Mhiri",
    "Estádio Ticha"
   ],
-  "v": "c0daa7e952"
+  "v": "8ace0fcac8"
  },
  {
   "id": "jogo-tabuleiro",
@@ -1598,26 +1871,26 @@
  {
   "id": "profissao",
   "title": "Profissão",
-  "total": 781,
-  "obvious": "Ator",
+  "total": 961,
+  "obvious": "Médico",
   "rare": [
-   "Köçek",
-   "Moralistas franceses",
-   "Neurocientista"
+   "Product manager",
+   "Redator publicitário",
+   "Refusenik"
   ],
-  "v": "0545eb72ee"
+  "v": "69dc48f688"
  },
  {
   "id": "doenca",
   "title": "Doença",
-  "total": 377,
-  "obvious": "Síndrome da imunodeficiência adquirida",
+  "total": 560,
+  "obvious": "Dengue",
   "rare": [
-   "Miosite por corpúsculos de inclusão",
-   "Neoplasia endócrina múltipla do tipo 1",
-   "Síndrome de Aicardi-Goutières"
+   "Querubismo",
+   "Síndrome de Gitelman",
+   "Síndrome de Landau-Kleffner"
   ],
-  "v": "681d6651bb"
+  "v": "3baebe01f7"
  },
  {
   "id": "fobia",
@@ -1657,15 +1930,15 @@
  },
  {
   "id": "orgao",
-  "title": "Órgão do corpo humano",
-  "total": 927,
-  "obvious": "Olho",
+  "title": "Órgão ou parte do corpo humano",
+  "total": 83,
+  "obvious": "Coração",
   "rare": [
-   "Músculo transverso profundo do períneo",
-   "Músculo transverso superficial do períneo",
-   "Nervo cutâneo medial do antebraço"
+   "Retina",
+   "Córnea",
+   "Íris"
   ],
-  "v": "e55f9ae7dc"
+  "v": "ec6379e89b"
  },
  {
   "id": "elemento-quimico",
@@ -1718,14 +1991,14 @@
  {
   "id": "fast-food",
   "title": "Rede de fast-food",
-  "total": 99,
+  "total": 164,
   "obvious": "McDonald's",
   "rare": [
-   "China in Box",
-   "Fuzzy's Taco Shop",
-   "Juice It Up!"
+   "Blimpie",
+   "Cousins Subs",
+   "Portillo's Restaurants"
   ],
-  "v": "1717df05a6"
+  "v": "42b0f45861"
  },
  {
   "id": "coquetel",
@@ -1766,14 +2039,92 @@
  {
   "id": "sobremesa",
   "title": "Sobremesa ou doce",
-  "total": 191,
-  "obvious": "Sorvete",
+  "total": 295,
+  "obvious": "Brigadeiro",
   "rare": [
-   "Cream cracker",
-   "Goldfish",
-   "Mantecado"
+   "Sorvete tailandês",
+   "Cassatella di Sant'Agata",
+   "Jeonbokjuk"
   ],
-  "v": "4e6585bfdc"
+  "v": "23e516e88e"
+ },
+ {
+  "id": "fruta",
+  "title": "Fruta",
+  "total": 109,
+  "obvious": "Banana",
+  "rare": [
+   "Cereja-do-rio-grande",
+   "Uxi",
+   "Abricó"
+  ],
+  "v": "3b87efcc6a",
+  "since": "2026-11-25"
+ },
+ {
+  "id": "festa-junina",
+  "title": "Comida ou bebida de festa junina",
+  "total": 48,
+  "obvious": "Pamonha",
+  "rare": [
+   "Cachaça",
+   "Licor de jenipapo",
+   "Broa de milho"
+  ],
+  "v": "a7cb537917",
+  "since": "2026-11-25"
+ },
+ {
+  "id": "cerveja",
+  "title": "Marca de cerveja",
+  "total": 107,
+  "obvious": "Skol",
+  "rare": [
+   "Way Beer",
+   "Bodebrown",
+   "Dama Bier"
+  ],
+  "v": "1ce9f600e8",
+  "since": "2026-11-25"
+ },
+ {
+  "id": "bebida-sem-alcool",
+  "title": "Bebida sem álcool (refrigerante, suco, marca...)",
+  "total": 112,
+  "obvious": "Coca-Cola",
+  "rare": [
+   "Sufresh",
+   "Do Bem",
+   "Natural One"
+  ],
+  "v": "1f939a53c7",
+  "since": "2026-11-25"
+ },
+ {
+  "id": "doce-de-marca",
+  "title": "Chocolate, bala ou doce de marca",
+  "total": 81,
+  "obvious": "Bis",
+  "rare": [
+   "Dadinho",
+   "Yogurte 100",
+   "Pirulito Pop"
+  ],
+  "v": "19aea86096",
+  "since": "2026-11-25"
+ },
+ {
+  "id": "biscoito-salgadinho",
+  "title": "Biscoito ou salgadinho de pacote",
+  "total": 72,
+  "obvious": "Trakinas",
+  "rare": [
+   "Choco Biscuit",
+   "Pingo d'Ouro",
+   "Yoki"
+  ],
+  "v": "e86279ea51",
+  "since": "2026-11-25"
  },
  {
   "id": "bebida-alcoolica",
@@ -1812,16 +2163,55 @@
   "v": "b10cb6320c"
  },
  {
-  "id": "roupa",
-  "title": "Peça de roupa",
-  "total": 1651,
-  "obvious": "Sapato",
+  "id": "app",
+  "title": "Aplicativo, site ou jogo de celular",
+  "total": 138,
+  "obvious": "WhatsApp",
   "rare": [
-   "Confraria de Belchite",
-   "Coroa de Coroação de Jorge IV",
-   "Coroa de Estado de Jorge I"
+   "FarmVille",
+   "Colheita Feliz",
+   "Cut the Rope"
   ],
-  "v": "da14c60627"
+  "v": "242fa8e560",
+  "since": "2026-11-25"
+ },
+ {
+  "id": "marca-tecnologia",
+  "title": "Marca de tecnologia ou eletrônicos",
+  "total": 110,
+  "obvious": "Apple",
+  "rare": [
+   "Bosch",
+   "Midea",
+   "Whirlpool"
+  ],
+  "v": "ffbe7047d2",
+  "since": "2026-11-25"
+ },
+ {
+  "id": "filme-disney",
+  "title": "Filme da Disney ou da Pixar",
+  "total": 140,
+  "obvious": "O Rei Leão",
+  "rare": [
+   "O Diário da Princesa 2: Casamento Real",
+   "Operação Cupido",
+   "Querida, Encolhi as Crianças"
+  ],
+  "v": "c27c3c633a",
+  "since": "2026-11-25"
+ },
+ {
+  "id": "roupa",
+  "title": "Peça de roupa ou calçado",
+  "total": 122,
+  "obvious": "Camiseta",
+  "rare": [
+   "Baby-doll",
+   "Ceroula",
+   "Samba-canção"
+  ],
+  "v": "c77afb0b1e"
  },
  {
   "id": "movel",
