@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { Creature } from "./art";
 import { MAX_DEPTH, MAX_POINTS, MILESTONES, milestonesAt } from "./tiers";
@@ -32,7 +32,9 @@ function mix(a: string, b: string, t: number) {
 
 /** Cor da água em cima e embaixo, a uma profundidade. */
 export function waterAt(depth: number): [string, string] {
-  const i = Math.max(0, WATER.findIndex(([d]) => d > depth) - 1);
+  // No fundo da fossa (ou além) não há trecho seguinte: fica a cor do último.
+  const next = WATER.findIndex(([d]) => d > depth);
+  const i = next === -1 ? WATER.length - 2 : Math.max(0, next - 1);
   const [d0, t0, b0] = WATER[i];
   const [d1, t1, b1] = WATER[Math.min(i + 1, WATER.length - 1)];
   const t = d1 === d0 ? 0 : Math.min(1, (depth - d0) / (d1 - d0));
@@ -143,6 +145,9 @@ export function Ocean({
         </svg>
       </div>
 
+      {/* As paredes da fossa e o que passa por ela: tudo sobe enquanto o submarino desce. */}
+      <Scenery depth={depth} />
+
       {/* Algas do recife */}
       <div
         className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3"
@@ -186,6 +191,253 @@ export function Ocean({
       />
 
       {children}
+    </div>
+  );
+}
+
+/**
+ * A largura de cada parede de rocha (fração do card): quase nada perto da superfície, abrindo devagar
+ * na descida e se fechando de vez na zona hadal, dentro da fossa.
+ */
+function wallWidth(depth: number) {
+  return 0.045 + 0.075 * Math.pow(clamp(depth / 6000), 0.7) + 0.08 * clamp((depth - 6000) / 4000);
+}
+
+/** A cor da rocha (no fundo da parede e na borda): escura na água clara, um pouco mais clara no breu. */
+function rockAt(depth: number): [base: string, edge: string] {
+  const t = clamp(depth / 5000);
+  return [mix("#04213a", "#161f3a", t), mix("#2b7fa8", "#4a5f96", t)];
+}
+
+/** O recorte de uma parede (a borda de dentro à direita), repetido para baixo sem emenda. */
+const tile = (path: string, height: number) =>
+  `url("data:image/svg+xml,${encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 ${height}" preserveAspectRatio="none"><path d="${path}"/></svg>`,
+  )}")`;
+const FRONT_WALL = tile(
+  "M0 0 H72 L86 34 L66 70 L80 104 L94 128 L74 160 L60 196 L82 226 L68 258 L90 280 L72 300 H0 Z",
+  300,
+);
+const BACK_WALL = tile(
+  "M0 0 H60 Q92 40 70 90 Q50 140 84 190 Q100 230 66 280 Q44 330 78 380 Q88 400 60 420 H0 Z",
+  420,
+);
+
+/** Recorta a parede e a faz subir com a descida (`--scroll`); `speed` menor é mais longe. */
+function wallStyle(image: string, height: number, speed: number): CSSProperties {
+  const position = `0 calc(var(--scroll, 0) * ${-speed}px)`;
+  return {
+    maskImage: image,
+    WebkitMaskImage: image,
+    maskSize: `100% ${height}px`,
+    WebkitMaskSize: `100% ${height}px`,
+    maskRepeat: "repeat-y",
+    WebkitMaskRepeat: "repeat-y",
+    maskPosition: position,
+    WebkitMaskPosition: position,
+  };
+}
+
+const FISH = "M1 10 Q10 1 24 5 L38 0 L33 10 L38 20 L24 15 Q10 19 1 10 Z";
+const svg = (viewBox: string, body: string) =>
+  `<svg viewBox="${viewBox}" fill="currentColor" style="display:block;width:100%;height:auto">${body}</svg>`;
+
+/** O que passa pela janela na descida, em silhueta, olhando para a esquerda. */
+const PASSING = {
+  peixe: { width: 34, svg: svg("0 0 40 20", `<path d="${FISH}"/>`) },
+  cardume: {
+    width: 84,
+    svg: svg(
+      "0 0 96 56",
+      [
+        [2, 18, 1],
+        [30, 2, 0.8],
+        [44, 30, 0.9],
+        [66, 12, 0.75],
+      ]
+        .map(([x, y, s]) => `<path transform="translate(${x} ${y}) scale(${s})" d="${FISH}"/>`)
+        .join(""),
+    ),
+  },
+  "agua-viva": {
+    width: 30,
+    svg: svg(
+      "0 0 36 48",
+      `<path d="M2 18 Q2 2 18 2 Q34 2 34 18 Q26 15 18 18 Q10 15 2 18 Z"/><path d="M8 18 Q5 30 9 44 M15 19 Q13 32 16 46 M22 19 Q24 32 21 46 M29 18 Q32 30 28 44" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>`,
+    ),
+  },
+  lula: {
+    width: 56,
+    svg: svg(
+      "0 0 60 22",
+      `<path d="M28 11 Q38 1 58 11 Q38 21 28 11 Z"/><ellipse cx="28" cy="11" rx="6" ry="5"/><path d="M26 8 Q16 4 3 6 M26 11 Q14 11 1 12 M26 14 Q16 18 3 17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>`,
+    ),
+  },
+  lanterna: {
+    width: 42,
+    svg: svg(
+      "0 0 48 26",
+      `<path transform="translate(8 5)" d="${FISH}"/><path d="M12 10 Q8 1 3 4" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="3" cy="4" r="3" fill="#5eead4" style="filter:drop-shadow(0 0 4px #5eead4)"/>`,
+    ),
+  },
+  pedra: {
+    width: 86,
+    svg: svg(
+      "0 0 100 60",
+      `<path d="M0 6 L30 2 L58 10 L84 22 L98 36 L80 46 L52 52 L22 58 L0 56 Z"/><path d="M4 8 L30 4 L56 12 L80 24" fill="none" stroke="rgb(255 255 255 / 0.16)" stroke-width="3" stroke-linecap="round"/>`,
+    ),
+  },
+} as const;
+type PassingKind = keyof typeof PASSING;
+
+/** O que passa em cada camada do mar: peixes perto da superfície, bichos que brilham e rocha no fundo. */
+function passingAt(depth: number): PassingKind[] {
+  if (depth < 30) return ["peixe", "cardume"];
+  if (depth < 200) return ["peixe", "cardume", "peixe", "pedra"];
+  if (depth < 1000) return ["cardume", "peixe", "agua-viva", "lula", "pedra"];
+  if (depth < 4000) return ["agua-viva", "lanterna", "lula", "pedra", "pedra"];
+  return ["lanterna", "pedra", "pedra", "agua-viva"];
+}
+
+/** Uma coisa passando: o elemento, onde está (px do topo) e a velocidade (menor = mais longe). */
+interface Thing {
+  el: HTMLDivElement;
+  y: number;
+  speed: number;
+}
+
+const THINGS = 9;
+/** Margem em cima e embaixo do card, para as coisas entrarem e saírem fora de vista. */
+const MARGIN = 110;
+
+/** Sorteia o que a coisa vira ao entrar por baixo: um bicho da camada do momento, ou uma pedra na parede. */
+function dress(thing: Thing, depth: number, width: number) {
+  const kinds = passingAt(depth);
+  const kind = kinds[Math.floor(Math.random() * kinds.length)];
+  const far = Math.random();
+  const rock = kind === "pedra";
+  // No celular, pedra e cardume menores, para não tomarem o card.
+  const size = Math.min(PASSING[kind].width, width * (rock ? 0.16 : 0.2)) * (1 - far * 0.4);
+  thing.speed = 0.95 - far * 0.45;
+  const right = Math.random() < 0.5;
+  const edge = wallWidth(depth) * 100;
+  const sizePct = (size / Math.max(width, 1)) * 100;
+  // A pedra entra um pouco na parede, para sair dela; o resto passa no meio.
+  const left = rock
+    ? right
+      ? 100 - edge - sizePct * 0.75
+      : edge - sizePct * 0.25
+    : 16 + Math.random() * Math.max(0, 62 - sizePct);
+  const deep = depth > 1200;
+  Object.assign(thing.el.style, {
+    left: `${left}%`,
+    width: `${size}px`,
+    color: rock ? rockAt(depth)[0] : deep ? "#c7d7fe" : "#062b4f",
+    opacity: String(rock ? 0.95 : (deep ? 0.3 : 0.38) * (1 - far * 0.35)),
+  });
+  thing.el.innerHTML = PASSING[kind].svg;
+  // O peixe nada para um lado ou para o outro; a pedra sai da parede do lado dela.
+  const flip = rock ? right : Math.random() < 0.5;
+  (thing.el.firstElementChild as SVGElement).style.scale = flip ? "-1 1" : "1 1";
+}
+
+interface SceneryState {
+  things: Thing[];
+  /** Quanto o cenário já subiu, em px. */
+  scroll: number;
+  /** A profundidade do último quadro (NaN antes do primeiro). */
+  depth: number;
+  time: number;
+}
+
+/**
+ * Um quadro da descida: tudo sobe o tanto que a profundidade mudou, com a raiz para os mergulhos
+ * grandes não virarem borrão. O que sai por cima volta por baixo, já como coisa da camada nova.
+ */
+function descend(s: SceneryState, box: HTMLDivElement, host: HTMLDivElement, depth: number) {
+  const now = performance.now();
+  const width = box.clientWidth;
+  if (Number.isNaN(s.depth)) {
+    for (const t of s.things) {
+      dress(t, depth, width);
+      t.el.style.transform = `translate3d(0, ${t.y}px, 0)`;
+    }
+  } else if (depth > s.depth) {
+    const dt = Math.min(0.05, Math.max(0.004, (now - s.time) / 1000));
+    const step = 22 * Math.sqrt((depth - s.depth) * dt);
+    const height = box.clientHeight;
+    s.scroll += step;
+    for (const t of s.things) {
+      t.y -= step * t.speed;
+      if (t.y < -MARGIN) {
+        t.y += height + 2 * MARGIN;
+        dress(t, depth, width);
+      }
+      t.el.style.transform = `translate3d(0, ${t.y}px, 0)`;
+    }
+    host.style.setProperty("--scroll", s.scroll.toFixed(1));
+  }
+  s.depth = depth;
+  s.time = now;
+}
+
+/**
+ * As paredes de rocha dos lados e as coisas que passam (peixes, águas-vivas, pedras). Tudo sobe
+ * enquanto o submarino desce, mais rápido quanto mais rápido ele desce, e para quando ele chega: dá
+ * para ver que ele está descendo e entrando na fossa, com as paredes se fechando no fundo.
+ */
+function Scenery({ depth }: { depth: number }) {
+  const host = useRef<HTMLDivElement>(null);
+  const layer = useRef<HTMLDivElement>(null);
+  const sim = useRef<SceneryState | null>(null);
+
+  useEffect(() => {
+    const box = layer.current;
+    if (!box || reducedMotion()) return;
+    const height = box.clientHeight || 500;
+    const things = Array.from({ length: THINGS }, (_, i) => {
+      const el = document.createElement("div");
+      Object.assign(el.style, { position: "absolute", top: "0", willChange: "transform" });
+      box.appendChild(el);
+      return { el, y: -MARGIN + ((i + Math.random() * 0.8) / THINGS) * (height + 2 * MARGIN), speed: 1 };
+    });
+    sim.current = { things, scroll: 0, depth: NaN, time: performance.now() };
+    return () => {
+      sim.current = null;
+      things.forEach((t) => t.el.remove());
+    };
+  }, []);
+
+  useEffect(() => {
+    if (sim.current && layer.current && host.current) descend(sim.current, layer.current, host.current, depth);
+  }, [depth]);
+
+  const wall = wallWidth(depth);
+  const [rock, rim] = rockAt(depth);
+  const fade = clamp((depth - 10) / 120);
+  const walls = (front: boolean) =>
+    [false, true].map((right) => (
+      <div
+        key={`${front}-${right}`}
+        className="absolute inset-y-0"
+        style={{
+          [right ? "right" : "left"]: 0,
+          width: `${(front ? wall : wall * 1.6 + 0.03) * 100}%`,
+          // A da direita é a da esquerda espelhada, com outro passo para não parecer igual.
+          scale: right ? "-1 1" : undefined,
+          opacity: fade * (front ? 0.95 : 0.45),
+          background: `linear-gradient(90deg, ${rock}, ${rim})`,
+          ...(front
+            ? wallStyle(FRONT_WALL, right ? 340 : 300, 1)
+            : wallStyle(BACK_WALL, right ? 470 : 420, 0.5)),
+        }}
+      />
+    ));
+  return (
+    <div ref={host} className="pointer-events-none absolute inset-0" aria-hidden="true">
+      {walls(false)}
+      <div ref={layer} className="absolute inset-0" />
+      {walls(true)}
     </div>
   );
 }
