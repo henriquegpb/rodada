@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { getGame } from "@/games";
@@ -46,7 +46,6 @@ export function HomeScreen() {
           ))}
         </HoverGlideGroup>
       </section>
-
     </div>
   );
 }
@@ -63,48 +62,87 @@ function NewGameHero({ metas, today, className }: { metas: GameMeta[]; today: st
     .filter((m) => m.launchedOn && m.launchedOn <= today && daysBetween(m.launchedOn, today) < NEW_GAME_DAYS)
     .sort((a, b) => b.launchedOn!.localeCompare(a.launchedOn!))[0];
   if (!meta) return null;
+  return <HeroCard meta={meta} className={className} />;
+}
+
+/**
+ * O card só aparece depois que a página sabe que dia é (no navegador), já com os jogos na tela. Para
+ * não dar um pulo, ele entra abrindo espaço (os jogos descem junto) e o brilho acende depois que ele
+ * assenta. Com "reduzir movimento", aparece direto.
+ */
+function HeroCard({ meta, className }: { meta: GameMeta; className?: string }) {
+  const wrap = useRef<HTMLDivElement>(null);
+  const [lit, setLit] = useState(false);
+  useEffect(() => {
+    const el = wrap.current;
+    let timer = 0;
+    if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      timer = window.setTimeout(() => setLit(true), 0);
+      return () => window.clearTimeout(timer);
+    }
+    const { height, marginTop } = getComputedStyle(el);
+    el.style.overflow = "hidden";
+    const opening = el.animate(
+      [
+        { height: "0px", marginTop: "0px", opacity: 0, transform: "translateY(-8px)" },
+        { height, marginTop, opacity: 1, transform: "translateY(0)" },
+      ],
+      { duration: 650, easing: "cubic-bezier(.22,1,.36,1)" },
+    );
+    opening.onfinish = () => {
+      el.style.overflow = "";
+      timer = window.setTimeout(() => setLit(true), 150);
+    };
+    return () => {
+      opening.cancel();
+      el.style.overflow = "";
+      window.clearTimeout(timer);
+    };
+  }, []);
+
   return (
-    <Link
-      href={`/${meta.slug}`}
-      onPointerEnter={() => preloadEngine(meta.slug)}
-      className={cn(
-        "group grid items-center gap-5 overflow-hidden rounded-2xl border-2 bg-background p-5 outline-none sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] sm:p-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,400px)] lg:gap-8",
-        "transition-shadow duration-500 focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-        className,
-      )}
-      // Fundo da página, contorno na cor do jogo e um brilho dela atrás, mais forte com o mouse em cima.
-      style={{
-        borderColor: meta.color,
-        boxShadow: `0 0 48px -14px ${meta.color}`,
-      }}
-    >
-      <div className="flex flex-col items-start gap-3">
-        <span
-          className="rounded-full px-2.5 py-0.5 text-[11px] font-bold tracking-wider text-white uppercase"
-          style={{ background: meta.color }}
-        >
-          {t.home.newGame}
-        </span>
-        <div>
-          <h2 className="font-display text-4xl leading-[0.95] sm:text-5xl" style={{ color: meta.color }}>
-            {meta.name}
-          </h2>
-          <p className="mt-2 font-semibold leading-snug">{meta.tagline}</p>
-          <p className="mt-1.5 max-w-[46ch] text-sm leading-relaxed text-muted-foreground">{meta.description}</p>
+    <div ref={wrap} className={className}>
+      <Link
+        href={`/${meta.slug}`}
+        onPointerEnter={() => preloadEngine(meta.slug)}
+        className={cn(
+          "group grid items-center gap-5 overflow-hidden rounded-2xl border-2 bg-background p-5 outline-none sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] sm:p-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,400px)] lg:gap-8",
+          "transition-[box-shadow,border-color] duration-700 ease-out focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        )}
+        // Fundo da página; o contorno e o brilho na cor do jogo acendem juntos, depois de o card entrar.
+        style={{
+          borderColor: lit ? meta.color : "transparent",
+          boxShadow: lit ? `0 0 48px -14px ${meta.color}` : `0 0 0 -14px ${meta.color}`,
+        }}
+      >
+        <div className="flex flex-col items-start gap-3">
+          <span
+            className="rounded-full px-2.5 py-0.5 text-[11px] font-bold tracking-wider text-white uppercase"
+            style={{ background: meta.color }}
+          >
+            {t.home.newGame}
+          </span>
+          <div>
+            <h2 className="font-display text-4xl leading-[0.95] sm:text-5xl" style={{ color: meta.color }}>
+              {meta.name}
+            </h2>
+            <p className="mt-2 font-semibold leading-snug">{meta.tagline}</p>
+            <p className="mt-1.5 max-w-[46ch] text-sm leading-relaxed text-muted-foreground">{meta.description}</p>
+          </div>
+          <span
+            className="inline-flex items-center gap-2 rounded-full py-2 pr-3.5 pl-4 text-sm font-bold text-white transition-transform duration-300 group-hover:translate-x-0.5"
+            style={{ background: meta.color }}
+          >
+            {t.home.playNow} <ArrowRight size={16} />
+          </span>
         </div>
-        <span
-          className="inline-flex items-center gap-2 rounded-full py-2 pr-3.5 pl-4 text-sm font-bold text-white transition-transform duration-300 group-hover:translate-x-0.5"
-          style={{ background: meta.color }}
-        >
-          {t.home.playNow} <ArrowRight size={16} />
-        </span>
-      </div>
-      <GameVideo
-        slug={meta.slug}
-        playing
-        className="rounded-xl shadow-2xl shadow-black/30 ring-1 ring-border transition-transform duration-500 ease-[cubic-bezier(.22,1,.36,1)] group-hover:-rotate-1 group-hover:scale-[1.02]"
-      />
-    </Link>
+        <GameVideo
+          slug={meta.slug}
+          playing
+          className="rounded-xl shadow-2xl shadow-black/30 ring-1 ring-border transition-transform duration-500 ease-[cubic-bezier(.22,1,.36,1)] group-hover:-rotate-1 group-hover:scale-[1.02]"
+        />
+      </Link>
+    </div>
   );
 }
 
