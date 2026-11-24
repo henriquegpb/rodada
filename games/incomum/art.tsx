@@ -10,15 +10,37 @@ import type { MilestoneArt } from "./tiers";
 const INK = "#0b1020";
 const LINE = { stroke: INK, strokeWidth: 3.5, strokeLinejoin: "round", strokeLinecap: "round" } as const;
 
-/** O submarino, de lado, olhando para a direita. `lamp` acende o farol (no fundo do mar). */
-export function Submarine({ className, lamp = 0 }: { className?: string; lamp?: number }) {
+/**
+ * O submarino, de lado, olhando para a direita. `lamp` acende o farol (no fundo do mar); `diving` gira
+ * a hélice rápido, com o borrão de quando ela está a toda.
+ */
+export function Submarine({
+  className,
+  lamp = 0,
+  diving = false,
+}: {
+  className?: string;
+  lamp?: number;
+  diving?: boolean;
+}) {
   return (
     <svg viewBox="0 0 210 130" className={className} aria-hidden="true">
-      {/* Hélice */}
+      {/* Hélice: as pás viram (uma clara, outra escura), devagar parado e a toda na descida. */}
       <g>
         <rect x="8" y="64" width="18" height="12" rx="4" fill="#94a3b8" {...LINE} />
-        <ellipse cx="9" cy="56" rx="5" ry="12" fill="#cbd5e1" {...LINE} />
-        <ellipse cx="9" cy="84" rx="5" ry="12" fill="#cbd5e1" {...LINE} />
+        <ellipse
+          cx="9"
+          cy="70"
+          rx="7"
+          ry="27"
+          fill="rgb(226 232 240 / 0.45)"
+          style={{ opacity: diving ? 1 : 0, transition: "opacity 300ms" }}
+        />
+        <g className="animate-propeller" style={{ animationDuration: diving ? "0.2s" : "1.6s" }}>
+          <ellipse cx="9" cy="56" rx="5" ry="12" fill="#e2e8f0" {...LINE} />
+          <ellipse cx="9" cy="84" rx="5" ry="12" fill="#64748b" {...LINE} />
+        </g>
+        <circle cx="10" cy="70" r="4.5" fill="#475569" {...LINE} strokeWidth="2.5" />
       </g>
       {/* Leme em cima, atrás */}
       <path d="M38 50 L30 30 L56 30 L62 50 Z" fill="#f59e0b" {...LINE} />

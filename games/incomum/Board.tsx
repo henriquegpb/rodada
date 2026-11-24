@@ -147,6 +147,8 @@ export function IncomumBoard({ play, submitGuess }: BoardProps<IncomumPuzzle, In
   // Uma descida só: a profundidade é a dos pontos somados, e o submarino nunca sobe.
   const { depth, arrived } = useDepth(depthAt(points));
   const caught = revealed && arrived ? revealed : undefined;
+  /** Descendo de verdade agora (resposta que valeu ponto, ainda a caminho). */
+  const descending = Boolean(revealed && !arrived && revealed.points > 0);
   // Os bichos que a última resposta alcançou (pode ser mais de um, numa resposta rara).
   const crossed = revealed ? MILESTONES.slice(milestonesAt(points - revealed.points), milestonesAt(points)) : [];
   /** Os pontos que a profundidade do momento representa: a régua acende os bichos conforme passa. */
@@ -299,11 +301,26 @@ export function IncomumBoard({ play, submitGuess }: BoardProps<IncomumPuzzle, In
               <div
                 className="relative"
                 style={{
-                  // Sempre de nariz para baixo; mais inclinado quando desce de verdade.
-                  rotate: revealed && !arrived && revealed.points > 0 ? "14deg" : "5deg",
-                  transition: "rotate 500ms ease",
+                  // Nariz bem para baixo enquanto desce; chegou, volta a ficar reto.
+                  rotate: descending ? "24deg" : "0deg",
+                  transition: "rotate 650ms cubic-bezier(.4,0,.2,1)",
                 }}
               >
+                {/* O rastro de bolhas da hélice. */}
+                {descending &&
+                  [0, 1, 2, 3].map((i) => (
+                    <span
+                      key={i}
+                      className="animate-wake pointer-events-none absolute left-[3%] rounded-full border-2 border-white/70 bg-white/15"
+                      style={{
+                        top: `${44 + (i % 2) * 14}%`,
+                        width: 7 + (i % 3) * 3,
+                        height: 7 + (i % 3) * 3,
+                        animationDelay: `${-i * 160}ms`,
+                      }}
+                      aria-hidden="true"
+                    />
+                  ))}
                 {/* Farol: um cone de luz que só aparece no escuro. */}
                 <span
                   className="pointer-events-none absolute top-[52%] left-[88%] h-[120px] w-[260px] -translate-y-1/2"
@@ -315,7 +332,11 @@ export function IncomumBoard({ play, submitGuess }: BoardProps<IncomumPuzzle, In
                   aria-hidden="true"
                 />
                 <div className="animate-bob">
-                  <Submarine className="w-full drop-shadow-[0_8px_0_rgb(0_0_0/0.2)]" lamp={depth / 3000} />
+                  <Submarine
+                    className="w-full drop-shadow-[0_8px_0_rgb(0_0_0/0.2)]"
+                    lamp={depth / 3000}
+                    diving={descending}
+                  />
                 </div>
               </div>
               <p className="mt-1 text-center font-mono text-sm leading-tight font-bold tabular-nums sm:text-base">
