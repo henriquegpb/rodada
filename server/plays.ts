@@ -148,6 +148,7 @@ async function refreshCounters(db: Db, accountId: string, now: Date): Promise<Co
       slug: plays.slug,
       plays: sql<number>`count(*)::int`,
       perfect: sql<number>`(count(*) filter (where ${plays.nota} = 100))::int`,
+      best: sql<number>`max(${plays.count})::int`,
     })
     .from(plays)
     .where(eq(plays.accountId, accountId))
@@ -161,7 +162,7 @@ async function refreshCounters(db: Db, accountId: string, now: Date): Promise<Co
     daysPlayed: days.length,
     maxStreak: computeStreak(new Map(days.map((d) => [d.dateKey, true])), getDateKey(now)).max,
     fullRounds: days.filter((d) => d.roundFinished >= roundSizeOn(d.dateKey)).length,
-    byGame: Object.fromEntries(games.map((g) => [g.slug, { plays: g.plays, perfect: g.perfect }])),
+    byGame: Object.fromEntries(games.map((g) => [g.slug, { plays: g.plays, perfect: g.perfect, best: g.best }])),
   };
   await db
     .insert(accountCounters)

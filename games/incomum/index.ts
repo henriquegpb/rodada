@@ -3,7 +3,7 @@ import type { GameDefinition, PointsRules } from "../types";
 import { IncomumBoard } from "./Board";
 import { IncomumCover } from "./Cover";
 import { IncomumRecap } from "./Recap";
-import { COLOR, MAX_DEPTH, MAX_POINTS, MILESTONES, ROUND, SECONDS, TIERS } from "./tiers";
+import { COLOR, MAX_DEPTH, MAX_POINTS, MILESTONES, ROUND, SECONDS, TIERS, milestonesAt } from "./tiers";
 import type { IncomumFeedback, IncomumPuzzle } from "./types";
 
 export const incomum: GameDefinition<IncomumPuzzle, IncomumFeedback, PointsRules> = {
@@ -25,6 +25,16 @@ export const incomum: GameDefinition<IncomumPuzzle, IncomumFeedback, PointsRules
     resultDelayMs: 5200,
     wide: true,
     launchedOn: "2026-11-24",
+    // O bicho mais fundo numa partida: Bronze na água-viva-coroa, até Diamante no anfípode-gigante.
+    // O fundo da fossa (700 pontos) já é o "Perfeito no Incomum".
+    bestAchievement: {
+      id: "fundo-incomum",
+      name: "Mergulho mais fundo",
+      description: "O bicho mais fundo que você alcançou numa partida do Incomum",
+      thresholds: [3, 5, 7, 9],
+      metric: milestonesAt,
+      label: (n) => (n > 0 ? MILESTONES[Math.min(n, MILESTONES.length) - 1].name : "Nenhum ainda"),
+    },
     howToPlay: [
       `São ${ROUND} categorias por dia: "cidade do Paraná com 50 mil+ habitantes", "raça de cachorro", "filme de terror"…`,
       `Escreva uma resposta que vale. Quanto menos óbvia, mais pontos: ${TIERS.map((t) => `${t.name} +${t.points}`).join(", ")}. Curitiba é óbvia; Cianorte é raríssima.`,

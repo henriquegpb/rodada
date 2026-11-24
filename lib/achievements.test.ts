@@ -41,6 +41,18 @@ describe("Nível", () => {
     expect(progressOf("perfeito-palavra", counters).level).toBe("bronze");
     expect(progressOf("fiel-elo", counters).level).toBe(null);
   });
+
+  it("o bicho mais fundo do Incomum sai do recorde de pontos, um bicho a cada 70", () => {
+    const at = (best: number) => progressOf("fundo-incomum", { ...EMPTY_COUNTERS, byGame: { incomum: { plays: 1, perfect: 0, best } } });
+    expect(at(200)).toMatchObject({ value: 2, level: null, next: 3 });
+    expect(at(210)).toMatchObject({ value: 3, level: "bronze" });
+    expect(at(360)).toMatchObject({ value: 5, level: "prata" });
+    expect(at(630)).toMatchObject({ value: 9, level: "diamante", next: null });
+    // Contadores gravados antes do recorde existir: sem bicho, sem erro.
+    expect(progressOf("fundo-incomum", { ...EMPTY_COUNTERS, byGame: { incomum: { plays: 3, perfect: 0 } } }).value).toBe(0);
+    const label = achievements.find((a) => a.id === "fundo-incomum")!.label!;
+    expect([label(0), label(5), label(10)]).toEqual(["Nenhum ainda", "Peixe-diabo", "Fundo da fossa"]);
+  });
 });
 
 describe("levelUps", () => {

@@ -126,6 +126,19 @@ export interface GameMeta<R extends GameRules = GameRules> {
   resultDelayMs?: number;
   /** Dia em que o jogo entrou no site (YYYY-MM-DD). Sem ele, a estreia do Rodada (EPOCH_DATE). */
   launchedOn?: string;
+  /**
+   * Conquista do melhor resultado numa partida só (o maior `count`: os pontos, nos jogos por pontos),
+   * além das de todo jogo (Fiel e Perfeito). `metric` transforma esse recorde no valor medido e
+   * `label` dá nome a um valor (o Incomum mostra o bicho, em vez de um número).
+   */
+  bestAchievement?: {
+    id: string;
+    name: string;
+    description: string;
+    thresholds: readonly [number, number, number, number];
+    metric(best: number): number;
+    label?(value: number): string;
+  };
   howToPlay: string[];
   /**
    * Título e descrição para buscadores e prévias de link, com as palavras que as pessoas buscam

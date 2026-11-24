@@ -174,7 +174,10 @@ export function Achievements({ items, compact = false }: { items: AchievementPro
 /** A medalha grande, o Nível, a barra até o próximo e os quatro marcos. */
 function AchievementDetail({ achievement }: { achievement: AchievementProgress }) {
   const { level, value, next } = achievement;
-  const thresholds = achievements.find((a) => a.id === achievement.id)?.thresholds ?? [];
+  const definition = achievements.find((a) => a.id === achievement.id);
+  const thresholds = definition?.thresholds ?? [];
+  // O Incomum mostra o bicho ("Peixe-diabo") em vez do número.
+  const show = (n: number) => definition?.label?.(n) ?? n;
   const tier = level ? LEVELS.indexOf(level) + 1 : 0;
   // A barra vai do marco atual ao próximo; no Diamante, cheia.
   const from = tier > 0 ? thresholds[tier - 1] : 0;
@@ -203,7 +206,7 @@ function AchievementDetail({ achievement }: { achievement: AchievementProgress }
       <div className="mt-6 w-full">
         <div className="mb-1.5 flex justify-between text-xs tabular-nums text-muted-foreground">
           <span>{next === null ? t.profile.maxLevel : t.profile.toNext(LEVEL_NAMES[target])}</span>
-          <span>{next === null ? value : `${value}/${next}`}</span>
+          <span>{next === null || definition?.label ? show(value) : `${value}/${next}`}</span>
         </div>
         <div className="h-2.5 w-full overflow-hidden rounded-full bg-secondary">
           <div
@@ -223,7 +226,7 @@ function AchievementDetail({ achievement }: { achievement: AchievementProgress }
                 style={{ background: reached ? SOLID[l] : "var(--muted-foreground)" }}
               />
               <span className="mt-1.5 block text-[11px] font-medium">{LEVEL_NAMES[l]}</span>
-              <span className="block text-[11px] tabular-nums text-muted-foreground">{thresholds[i]}</span>
+              <span className="block text-[11px] tabular-nums text-muted-foreground">{show(thresholds[i])}</span>
             </li>
           );
         })}

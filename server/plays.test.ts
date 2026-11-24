@@ -37,6 +37,8 @@ describe("registerPlay", () => {
     const obvious = incomum.createChallenge(day).answer.categories.map((c) => c.obvious);
     const receipt = await registerPlay(db, ana, { slug: "incomum", dateKey: day, guesses: obvious }, at(`${day}T15:00:00Z`));
     expect(receipt.play).toMatchObject({ status: "won", count: obvious.length * 10 });
+    // O recorde da partida vira contador: é dele que sai a conquista do bicho mais fundo.
+    expect((await readCounters(db, ana)).byGame.incomum).toMatchObject({ plays: 1, best: obvious.length * 10 });
   });
 
   it("reenviar a mesma partida devolve o que já estava gravado, sem contar de novo", async () => {
@@ -189,7 +191,7 @@ describe("recomputeScores", () => {
     await recomputeScores(db, { apply: true, now: NOON });
     expect(await eloNota()).toBe(100);
     expect(await scoreOfDay()).toBe(duplaNota + 100);
-    expect((await readCounters(db, ana)).byGame.elo).toEqual({ plays: 1, perfect: 1 });
+    expect((await readCounters(db, ana)).byGame.elo).toMatchObject({ plays: 1, perfect: 1 });
     expect(await recomputeScores(db, { now: NOON })).toEqual({ plays: {}, days: 0, accounts: 0 });
   });
 });
