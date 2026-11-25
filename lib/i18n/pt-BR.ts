@@ -170,6 +170,8 @@ export const ptBR = {
     failed: "Não deu para entrar. Tente de novo.",
     signedInAs: "Entrou como",
     signOut: "Sair",
+    saveTitle: "Entre para não perder suas partidas",
+    saveText: "Sua sequência fica salva na Conta, em qualquer aparelho, e você aparece no ranking. As partidas deste navegador vão junto.",
   },
   dayPicker: {
     today: "Hoje",

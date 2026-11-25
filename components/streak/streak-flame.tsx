@@ -86,7 +86,8 @@ export function FlameArt({ lit, color, className }: { lit: boolean; color?: stri
  * Sequência geral: chama animada + número. Mouse em cima (ou toque) mostra a sequência
  * de cada jogo terminado hoje, cada um com a chama na cor do jogo.
  */
-export function StreakFlame() {
+/** A sequência da Rodada, com a chama. `compact` tira o "dias seguidos" (ao lado do botão de entrar). */
+export function StreakFlame({ compact = false }: { compact?: boolean }) {
   const { today, round } = useRound();
   const records = usePlayRecords();
   const [open, setOpen] = useState(false);
@@ -125,7 +126,7 @@ export function StreakFlame() {
           {/* Sem jogar hoje o número de ontem continua, mas a chama só acende quando hoje conta. */}
           <FlameArt lit={overall.doneToday} className="h-14 w-9" />
           <span className="font-display text-5xl leading-none tabular-nums">{streak}</span>
-          <span className="pb-1 text-sm text-muted-foreground">{t.home.streakDays(streak)}</span>
+          {!compact && <span className="pb-1 text-sm text-muted-foreground">{t.home.streakDays(streak)}</span>}
         </button>
       </PopoverTrigger>
       <PopoverContent

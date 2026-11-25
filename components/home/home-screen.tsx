@@ -9,6 +9,8 @@ import type { GameMeta } from "@/games/types";
 import { GameVideo } from "@/components/game/game-preview";
 import { HoverGlideGroup } from "@/components/microkit/hover-glide-cards";
 import { StreakFlame } from "@/components/streak/streak-flame";
+import { GoogleSignInButton } from "@/components/ranking/sign-in";
+import { useMe } from "@/lib/ranking/client";
 import { challengeNumber, daysBetween } from "@/lib/daily/date";
 import { useRound } from "@/lib/plays/hooks";
 import { cn } from "@/lib/utils";
@@ -16,6 +18,7 @@ import { t } from "@/lib/i18n";
 
 export function HomeScreen() {
   const { today, round } = useRound();
+  const me = useMe();
   const date = today
     ? new Date(`${today}T12:00:00Z`).toLocaleDateString("pt-BR", {
         weekday: "long",
@@ -35,7 +38,11 @@ export function HomeScreen() {
               {t.home.round} <span className="text-primary">{today ? challengeNumber(today) : ""}</span>
             </h1>
           </div>
-          <StreakFlame />
+          {/* Sem Conta, o "Entrar com Google" fica ao lado da sequência, no lugar do "dias seguidos". */}
+          <div className="flex items-center gap-4">
+            <StreakFlame compact={me === null} />
+            {me === null && <GoogleSignInButton from="home" />}
+          </div>
         </div>
 
         {today && <NewGameHero metas={round.map((r) => r.meta)} today={today} className="mt-8" />}
@@ -193,8 +200,17 @@ function GameTile({ meta }: { meta: GameMeta }) {
           <h3 className="font-display text-[26px] leading-none lg:text-[22px]">{meta.name}</h3>
           <p className="mt-1.5 text-[13px] font-medium leading-snug opacity-70">{meta.tagline}</p>
         </div>
-        <span className="grid size-9 shrink-0 place-items-center rounded-full bg-ink text-white transition-transform duration-300 group-hover:translate-x-0.5">
-          <ArrowRight size={18} />
+        {/*
+          Microkit · White Contact Orbit Button: o círculo branco com a seta; com o mouse no card, um
+          círculo preto cresce do centro e a seta fica branca, apontando para cima.
+        */}
+        <span className="relative grid size-9 shrink-0 place-items-center rounded-full bg-white text-ink transition-colors duration-[120ms] group-hover:text-white group-hover:delay-[80ms] group-focus-visible:text-white group-focus-visible:delay-[80ms] motion-reduce:transition-none">
+          <span className="absolute inset-0 origin-center scale-0 rounded-[inherit] bg-ink transition-transform duration-[420ms] ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-100 group-focus-visible:scale-100 motion-reduce:transition-none" />
+          <ArrowRight
+            size={18}
+            strokeWidth={2.6}
+            className="relative z-10 transition-transform duration-[500ms] ease-[cubic-bezier(.16,1,.3,1)] group-hover:-rotate-45 group-focus-visible:-rotate-45 motion-reduce:transition-none"
+          />
         </span>
       </div>
     </Link>

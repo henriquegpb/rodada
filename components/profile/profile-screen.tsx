@@ -13,6 +13,7 @@ import { usePlayRecords } from "@/lib/plays/hooks";
 import { gameStats, overallStreak, type PlayRecord } from "@/lib/stats";
 import { useMe, useProfile, type Me } from "@/lib/ranking/client";
 import { t } from "@/lib/i18n";
+import { SignInCard } from "@/components/ranking/sign-in";
 import { EditProfile } from "./edit-profile";
 import { profileHref } from "./profile-link";
 import { ProfileLayout, ProfileSide, ProfileSkeleton } from "./profile-layout";
@@ -55,6 +56,7 @@ export function ProfileScreen() {
     <div className="flex flex-col gap-6">
       <h1 className="font-display text-5xl leading-[0.9]">{t.profile.title}</h1>
       <StatStrip items={stats} />
+      <SignInCard from="profile" />
     </div>
   );
 
