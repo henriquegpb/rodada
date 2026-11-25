@@ -12,8 +12,9 @@
  *  3. junta os nomes: rótulos e apelidos do Wikidata em português e inglês e o título do artigo da
  *     Wikipédia em português;
  *  4. mede o quão comum é (a "fama"): em quantos projetos Wikimedia o item tem página, mais quantas
- *     informações o Wikidata tem sobre ele; nas cidades, a população; nos filmes e séries, os votos
- *     no IMDb.
+ *     informações o Wikidata tem sobre ele, e acima de tudo a audiência do artigo na Wikipédia em
+ *     português (o que o brasileiro procura); nas cidades, a população; nos filmes e séries, os
+ *     votos no IMDb.
  *
  * Quase tudo sai do serviço de consultas do Wikidata (query.wikidata.org): a API da Wikipédia
  * bloqueia o IP depois de alguns milhares de pedidos, e fica só para categorias e listas da Wikipédia.
@@ -24,6 +25,11 @@
  * Saída: um arquivo por categoria em public/incomum/<id>.json (só os nomes, da mais óbvia à mais
  * rara), baixado só no dia em que a categoria cai, e o índice games/incomum/data/index.json (título,
  * total, a mais óbvia e as raras de exemplo), que vai junto com o jogo.
+ *
+ * Categoria que já foi jogada e mudou ganha uma versão nova, que só vale a partir de amanhã (ou de
+ * INCOMUM_FROM=AAAA-MM-DD, para quem só vai publicar depois); a anterior fica em public/incomum/v/ e
+ * continua valendo nos dias dela. Publique no mesmo dia do build: depois da virada, a versão nova
+ * mudaria a partida de quem já jogou o dia antes da publicação.
  */
 /* eslint-disable @typescript-eslint/no-explicit-any -- respostas JSON das APIs (Wikidata, Wikipédia, IBGE), lidas campo a campo */
 import { createHash } from "node:crypto";
@@ -34,9 +40,10 @@ import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import { createGunzip } from "node:zlib";
 import { createWriteStream } from "node:fs";
+import { addDays, getDateKey } from "../lib/daily/date";
 import { answerKey } from "../games/incomum/match";
 import { TIERS, rareStart } from "../games/incomum/tiers";
-import type { IncomumCategoryRef } from "../games/incomum/types";
+import type { IncomumCategoryRef, IncomumCategoryVersion } from "../games/incomum/types";
 import { CATEGORIES, type CategorySpec, type Source } from "./incomum-list";
 
 const ROOT = join(import.meta.dirname, "..");
@@ -47,6 +54,18 @@ const INDEX = join(ROOT, "games/incomum/data/index.json");
 /** Formato antigo (tudo num arquivo só): convertido na primeira rodada e apagado. */
 const LEGACY = [join(ROOT, "games/incomum/data/categories.json"), join(RAW, "categories.partial.json")];
 const UA = "wiki-category-builder/0.1";
+/** As versões anteriores das respostas, que continuam valendo nos dias delas. */
+const ARCHIVE = join(PUBLIC, "v");
+const TODAY = getDateKey();
+/** Primeiro dia das respostas que mudarem agora: amanhã, para a partida de hoje não mudar no meio. */
+const FROM = process.env.INCOMUM_FROM ?? addDays(TODAY, 1);
+/** O índice de antes do build: de onde vêm as versões e o dia em que cada uma começou a valer. */
+const BEFORE = new Map<string, IncomumCategoryRef>(
+  existsSync(INDEX) ? (JSON.parse(readFileSync(INDEX, "utf8")) as IncomumCategoryRef[]).map((c) => [c.id, c]) : [],
+);
+const hashOf = (text: string) => createHash("sha1").update(text).digest("hex").slice(0, 10);
+/** A versão já pode ter caído num dia: a categoria estreou e a versão começou a valer até hoje. */
+const wentLive = (ref: IncomumCategoryRef) => (!ref.since || ref.since <= TODAY) && (!ref.from || ref.from <= TODAY);
 
 mkdirSync(CACHE, { recursive: true });
 
@@ -369,6 +388,47 @@ async function titlesToQids(lang: string, titles: string[], skipDisambiguation =
   return out;
 }
 
+/**
+ * Audiência de cada artigo da Wikipédia em português: os cliques que chegam a ele nos últimos três
+ * meses do "clickstream" da Wikimedia (um arquivo por mês, ~17 MB, baixado uma vez para data-raw/).
+ * Mede o que o brasileiro procura (o Vesúvio, não o Ararate) sem pedir artigo por artigo: a API de
+ * estatísticas recusa depois de uns 20 pedidos. Mês que ainda não saiu fica de fora; sem nenhum, a
+ * fama fica a de antes.
+ */
+let clicks: Promise<Map<string, number>> | undefined;
+function ptClicks(): Promise<Map<string, number>> {
+  clicks ??= (async () => {
+    const out = new Map<string, number>();
+    const [year, month] = TODAY.split("-").map(Number);
+    for (let back = 1; back <= 4 && out.size < 3e6; back++) {
+      const m = new Date(Date.UTC(year, month - 1 - back, 1)).toISOString().slice(0, 7);
+      let path: string;
+      try {
+        path = await download(
+          `clickstream-ptwiki-${m}.tsv.gz`,
+          `https://dumps.wikimedia.org/other/clickstream/${m}/clickstream-ptwiki-${m}.tsv.gz`,
+        );
+      } catch {
+        continue;
+      }
+      const lines = createInterface({ input: createReadStream(path).pipe(createGunzip()), crlfDelay: Infinity });
+      // Cada linha: de onde veio, artigo, tipo de link, cliques.
+      for await (const line of lines) {
+        const [, article, , n] = line.split("\t");
+        if (article) out.set(article, (out.get(article) ?? 0) + (Number(n) || 0));
+      }
+      if (++readMonths >= 3) break;
+    }
+    logLine(`audiência da Wikipédia em português: ${out.size} artigos (${readMonths} meses)`);
+    return out;
+  })();
+  return clicks;
+}
+let readMonths = 0;
+
+/** Com a audiência, a fama de quem tem item no Wikidata fica acima da de quem só tem o nome. */
+const VIEWS_BASE = 1_000_000;
+
 // ---------- fontes específicas ----------
 
 /** Municípios com população no Censo 2022 (IBGE, tabela 4709). */
@@ -642,7 +702,12 @@ async function buildCategory(spec: CategorySpec) {
   const list = [...merged.values()];
   setPhase(3);
 
-  const items: (Item & { fromList: boolean; listIndex: number })[] = list.flatMap((c) => {
+  const items: (Item & {
+    fromList: boolean;
+    listIndex: number;
+    /** Fama pelo número de Wikipédias: o artigo em português e em quantos projetos tem página. */
+    byWikis?: { pt?: string; wikis: number };
+  })[] = list.flatMap((c) => {
     const e = c.qid ? info.get(c.qid) : undefined;
     const name = displayName(e, c.name) ?? c.extraNames?.[0];
     // Item sem nome em português nem inglês: ninguém vai digitar.
@@ -674,8 +739,24 @@ async function buildCategory(spec: CategorySpec) {
     // Fama: em quantos projetos Wikimedia tem página, mais 1 a cada 10 informações no Wikidata
     // (desempata o que só o Brasil conhece: novelas, bairros, cidades do interior).
     const views = c.views ?? (e ? e.wikis + Math.round(e.statements / 10) : -1);
-    return [{ name, names, views, fromList: Boolean(c.fromList), listIndex: c.listIndex ?? Infinity }];
+    // Sem fama da fonte (população, votos): as visitas na Wikipédia em português podem reordenar.
+    const byWikis = c.views === undefined && e ? { pt, wikis: e.wikis } : undefined;
+    return [{ name, names, views, byWikis, fromList: Boolean(c.fromList), listIndex: c.listIndex ?? Infinity }];
   });
+
+  // Sem fama da fonte, vale a audiência do artigo em português, com um peso pequeno para a presença
+  // no mundo (desempata quem não tem artigo em português e segura o pico de um mês).
+  // Só nas categorias com lista à mão (veja `audience`); com fama da fonte (votos do IMDb,
+  // população), fica a da fonte: as escalas não se misturam.
+  const audience =
+    spec.audience && !list.some((c) => c.views !== undefined) ? await ptClicks() : new Map<string, number>();
+  if (audience.size) {
+    for (const item of items) {
+      if (!item.byWikis) continue;
+      const seen = item.byWikis.pt ? (audience.get(item.byWikis.pt.replaceAll(" ", "_")) ?? 0) : 0;
+      item.views = VIEWS_BASE + Math.round(1000 * (Math.log10(1 + seen) + 0.35 * Math.log10(1 + item.byWikis.wikis)));
+    }
+  }
 
   const byFame = (a: { views: number; name: string }, b: { views: number; name: string }) =>
     b.views - a.views || a.name.localeCompare(b.name, "pt");
@@ -690,7 +771,8 @@ async function buildCategory(spec: CategorySpec) {
     const fameRank = new Map([...items].sort(byFame).map((item, i) => [item, i]));
     const score = (item: (typeof items)[number]) =>
       spec.ordered === "list"
-        ? item.listIndex !== Infinity
+        ? // A lista de raras ("rare") não vai na frente: entra com o resto, pela fama.
+          item.fromList && item.listIndex !== Infinity
           ? item.listIndex
           : items.length + fameRank.get(item)!
         : Math.min(item.listIndex, fameRank.get(item)!);
@@ -730,7 +812,48 @@ function writeCategory(id: string, items: Item[]) {
   const compact: Compact[] = items
     .slice(0, MAX_ITEMS)
     .map((i) => [i.name, ...i.names.filter((n) => n !== i.name).slice(0, MAX_ALIASES)]);
-  writeFileSync(join(PUBLIC, `${id}.json`), JSON.stringify(compact));
+  const text = JSON.stringify(compact);
+  const file = join(PUBLIC, `${id}.json`);
+  // A versão que já foi jogada fica guardada: os dias dela continuam com as mesmas respostas.
+  const before = BEFORE.get(id);
+  if (before && existsSync(file) && hashOf(text) !== before.v && wentLive(before)) {
+    const old = readFileSync(file, "utf8");
+    if (hashOf(old) === before.v) {
+      mkdirSync(ARCHIVE, { recursive: true });
+      writeFileSync(join(ARCHIVE, `${id}.${before.v}.json`), old);
+    }
+  }
+  writeFileSync(file, text);
+}
+
+/**
+ * As versões de uma categoria no índice novo. Mudou depois de ir ao ar: a nova vale a partir de
+ * `FROM` e a anterior entra no histórico. Mudou de novo antes de ir ao ar: só troca a pendente.
+ */
+function versions(id: string, v: string): Pick<IncomumCategoryRef, "from" | "previous"> {
+  const before = BEFORE.get(id);
+  if (!before) return {};
+  const kept = { ...(before.from && { from: before.from }), ...(before.previous && { previous: before.previous }) };
+  // Voltou a ser igual à anterior antes de ir ao ar: desfaz a versão nova.
+  const last = before.previous?.at(-1);
+  if (!wentLive(before) && last?.v === v) {
+    const rest = before.previous!.slice(0, -1);
+    return { ...(last.from && { from: last.from }), ...(rest.length && { previous: rest }) };
+  }
+  if (before.v === v || !wentLive(before)) return kept;
+  if (!existsSync(join(ARCHIVE, `${id}.${before.v}.json`))) {
+    logLine(`  AVISO: ${id} mudou, mas a versão ${before.v} não ficou guardada; os dias dela usam a nova`);
+    return kept;
+  }
+  const old: IncomumCategoryVersion = {
+    title: before.title,
+    total: before.total,
+    obvious: before.obvious,
+    rare: before.rare,
+    v: before.v,
+    ...(before.from && { from: before.from }),
+  };
+  return { from: FROM, previous: [...(before.previous ?? []), old] };
 }
 
 /** O índice que vai com o jogo, montado dos arquivos de categoria que existem. */
@@ -743,6 +866,7 @@ function writeIndex() {
     const items: Compact[] = JSON.parse(text);
     if (items.length < MIN_ITEMS) continue;
     const first = rareStart(items.length);
+    const v = hashOf(text);
     index.push({
       id: spec.id,
       title: spec.title,
@@ -750,8 +874,9 @@ function writeIndex() {
       obvious: items[0][0],
       rare: items.slice(first, first + 3).map((i) => i[0]),
       // Muda quando o arquivo muda: o navegador não usa a versão velha do cache.
-      v: createHash("sha1").update(text).digest("hex").slice(0, 10),
+      v,
       ...(spec.since && { since: spec.since }),
+      ...versions(spec.id, v),
     });
   }
   // Categoria tirada da lista: o arquivo sai junto.
