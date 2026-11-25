@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/api/plays": ["./public/incomum/**/*"],
     "/api/plays/import": ["./public/incomum/**/*"],
+    "/api/incomum/misses": ["./public/incomum/**/*"],
   },
   partialPrefetching: true,
   turbopack: {

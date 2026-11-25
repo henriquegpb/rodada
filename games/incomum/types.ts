@@ -24,6 +24,25 @@ export interface IncomumCategoryRef {
    * dias que já passaram (e o de hoje, no meio das partidas).
    */
   since?: string;
+  /**
+   * Primeiro dia desta versão das respostas. Antes dele vale a versão anterior (`previous`): a lista
+   * crescer não muda a partida de um dia que já foi jogado, nem a de hoje no meio do dia.
+   */
+  from?: string;
+  /** As versões anteriores, da mais antiga à mais nova, cada uma guardada em public/incomum/v/. */
+  previous?: IncomumCategoryVersion[];
+  /** Esta é uma versão anterior: as respostas estão em public/incomum/v/<id>.<v>.json. */
+  archived?: boolean;
+}
+
+/** Uma versão anterior das respostas de uma categoria, e o dia em que ela começou a valer. */
+export interface IncomumCategoryVersion {
+  title: string;
+  total: number;
+  obvious: string;
+  rare: string[];
+  v: string;
+  from?: string;
 }
 
 export interface IncomumPuzzle {

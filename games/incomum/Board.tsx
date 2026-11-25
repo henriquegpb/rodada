@@ -19,7 +19,8 @@ import {
   useCountUp,
   usePreloadNotes,
 } from "./Celebrate";
-import { suggestionIn } from "./match";
+import { NOT_IN_LIST, suggestionIn } from "./match";
+import { reportMiss } from "./misses";
 import { Ocean, TrenchRuler, useDepth, waterAt } from "./Scene";
 import {
   COLOR,
@@ -169,6 +170,8 @@ export function IncomumBoard({ play, submitGuess }: BoardProps<IncomumPuzzle, In
       return;
     }
     if (error) {
+      // O que falta na lista vai para a revisão (sem nada de quem digitou).
+      if (error === NOT_IN_LIST) reportMiss(play.dateKey, index, input);
       toast(error, { id: "incomum-erro" });
       setShaking(true);
       window.setTimeout(() => setShaking(false), SHAKE_MS);

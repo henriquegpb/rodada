@@ -40,6 +40,10 @@ import {
   PRESIDENTES_BRASIL,
   TIMES_NBA,
 } from "./incomum-lists/lugares";
+import * as coisas from "./incomum-lists/coisas";
+import * as cultura from "./incomum-lists/cultura";
+import * as natureza from "./incomum-lists/natureza";
+import * as sociedade from "./incomum-lists/sociedade";
 import {
   APRESENTADORES,
   ATORES_HOLLYWOOD,
@@ -92,6 +96,11 @@ export interface CategorySpec {
   exclude?: Source[];
   /** Tira itens deste país de origem (P495) ou país (P17). */
   excludeCountry?: string;
+  /**
+   * Ordena pela audiência na Wikipédia em português (o que vem depois da lista à mão). Só com lista:
+   * sozinha, a audiência mede a fama da pessoa, não na categoria (Jorge VI virava o tenista mais óbvio).
+   */
+  audience?: boolean;
   /** Aceita item com artigo só na Wikipédia em inglês (bandas de K-pop, danças pouco conhecidas). */
   allowEnglishOnly?: boolean;
   /**
@@ -135,6 +144,8 @@ function wd(body: string, { minLinks = 0, anyArticle = false } = {}): Extract<So
 
 /** Instância direta de um dos tipos. */
 const isA = (...classes: string[]) => `?x wdt:P31 ?class. VALUES ?class { ${values(classes)} }.`;
+/** Instância de um tipo ou de um subtipo dele: o Vesúvio é "estratovulcão", que é um vulcão. */
+const instanceOf = (cls: string) => `?x wdt:P31/wdt:P279* wd:${cls}.`;
 /** Instância ou subclasse, a qualquer distância (queijos: "brie" é subclasse de "queijo mole", que é de "queijo"). */
 const kindOf = (cls: string) => `?x (wdt:P31|wdt:P279)/wdt:P279* wd:${cls}.`;
 /** Pessoa com uma das profissões. */
@@ -215,6 +226,8 @@ const simple = (id: string, title: string, ...sources: Source[]): CategorySpec =
 
 /** Estreia das categorias criadas depois do lançamento: os dias antes dela não mudam. */
 const SECOND_BATCH = "2026-11-25";
+/** Rock, hard rock, rock alternativo, punk, heavy metal, progressivo, pop rock, indie, grunge, rock and roll e psicodélico. */
+const ROCK_GENRES = ["Q11399", "Q83270", "Q11366", "Q3071", "Q38848", "Q49451", "Q484641", "Q183504", "Q11365", "Q7749", "Q206159"];
 const HUMAN = "Q5";
 const CHARACTER = "Q95074";
 const BRAND = ["Q431289", "Q43229", "Q2424752"];
@@ -708,7 +721,7 @@ const NORDESTE_DISHES: string[][] = [
 
 // ---------- as categorias ----------
 
-export const CATEGORIES: CategorySpec[] = [
+const BASE: CategorySpec[] = [
   // --- Brasil: cidades ---
   city("cidade-sp", "Cidade do estado de São Paulo com 50 mil+ habitantes", 35),
   city("cidade-mg", "Cidade de Minas Gerais com 50 mil+ habitantes", 31),
@@ -916,14 +929,23 @@ export const CATEGORIES: CategorySpec[] = [
     ...simple("montanha", "Montanha ou pico", wd(isA("Q8502"), { minLinks: 10 })),
     shortNames: [/^(Monte|Pico|Serra|Morro|Mount|Mont)\s+(d[aoe]s?\s+)?/i],
   },
-  { ...simple("vulcao", "Vulcão", wd(isA("Q8072"), { minLinks: 5 })), shortNames: [/^(Vulcão|Monte|Mount)\s+/i] },
-  { ...simple("ilha", "Ilha", wd(isA("Q23442"), { minLinks: 15 })), shortNames: [/^Ilhas?\s+(d[aoe]s?\s+)?/i] },
+  // Vulcão: o Vesúvio e o Etna estão como "estratovulcão", um subtipo.
+  { ...simple("vulcao", "Vulcão", wd(instanceOf("Q8072"), { minLinks: 5 })), shortNames: [/^(Vulcão|Monte|Mount)\s+/i] },
+  // Ilha: também os arquipélagos (Havaí, Fernando de Noronha) e os países-ilha (Madagascar, Islândia).
+  {
+    ...simple("ilha", "Ilha", wd(isA("Q23442", "Q33837", "Q112099"), { minLinks: 15 })),
+    shortNames: [/^(Ilhas?|Arquipélago)\s+(d[aoe]s?\s+)?/i],
+  },
   { ...simple("deserto", "Deserto", wd(isA("Q8514"))), shortNames: [/^Deserto\s+(d[aoe]s?\s+)?/i] },
   {
-    ...simple("cachoeira", "Cachoeira ou catarata", wd(isA("Q34038"), { minLinks: 3 })),
+    ...simple("cachoeira", "Cachoeira ou catarata", wd(instanceOf("Q34038"), { minLinks: 3 })),
     shortNames: [/^(Cachoeiras?|Cataratas?|Salto|Queda)\s+(d[aoe]s?\s+)?/i],
   },
-  { ...simple("lago", "Lago", wd(isA("Q23397"), { minLinks: 15 })), shortNames: [/^Lag(o|oa)\s+(d[aoe]s?\s+)?/i] },
+  // Lago: também lagoas e represas (Lagoa Rodrigo de Freitas, Billings).
+  {
+    ...simple("lago", "Lago", wd(isA("Q23397", "Q187223", "Q131681"), { minLinks: 15 })),
+    shortNames: [/^(Lago|Lagoa|Represa)\s+(d[aoe]s?\s+)?/i],
+  },
   simple("idioma", "Idioma (língua)", wd(isA("Q34770", "Q1288568", "Q33742"), { minLinks: 15 })),
   simple("moeda", "Moeda de algum país", wd(isA("Q8142"))),
   simple("estado-eua", "Estado dos EUA", wd(isA("Q35657"))),
@@ -1083,7 +1105,16 @@ export const CATEGORIES: CategorySpec[] = [
       "Twice",
     ],
   },
-  simple("banda-rock", "Banda de rock", wd(isA("Q5741069"), { minLinks: 8 })),
+  // Banda de rock: os Beatles e o Queen estão como "grupo musical" de gênero rock, não "banda de rock".
+  simple(
+    "banda-rock",
+    "Banda de rock",
+    wd(
+      // Os gêneros principais do rock, um a um: a árvore inteira de subgêneros estoura o tempo do Wikidata.
+      `{ ?x wdt:P31 wd:Q5741069. } UNION { VALUES ?g { ${values(ROCK_GENRES)} } ?x wdt:P136 ?g; wdt:P31 ?t. VALUES ?t { wd:Q215380 wd:Q2088357 } }`,
+      { minLinks: 8 },
+    ),
+  ),
   simple(
     "cantora-pop",
     "Cantora pop internacional",
@@ -1112,13 +1143,15 @@ export const CATEGORIES: CategorySpec[] = [
     exclude: [{ kind: "manual", items: [["Walt Disney"]] }],
   },
   simple("arquiteto", "Arquiteto ou arquiteta", wd(person("Q42973"), { minLinks: 15 })),
-  simple(
-    "compositor-classico",
-    "Compositor de música clássica",
-    wd(`${person("Q36834")} ?x wdt:P569 ?born. FILTER(YEAR(?born) < 1900)`, {
-      minLinks: 15,
-    }),
-  ),
+  {
+    ...simple(
+      "compositor-classico",
+      "Compositor de música clássica",
+      wd(`${person("Q36834")} ?x wdt:P569 ?born. FILTER(YEAR(?born) < 1900)`, { minLinks: 15 }),
+    ),
+    // Tocava e escreveu sobre música, mas não é lembrado como compositor.
+    exclude: [{ kind: "manual", items: [["Leonardo da Vinci"]] }],
+  },
   simple("diretor-cinema", "Diretor ou diretora de cinema", wd(person("Q2526255"), { minLinks: 20 })),
   simple("livro", "Livro (romance ou clássico)", wd(isA("Q7725634", "Q8261", "Q47461344"), { minLinks: 20 })),
   simple("videogame", "Videogame", wd(isA("Q7889"), { minLinks: 15 })),
@@ -1186,7 +1219,8 @@ export const CATEGORIES: CategorySpec[] = [
   simple("astronauta", "Astronauta", wd(person("Q11631"), { minLinks: 10 })),
   simple("inventor", "Inventor ou inventora", wd(person("Q205375"), { minLinks: 15 })),
   simple("explorador", "Explorador ou navegador", wd(person("Q11900058"), { minLinks: 15 })),
-  simple("religiao", "Religião", wd(isA("Q9174"), { minLinks: 5 })),
+  // Religião: o catolicismo e as igrejas evangélicas estão como "denominação", um subtipo.
+  simple("religiao", "Religião", wd(instanceOf("Q9174"), { minLinks: 10 })),
   {
     // O id ficou do tempo em que só valia dança de fora; agora vale qualquer uma.
     id: "danca-do-mundo",
@@ -1223,7 +1257,11 @@ export const CATEGORIES: CategorySpec[] = [
   listOnly("time-nba", "Time da NBA", TIMES_NBA, ["Q43229"]),
   simple("tenista", "Tenista", wd(person("Q10833314"), { minLinks: 15 })),
   simple("piloto-f1", "Piloto de Fórmula 1", wd(person("Q10841764"))),
-  simple("lutador-mma", "Lutador ou lutadora de MMA", wd(person("Q11607585"), { minLinks: 8 })),
+  {
+    ...simple("lutador-mma", "Lutador ou lutadora de MMA", wd(person("Q11607585"), { minLinks: 8 })),
+    // Lutou kickboxing, não MMA; a fama de fora o punha como o mais óbvio.
+    exclude: [{ kind: "manual", items: [["Andrew Tate"]] }],
+  },
   {
     // A categoria também tem as edições do programa: `people` deixa só gente.
     ...people("participante-bbb", "Participante do Big Brother Brasil", PARTICIPANTES_BBB, {
@@ -1325,7 +1363,13 @@ export const CATEGORIES: CategorySpec[] = [
     ordered: true,
   },
   simple("marca-carro", "Marca de carro", wd(isA("Q786820"), { minLinks: 5 })),
-  simple("modelo-carro", "Modelo de carro", wd(isA("Q3231690"), { minLinks: 5 })),
+  {
+    ...simple("modelo-carro", "Modelo de carro", wd(isA("Q3231690"), { minLinks: 5 })),
+    // "Volkswagen Gol" vale como "Gol".
+    shortNames: [
+      /^(Volkswagen|VW|Chevrolet|GM|Fiat|Ford|Toyota|Honda|Hyundai|Renault|Nissan|Peugeot|Citroën|Jeep|Mitsubishi|Kia|BMW|Mercedes-Benz|Audi|Volvo|Land Rover|Suzuki|Subaru|Mazda|Chery|Caoa Chery|BYD|GWM|JAC|Dodge|Chrysler|RAM|Lexus|Porsche|Ferrari|Lamborghini|Tesla|Mini|Troller|Gurgel|Opel|Seat|Škoda|Dacia|Lada)\s+/i,
+    ],
+  },
   {
     id: "fast-food",
     title: "Rede de fast-food",
@@ -1398,3 +1442,105 @@ export const CATEGORIES: CategorySpec[] = [
     ordered: true,
   },
 ];
+
+/**
+ * Listas à mão que vão na frente da categoria (scripts/incomum-lists/): o que o brasileiro digita, do
+ * mais óbvio ao mais raro. O resto (Wikidata, listas antigas da categoria) vem depois, pela fama.
+ * `classes` escolhe o artigo certo quando o nome também é de outra coisa ("Mercúrio" o deus, não o
+ * planeta); sem artigo do tipo certo, o nome entra sozinho.
+ */
+/** Linguagens: o "C" e o "R" sozinhos não dão para digitar (1 letra) e ficavam como as mais óbvias. */
+const LINGUAGENS = `
+Python; JavaScript|JS; Java; C++|CPP|C plus plus; C#|C Sharp|CSharp; Linguagem C|C (linguagem de programação)|Linguagem de programação C;
+PHP; TypeScript|TS; SQL; Ruby; Swift; Kotlin; Go|Golang; Rust; Lua; Dart; Linguagem R|R (linguagem de programação); MATLAB; Perl; Scala;
+Assembly|Assembler|Linguagem de montagem; Pascal; Delphi; Visual Basic|VB|VB.NET; COBOL; Fortran; Haskell; Objective-C; Elixir; Erlang;
+Lisp; Clojure; Prolog; Julia; Scratch; Bash|Shell script; PowerShell; Groovy; F#|F Sharp; OCaml; Ada; Smalltalk; BASIC; Logo; Solidity;
+Zig; Crystal; Nim; Elm; Racket; Scheme; ABAP; Apex; Portugol; VBA
+`;
+
+const LIST_FIRST: Record<string, { list: string; classes?: string[]; title?: string }> = {
+  "linguagem-programacao": { list: LINGUAGENS, classes: ["Q9143"] },
+  vulcao: { list: natureza.VULCOES, classes: ["Q8072"] },
+  cachoeira: { list: natureza.CACHOEIRAS, classes: ["Q34038"] },
+  ilha: { list: natureza.ILHAS, classes: ["Q23442", "Q33837", "Q112099"] },
+  lago: { list: natureza.LAGOS, classes: ["Q23397", "Q187223", "Q131681"] },
+  montanha: { list: natureza.MONTANHAS, classes: ["Q8502", "Q8072"] },
+  deserto: { list: natureza.DESERTOS },
+  "pedra-preciosa": { list: natureza.PEDRAS_PRECIOSAS, classes: ["Q83437", "Q12089225", "Q7946"] },
+  "arvore-frutifera": { list: natureza.ARVORES_FRUTIFERAS },
+  inseto: { list: natureza.INSETOS },
+  dinossauro: { list: natureza.DINOSSAUROS, title: "Dinossauro ou réptil pré-histórico" },
+  "raca-gato": { list: natureza.RACAS_GATO, classes: ["Q43577"] },
+  "raca-cavalo": { list: natureza.RACAS_CAVALO, classes: ["Q1160573"] },
+  "raca-cachorro": { list: natureza.RACAS_CACHORRO, classes: ["Q39367"] },
+  "verdura-legume": { list: natureza.VERDURAS_LEGUMES },
+  "tempero-erva": { list: natureza.TEMPEROS, classes: ["Q42527", "Q207123", "Q11004", "Q2095"] },
+  "banda-rock": { list: cultura.BANDAS_ROCK, classes: [Q.musicalGroup, "Q5741069", "Q2088357"] },
+  "forro-axe": { list: cultura.FORRO_AXE, classes: [HUMAN, Q.musicalGroup, "Q2088357"] },
+  dj: { list: cultura.DJS, classes: [HUMAN, Q.musicalGroup, "Q2088357"] },
+  "cantora-pop": { list: cultura.CANTORAS_POP, classes: [HUMAN] },
+  "genero-musical": { list: cultura.GENEROS_MUSICAIS, classes: ["Q188451"] },
+  "compositor-classico": { list: cultura.COMPOSITORES_CLASSICOS, classes: [HUMAN] },
+  livro: { list: cultura.LIVROS, classes: ["Q7725634", "Q8261", "Q47461344", "Q571"] },
+  "personagem-desenho": { list: cultura.PERSONAGENS_DESENHO, classes: [CHARACTER] },
+  "personagem-quadrinhos": { list: cultura.PERSONAGENS_QUADRINHOS, classes: [CHARACTER] },
+  "personagem-videogame": { list: cultura.PERSONAGENS_VIDEOGAME, classes: [CHARACTER] },
+  "super-heroi": { list: cultura.SUPER_HEROIS },
+  console: { list: cultura.CONSOLES, classes: ["Q8076", "Q56682555", "Q10929058"] },
+  "jogo-tabuleiro": { list: cultura.JOGOS_TABULEIRO, classes: ["Q131436", "Q142714", "Q11410"] },
+  "criatura-mitologica": { list: cultura.CRIATURAS_MITOLOGICAS },
+  "deus-mitologia": { list: cultura.DEUSES, classes: ["Q178885", "Q22989102", "Q11688446", "Q16513881", "Q146083"] },
+  pao: { list: coisas.PAES, classes: ["Q7802", Q.food] },
+  queijo: { list: coisas.QUEIJOS, classes: ["Q10943", Q.food] },
+  movel: { list: coisas.MOVEIS, classes: ["Q14745"] },
+  "utensilio-cozinha": { list: coisas.UTENSILIOS_COZINHA, classes: ["Q1521410", "Q212920", "Q39546"] },
+  grife: { list: coisas.GRIFES },
+  "modelo-carro": { list: coisas.MODELOS_CARRO, classes: ["Q3231690", "Q1420"] },
+  cor: { list: coisas.CORES },
+  moeda: { list: coisas.MOEDAS, classes: ["Q8142"] },
+  "unidade-medida": { list: coisas.UNIDADES_MEDIDA },
+  osso: { list: coisas.OSSOS, classes: ["Q265868"] },
+  musculo: { list: coisas.MUSCULOS, classes: ["Q7365"] },
+  coquetel: { list: coisas.COQUETEIS, classes: ["Q134768", "Q154", "Q40050"] },
+  "bebida-alcoolica": { list: coisas.BEBIDAS_ALCOOLICAS, classes: ["Q154", "Q40050", ...BRAND] },
+  "rede-social": { list: coisas.REDES_SOCIAIS, classes: ["Q3220391", "Q620615", "Q35127", "Q7397", ...BRAND] },
+  esporte: { list: coisas.ESPORTES, classes: ["Q349", "Q31629"] },
+  "marca-carro": { list: coisas.MARCAS_CARRO, classes: ["Q786820", ...BRAND] },
+  religiao: { list: sociedade.RELIGIOES, classes: ["Q9174"] },
+  santo: { list: sociedade.SANTOS, classes: [HUMAN, CHARACTER] },
+  "personagem-biblico": { list: sociedade.PERSONAGENS_BIBLICOS },
+  inventor: { list: sociedade.INVENTORES, classes: [HUMAN] },
+  explorador: { list: sociedade.EXPLORADORES, classes: [HUMAN] },
+  arquiteto: { list: sociedade.ARQUITETOS, classes: [HUMAN] },
+  filosofo: { list: sociedade.FILOSOFOS, classes: [HUMAN] },
+  astronauta: { list: sociedade.ASTRONAUTAS, classes: [HUMAN, "Q729"] },
+  "lutador-mma": { list: sociedade.LUTADORES_MMA, classes: [HUMAN] },
+  farao: { list: sociedade.FARAOS, classes: [HUMAN] },
+  estadio: { list: sociedade.ESTADIOS, classes: ["Q1154710", "Q483110", "Q41176"] },
+  museu: { list: sociedade.MUSEUS, classes: ["Q33506", "Q207694", "Q17431399", "Q41176"] },
+  castelo: { list: sociedade.CASTELOS, classes: ["Q23413", "Q16560", "Q41176"] },
+  "arte-marcial": { list: sociedade.ARTES_MARCIAIS, classes: ["Q11417", "Q349"] },
+  idioma: { list: sociedade.IDIOMAS, classes: ["Q34770", "Q1288568", "Q33742", "Q17376908"] },
+  fobia: { list: sociedade.FOBIAS, classes: ["Q175854", "Q12136"] },
+};
+
+/** A lista à mão na frente da primeira lista da categoria (ou como fonte nova) e a ordem "list". */
+function listFirst(spec: CategorySpec, { list, classes, title }: (typeof LIST_FIRST)[string]): CategorySpec {
+  const items = n(list);
+  let merged = false;
+  const sources = spec.sources.map((source) => {
+    if (merged || source.kind !== "manual" || source.rare) return source;
+    merged = true;
+    return { ...source, items: [...items, ...source.items] };
+  });
+  return {
+    ...spec,
+    ...(title && { title }),
+    sources: merged ? sources : [{ kind: "manual", items }, ...spec.sources],
+    ordered: "list",
+    audience: true,
+    ...(!spec.classes && classes && { classes }),
+  };
+}
+
+export const CATEGORIES: CategorySpec[] = BASE.map((spec) => (LIST_FIRST[spec.id] ? listFirst(spec, LIST_FIRST[spec.id]) : spec));
