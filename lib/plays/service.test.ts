@@ -10,20 +10,24 @@ Object.assign(globalThis, {
   },
 });
 
-const { closeStalePlays, peekPlay, startPlay, submitGuess, nextPracticeKey } = await import("./service");
-const { dailyStore, practiceStore } = await import("./store");
+const { closeStalePlays, modeForPastDay, nextPracticeKey, pastDays, peekPlay, pendingDays, startPlay, submitGuess } =
+  await import("./service");
+const { archiveStore, dailyStore, practiceStore } = await import("./store");
 const { engine } = await import("@/games/palavra/engine");
+const { EPOCH_DATE } = await import("@/lib/daily/date");
 
 const TODAY = "2026-10-22";
 
+/** Limpa pelo próprio armazenamento: ele guarda um cache em memória além do localStorage. */
+function clearStores() {
+  for (const store of [dailyStore, archiveStore, practiceStore]) {
+    for (const p of Object.values(store.getPlays())) store.deletePlay(p.slug, p.dateKey);
+  }
+  memory.clear();
+}
+
 describe("treino (Jogar outra)", () => {
-  // Limpa pelo próprio armazenamento: ele guarda um cache em memória além do localStorage.
-  beforeEach(() => {
-    for (const store of [dailyStore, practiceStore]) {
-      for (const p of Object.values(store.getPlays())) store.deletePlay(p.slug, p.dateKey);
-    }
-    memory.clear();
-  });
+  beforeEach(clearStores);
 
   it("fica guardado à parte e não mexe nas partidas do dia", async () => {
     const answer = engine.createChallenge(TODAY).answer;
@@ -33,8 +37,8 @@ describe("treino (Jogar outra)", () => {
     const key = nextPracticeKey("palavra");
     expect(key).not.toBe(TODAY);
     const practiceAnswer = engine.createChallenge(key).answer;
-    const result = await submitGuess("palavra", key, practiceAnswer, true);
-    expect(result).toMatchObject({ play: { status: "won", practice: true } });
+    const result = await submitGuess("palavra", key, practiceAnswer, "practice");
+    expect(result).toMatchObject({ play: { status: "won", practice: true, archive: false } });
 
     // As partidas do dia (fonte de sequência e estatísticas) seguem só com o desafio de hoje.
     expect(Object.keys(dailyStore.getPlays())).toEqual([`palavra:${TODAY}`]);
@@ -43,7 +47,7 @@ describe("treino (Jogar outra)", () => {
 
   it("o desafio do dia continua encerrado depois do treino", async () => {
     await submitGuess("palavra", TODAY, engine.createChallenge(TODAY).answer);
-    await submitGuess("palavra", nextPracticeKey("palavra"), "carro", true);
+    await submitGuess("palavra", nextPracticeKey("palavra"), "carro", "practice");
     const daily = await startPlay("palavra", TODAY);
     expect(daily).toMatchObject({ status: "won", practice: false });
     expect(await submitGuess("palavra", TODAY, "pedra")).toEqual({ error: "Você já jogou hoje" });
@@ -51,15 +55,24 @@ describe("treino (Jogar outra)", () => {
 
   it("continua o treino em andamento em vez de sortear outro", async () => {
     const key = nextPracticeKey("palavra");
-    await submitGuess("palavra", key, "carro", true);
+    await submitGuess("palavra", key, "carro", "practice");
     expect(nextPracticeKey("palavra")).toBe(key);
+  });
+
+  it("só usa dias antes da estreia do Rodada: nunca o desafio de um dia de verdade", () => {
+    for (let i = 0; i < 200; i++) expect(nextPracticeKey("palavra") < EPOCH_DATE).toBe(true);
+  });
+
+  it("depois de um treino, vai para o dia seguinte (dias seguidos não repetem)", async () => {
+    await submitGuess("palavra", "2010-05-01", engine.createChallenge("2010-05-01").answer, "practice");
+    expect(nextPracticeKey("palavra")).toBe("2010-05-02");
   });
 
   it("guarda só o treino mais recente de cada jogo", async () => {
     const first = nextPracticeKey("palavra");
-    await submitGuess("palavra", first, engine.createChallenge(first).answer, true);
+    await submitGuess("palavra", first, engine.createChallenge(first).answer, "practice");
     const second = nextPracticeKey("palavra");
-    await submitGuess("palavra", second, "carro", true);
+    await submitGuess("palavra", second, "carro", "practice");
     expect(Object.keys(practiceStore.getPlays())).toEqual([`palavra:${second}`]);
   });
 
@@ -105,10 +118,7 @@ describe("treino (Jogar outra)", () => {
 describe("virada do dia", () => {
   const YESTERDAY = "2026-10-21";
 
-  beforeEach(() => {
-    for (const p of Object.values(dailyStore.getPlays())) dailyStore.deletePlay(p.slug, p.dateKey);
-    memory.clear();
-  });
+  beforeEach(clearStores);
 
   it("a partida de ontem que ficou no meio vira desistência; a de hoje segue", async () => {
     await submitGuess("palavra", YESTERDAY, "carro");
@@ -126,5 +136,51 @@ describe("virada do dia", () => {
     const before = dailyStore.getPlay("palavra", YESTERDAY);
     await closeStalePlays(TODAY);
     expect(dailyStore.getPlay("palavra", YESTERDAY)).toEqual(before);
+  });
+});
+
+describe("dias anteriores", () => {
+  const LATER = "2026-10-25";
+
+  beforeEach(clearStores);
+
+  it("vão da estreia do jogo até ontem, do mais recente ao mais antigo", () => {
+    expect(pastDays("palavra", LATER)).toEqual(["2026-10-24", "2026-10-23", "2026-10-22"]);
+    expect(pastDays("palavra", EPOCH_DATE)).toEqual([]);
+    // O Incomum estreou depois: no dia da estreia ainda não tem dia anterior.
+    expect(pastDays("incomum", "2026-11-24")).toEqual([]);
+    expect(pastDays("incomum", "2026-11-26")).toEqual(["2026-11-25", "2026-11-24"]);
+  });
+
+  it("jogado depois fica salvo à parte, fora das partidas do dia", async () => {
+    const day = "2026-10-24";
+    const result = await submitGuess("palavra", day, engine.createChallenge(day).answer, "archive");
+    expect(result).toMatchObject({ play: { status: "won", archive: true, practice: false } });
+    expect(archiveStore.getPlay("palavra", day)?.status).toBe("won");
+    expect(dailyStore.getPlay("palavra", day)).toBeUndefined();
+    // Volta a abrir terminado.
+    expect(await startPlay("palavra", day, "archive")).toMatchObject({ status: "won", archive: true });
+  });
+
+  it("guarda todos os dias jogados, não só o último", async () => {
+    for (const day of ["2026-10-24", "2026-10-23"]) await submitGuess("palavra", day, "carro", "archive");
+    expect(Object.keys(archiveStore.getPlays()).sort()).toEqual(["palavra:2026-10-23", "palavra:2026-10-24"]);
+  });
+
+  it("o treino só libera sem dia anterior por terminar; vale o jogado no dia ou depois", async () => {
+    const pending = () => pendingDays(dailyStore.getPlays(), archiveStore.getPlays(), "palavra", LATER);
+    expect(pending()).toEqual(["2026-10-24", "2026-10-23", "2026-10-22"]);
+
+    // Jogado no próprio dia: abre a partida do dia, que já conta como feita.
+    await submitGuess("palavra", "2026-10-23", engine.createChallenge("2026-10-23").answer);
+    expect(modeForPastDay("palavra", "2026-10-23")).toBe("daily");
+    expect(modeForPastDay("palavra", "2026-10-24")).toBe("archive");
+    // Começado e não terminado ainda falta.
+    await submitGuess("palavra", "2026-10-24", "carro", "archive");
+    expect(pending()).toEqual(["2026-10-24", "2026-10-22"]);
+
+    await submitGuess("palavra", "2026-10-24", engine.createChallenge("2026-10-24").answer, "archive");
+    await submitGuess("palavra", "2026-10-22", engine.createChallenge("2026-10-22").answer, "archive");
+    expect(pending()).toEqual([]);
   });
 });

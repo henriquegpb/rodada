@@ -7,7 +7,7 @@ import { track } from "@vercel/analytics";
  * divergirem entre telas. Visualizações de página (qual jogo foi aberto) já são automáticas.
  *
  * Todo evento ligado a um jogo também leva as flags `game` e `practice`: no painel do Vercel dá
- * para segmentar qualquer evento por jogo e separar o desafio do dia do treino.
+ * para segmentar qualquer evento por jogo e separar o desafio do dia do resto (dia anterior e treino).
  */
 export interface AnalyticsEvents {
   /** Primeira tentativa (ou "Começar", no Mundo) de uma partida. */
@@ -17,7 +17,10 @@ export interface AnalyticsEvents {
   /** Desistiu antes do fim (Calor, Mundo). */
   game_given_up: { game: string; practice: boolean; attempts: number };
   result_shared: { game: string; method: string };
+  /** Treino ("Jogar outra"), liberado depois de terminar todos os dias anteriores. */
   play_another: { game: string };
+  /** Abriu um dia anterior (`days_ago`: 1 = ontem). */
+  past_day_opened: { game: string; days_ago: number };
   hint_used: { game: string; hint: number; practice: boolean };
   sound_toggled: { muted: boolean };
   theme_changed: { theme: string };

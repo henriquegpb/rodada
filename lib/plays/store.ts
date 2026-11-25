@@ -99,6 +99,12 @@ function createPlayStore(storageKey: string, { latestOnly = false } = {}): PlayS
 /** Desafios do dia: a fonte de sequências, estatísticas e histórico. */
 export const dailyStore = createPlayStore("rodada:plays:v1");
 
+/**
+ * Dias anteriores jogados depois do dia: todos ficam salvos, mas fora de sequência, estatísticas e
+ * ranking. Quem jogou no próprio dia tem a partida no `dailyStore`, e é ela que vale.
+ */
+export const archiveStore = createPlayStore("rodada:arquivo:v1");
+
 /** Treino ("Jogar outra"): uma partida por jogo, que nunca conta para nada. */
 export const practiceStore = createPlayStore("rodada:practice:v1", { latestOnly: true });
 

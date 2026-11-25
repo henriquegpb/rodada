@@ -78,6 +78,18 @@ export const ptBR = {
     notice: "Não conta para a sequência: o desafio de hoje já foi.",
     back: "Voltar ao desafio de hoje",
   },
+  archive: {
+    title: "Dias anteriores",
+    label: "Dia anterior",
+    playPast: "Jogar dias anteriores",
+    notice: "Fica salvo, mas não conta para a sequência nem para o ranking.",
+    playedThen: "Você jogou no dia.",
+    subtitle: (pending: number) =>
+      pending === 0
+        ? "Você terminou todos. O “Jogar outra” está liberado."
+        : `${pending} ${pending === 1 ? "dia ainda não terminado" : "dias ainda não terminados"}. O “Jogar outra” libera quando você terminar todos.`,
+    today: "Hoje",
+  },
   streak: {
     title: "Terminados hoje",
     subtitle: "Sequência de cada jogo que você terminou hoje",
