@@ -249,7 +249,21 @@
    "Fabio Turci",
    "Fábio William"
   ],
-  "v": "88a5b95041"
+  "v": "597ef20bdf",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Apresentador ou apresentadora de TV brasileira",
+    "total": 1230,
+    "obvious": "Faustão",
+    "rare": [
+     "Fábio Brasil",
+     "Fabio Turci",
+     "Fábio William"
+    ],
+    "v": "88a5b95041"
+   }
+  ]
  },
  {
   "id": "escritor-brasileiro",
@@ -302,14 +316,28 @@
  {
   "id": "forro-axe",
   "title": "Artista de forró ou axé",
-  "total": 181,
-  "obvious": "Ivete Sangalo",
+  "total": 289,
+  "obvious": "Wesley Safadão",
   "rare": [
-   "Lino de França",
-   "Luiz Wanderley",
-   "Messias Holanda"
+   "Volume 5",
+   "Ilê Pérola Negra",
+   "Hermelinda Lopes"
   ],
-  "v": "f9a4c44679"
+  "v": "ecf78b6b70",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Artista de forró ou axé",
+    "total": 181,
+    "obvious": "Ivete Sangalo",
+    "rare": [
+     "Lino de França",
+     "Luiz Wanderley",
+     "Messias Holanda"
+    ],
+    "v": "f9a4c44679"
+   }
+  ]
  },
  {
   "id": "escola-de-samba",
@@ -333,7 +361,21 @@
    "Jancarlos",
    "João Paulo"
   ],
-  "v": "11bf9f91aa"
+  "v": "2d21422ff0",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Jogador ou jogadora da Seleção Brasileira",
+    "total": 1611,
+    "obvious": "Pelé",
+    "rare": [
+     "Ipojucan",
+     "Jancarlos",
+     "João Paulo"
+    ],
+    "v": "11bf9f91aa"
+   }
+  ]
  },
  {
   "id": "time-brasileiro",
@@ -501,13 +543,27 @@
   "id": "prato-nordeste",
   "title": "Prato típico do Nordeste",
   "total": 99,
-  "obvious": "Caranguejada",
+  "obvious": "Moqueca baiana",
   "rare": [
-   "Chambaril",
-   "Cocada de forno",
-   "Doce de leite de cabra"
+   "Alfenim",
+   "Feijoada à brasileira",
+   "Acaçá"
   ],
-  "v": "ee48491fb7"
+  "v": "6ac7e53719",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Prato típico do Nordeste",
+    "total": 99,
+    "obvious": "Caranguejada",
+    "rare": [
+     "Chambaril",
+     "Cocada de forno",
+     "Doce de leite de cabra"
+    ],
+    "v": "ee48491fb7"
+   }
+  ]
  },
  {
   "id": "pais",
@@ -596,98 +652,210 @@
  {
   "id": "montanha",
   "title": "Montanha ou pico",
-  "total": 1241,
-  "obvious": "Monte Evereste",
+  "total": 1308,
+  "obvious": "Monte Everest",
   "rare": [
-   "Romeral",
-   "Rondoy",
-   "Serra da Coroa"
+   "Grand Pilier d'Angle",
+   "Hiunchuli",
+   "Hutyn Tomnatyk"
   ],
-  "v": "c48397b371"
+  "v": "872e213c31",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Montanha ou pico",
+    "total": 1241,
+    "obvious": "Monte Evereste",
+    "rare": [
+     "Romeral",
+     "Rondoy",
+     "Serra da Coroa"
+    ],
+    "v": "c48397b371"
+   }
+  ]
  },
  {
   "id": "vulcao",
   "title": "Vulcão",
-  "total": 176,
-  "obvious": "Monte Ararate",
+  "total": 427,
+  "obvious": "Vesúvio",
   "rare": [
-   "Kuwaé",
-   "Pico Mascarin",
-   "Pular"
+   "Tharsis Tholus",
+   "Toussidé",
+   "Tutupaca"
   ],
-  "v": "d79b490f33"
+  "v": "9f5800e878",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Vulcão",
+    "total": 176,
+    "obvious": "Monte Ararate",
+    "rare": [
+     "Kuwaé",
+     "Pico Mascarin",
+     "Pular"
+    ],
+    "v": "d79b490f33"
+   }
+  ]
  },
  {
   "id": "ilha",
   "title": "Ilha",
-  "total": 1365,
-  "obvious": "Guam",
+  "total": 1698,
+  "obvious": "Fernando de Noronha",
   "rare": [
-   "Ilha Drygalski",
-   "Ilha Gau",
-   "Ilha Jemo"
+   "Herrenchiemsee",
+   "Ilha Aniwa",
+   "Ilha Annenkov"
   ],
-  "v": "fe0cc37814"
+  "v": "3be02e6b9f",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Ilha",
+    "total": 1365,
+    "obvious": "Guam",
+    "rare": [
+     "Ilha Drygalski",
+     "Ilha Gau",
+     "Ilha Jemo"
+    ],
+    "v": "fe0cc37814"
+   }
+  ]
  },
  {
   "id": "deserto",
   "title": "Deserto",
-  "total": 93,
+  "total": 114,
   "obvious": "Deserto do Saara",
   "rare": [
-   "Caoco",
-   "Deserto de Escalante",
-   "Deserto de Mu Us"
+   "Deserto de Pedirka",
+   "Deserto do Vale do Indo",
+   "Vale Antílope"
   ],
-  "v": "0b6583eec4"
+  "v": "dba86879b3",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Deserto",
+    "total": 93,
+    "obvious": "Deserto do Saara",
+    "rare": [
+     "Caoco",
+     "Deserto de Escalante",
+     "Deserto de Mu Us"
+    ],
+    "v": "0b6583eec4"
+   }
+  ]
  },
  {
   "id": "cachoeira",
   "title": "Cachoeira ou catarata",
-  "total": 126,
-  "obvious": "Cataratas do Niágara",
+  "total": 241,
+  "obvious": "Cataratas do Iguaçu",
   "rare": [
-   "Cascata do Véu da Noiva",
-   "Cataratas de Wilberforce",
-   "Millaa Millaa Falls"
+   "Mongefossen",
+   "Albufeira de Smallwood",
+   "Churchill Falls"
   ],
-  "v": "75232ab690"
+  "v": "f937c739ab",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Cachoeira ou catarata",
+    "total": 126,
+    "obvious": "Cataratas do Niágara",
+    "rare": [
+     "Cascata do Véu da Noiva",
+     "Cataratas de Wilberforce",
+     "Millaa Millaa Falls"
+    ],
+    "v": "75232ab690"
+   }
+  ]
  },
  {
   "id": "lago",
   "title": "Lago",
-  "total": 311,
-  "obvious": "Mar Cáspio",
+  "total": 446,
+  "obvious": "Lagoa Rodrigo de Freitas",
   "rare": [
-   "Lago Adams",
-   "Lago Baldegg",
-   "Lago Ellsworth"
+   "Lago Tengrela",
+   "Lago Uru Uru",
+   "Represa de Kayrakkum"
   ],
-  "v": "13243f9b8c"
+  "v": "d9b9c36d74",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Lago",
+    "total": 311,
+    "obvious": "Mar Cáspio",
+    "rare": [
+     "Lago Adams",
+     "Lago Baldegg",
+     "Lago Ellsworth"
+    ],
+    "v": "13243f9b8c"
+   }
+  ]
  },
  {
   "id": "idioma",
   "title": "Idioma (língua)",
-  "total": 1155,
-  "obvious": "Língua inglesa",
+  "total": 1208,
+  "obvious": "Inglês",
   "rare": [
-   "Língua dong",
-   "Língua fataluco",
-   "Língua gestual portuguesa"
+   "Língua aguacateca",
+   "Língua airesa",
+   "Língua akha"
   ],
-  "v": "9bde350bd8"
+  "v": "1534942153",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Idioma (língua)",
+    "total": 1155,
+    "obvious": "Língua inglesa",
+    "rare": [
+     "Língua dong",
+     "Língua fataluco",
+     "Língua gestual portuguesa"
+    ],
+    "v": "9bde350bd8"
+   }
+  ]
  },
  {
   "id": "moeda",
   "title": "Moeda de algum país",
-  "total": 286,
-  "obvious": "Euro",
+  "total": 327,
+  "obvious": "Real",
   "rare": [
-   "Libra tornesa",
-   "SUCRE",
-   "Aes grave"
+   "Afro",
+   "Cash vietnamita",
+   "Peso ley argentino"
   ],
-  "v": "5eedc27f50"
+  "v": "b361f97bda",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Moeda de algum país",
+    "total": 286,
+    "obvious": "Euro",
+    "rare": [
+     "Libra tornesa",
+     "SUCRE",
+     "Aes grave"
+    ],
+    "v": "5eedc27f50"
+   }
+  ]
  },
  {
   "id": "estado-eua",
@@ -729,26 +897,54 @@
  {
   "id": "museu",
   "title": "Museu",
-  "total": 907,
+  "total": 980,
   "obvious": "Museu do Louvre",
   "rare": [
-   "Koldinghus",
-   "Los Pinos",
-   "Lutherhaus"
+   "Museu de Marraquexe",
+   "Museu Marítimo Nacional",
+   "Museu Nacional da História e Cultura da Bielorrússia"
   ],
-  "v": "84fb53ed7a"
+  "v": "a6704a3997",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Museu",
+    "total": 907,
+    "obvious": "Museu do Louvre",
+    "rare": [
+     "Koldinghus",
+     "Los Pinos",
+     "Lutherhaus"
+    ],
+    "v": "84fb53ed7a"
+   }
+  ]
  },
  {
   "id": "castelo",
   "title": "Castelo ou palácio",
-  "total": 932,
-  "obvious": "Palácio de Versalhes",
+  "total": 1019,
+  "obvious": "Palácio de Buckingham",
   "rare": [
-   "Palácio do Abade",
-   "Palácio do Catete",
-   "Palácio do Partal"
+   "Castelo de Wettin",
+   "Castelo de Xememis",
+   "Castelo Delgatie"
   ],
-  "v": "9ce43ea1f8"
+  "v": "2cc12ca22a",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Castelo ou palácio",
+    "total": 932,
+    "obvious": "Palácio de Versalhes",
+    "rare": [
+     "Palácio do Abade",
+     "Palácio do Catete",
+     "Palácio do Partal"
+    ],
+    "v": "9ce43ea1f8"
+   }
+  ]
  },
  {
   "id": "companhia-aerea",
@@ -765,38 +961,80 @@
  {
   "id": "raca-cachorro",
   "title": "Raça de cachorro",
-  "total": 464,
-  "obvious": "Pastor-alemão",
+  "total": 482,
+  "obvious": "Vira-lata",
   "rare": [
-   "Olde English Bulldogge",
-   "Sabujo de Hygen",
-   "Sabujo-austríaco-preto-e-castanho"
+   "Cuvac eslovaco",
+   "Schapendoes",
+   "Sealyham terrier"
   ],
-  "v": "bed7e6755f"
+  "v": "f9c3b1ed00",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Raça de cachorro",
+    "total": 464,
+    "obvious": "Pastor-alemão",
+    "rare": [
+     "Olde English Bulldogge",
+     "Sabujo de Hygen",
+     "Sabujo-austríaco-preto-e-castanho"
+    ],
+    "v": "bed7e6755f"
+   }
+  ]
  },
  {
   "id": "raca-gato",
   "title": "Raça de gato",
-  "total": 47,
-  "obvious": "Siamês",
+  "total": 79,
+  "obvious": "Vira-lata",
   "rare": [
-   "Gato de pelo curto brasileiro",
-   "LaPerm",
-   "Mist australiano"
+   "Gato egeu",
+   "Tiffanie",
+   "Munchkin"
   ],
-  "v": "c5fe2db82e"
+  "v": "1c467b7e24",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Raça de gato",
+    "total": 47,
+    "obvious": "Siamês",
+    "rare": [
+     "Gato de pelo curto brasileiro",
+     "LaPerm",
+     "Mist australiano"
+    ],
+    "v": "c5fe2db82e"
+   }
+  ]
  },
  {
   "id": "raca-cavalo",
   "title": "Raça de cavalo",
-  "total": 61,
-  "obvious": "Cavalo árabe",
+  "total": 98,
+  "obvious": "Árabe",
   "rare": [
-   "Monterufolino",
-   "Pampa",
-   "Árabo-frísio"
+   "Bagual",
+   "Cavalo Nordestino",
+   "American Cream Draft"
   ],
-  "v": "3cfe3168af"
+  "v": "ae6164efed",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Raça de cavalo",
+    "total": 61,
+    "obvious": "Cavalo árabe",
+    "rare": [
+     "Monterufolino",
+     "Pampa",
+     "Árabo-frísio"
+    ],
+    "v": "3cfe3168af"
+   }
+  ]
  },
  {
   "id": "mamifero",
@@ -861,74 +1099,158 @@
  {
   "id": "inseto",
   "title": "Inseto",
-  "total": 58,
+  "total": 101,
   "obvious": "Formiga",
   "rare": [
+   "Barata-alemã",
    "Mosca-branca",
-   "Esperança",
-   "Mosquito-palha"
+   "Lacerdinha"
   ],
-  "v": "214e0e69bc"
+  "v": "ab54f4c644",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Inseto",
+    "total": 58,
+    "obvious": "Formiga",
+    "rare": [
+     "Mosca-branca",
+     "Esperança",
+     "Mosquito-palha"
+    ],
+    "v": "214e0e69bc"
+   }
+  ]
  },
  {
   "id": "dinossauro",
-  "title": "Dinossauro",
-  "total": 79,
-  "obvious": "Tiranossauro",
+  "title": "Dinossauro ou réptil pré-histórico",
+  "total": 148,
+  "obvious": "Tiranossauro rex",
   "rare": [
-   "Struthiomimus",
-   "Suchomimus",
-   "Ouranossauro"
+   "Criolofossauro",
+   "Gorgossauro",
+   "Nanotyrannus"
   ],
-  "v": "be4aaefd48"
+  "v": "dd925e89bb",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Dinossauro ou réptil pré-histórico",
+    "total": 79,
+    "obvious": "Tiranossauro",
+    "rare": [
+     "Struthiomimus",
+     "Suchomimus",
+     "Ouranossauro"
+    ],
+    "v": "be4aaefd48"
+   }
+  ]
  },
  {
   "id": "arvore-frutifera",
   "title": "Árvore frutífera que existe no Brasil",
-  "total": 358,
-  "obvious": "Maçã",
+  "total": 388,
+  "obvious": "Mangueira",
   "rare": [
-   "Canela-preta",
-   "Couma utilis",
-   "Daphnopsis"
+   "Heisteria silvianii",
+   "Colubrina glandulosa",
+   "Mespilus"
   ],
-  "v": "ea4605f93d"
+  "v": "8b51984859",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Árvore frutífera que existe no Brasil",
+    "total": 358,
+    "obvious": "Maçã",
+    "rare": [
+     "Canela-preta",
+     "Couma utilis",
+     "Daphnopsis"
+    ],
+    "v": "ea4605f93d"
+   }
+  ]
  },
  {
   "id": "verdura-legume",
   "title": "Verdura ou legume",
-  "total": 70,
-  "obvious": "Milho",
+  "total": 105,
+  "obvious": "Alface",
   "rare": [
-   "Bertalha",
-   "Broto de bambu",
-   "Mostarda"
+   "Beldroega",
+   "Azedinha",
+   "Batata-yacon"
   ],
-  "v": "0cef658016"
+  "v": "52d58309eb",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Verdura ou legume",
+    "total": 70,
+    "obvious": "Milho",
+    "rare": [
+     "Bertalha",
+     "Broto de bambu",
+     "Mostarda"
+    ],
+    "v": "0cef658016"
+   }
+  ]
  },
  {
   "id": "tempero-erva",
   "title": "Tempero ou erva",
-  "total": 112,
-  "obvious": "Tomate",
+  "total": 183,
+  "obvious": "Sal",
   "rare": [
-   "Ginseng",
-   "Erva aromática",
-   "Gomásio"
+   "Masala",
+   "Malus sylvestris",
+   "Populus nigra"
   ],
-  "v": "e7d0c40b95"
+  "v": "d47422a819",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Tempero ou erva",
+    "total": 112,
+    "obvious": "Tomate",
+    "rare": [
+     "Ginseng",
+     "Erva aromática",
+     "Gomásio"
+    ],
+    "v": "e7d0c40b95"
+   }
+  ]
  },
  {
   "id": "pedra-preciosa",
   "title": "Pedra preciosa ou mineral",
-  "total": 289,
+  "total": 345,
   "obvious": "Diamante",
   "rare": [
-   "Lechatelierite",
-   "Okenita",
-   "Schreibersita"
+   "Pirofilita",
+   "Tridimita",
+   "Euxenita"
   ],
-  "v": "a60c2d4732"
+  "v": "de09fd663b",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Pedra preciosa ou mineral",
+    "total": 289,
+    "obvious": "Diamante",
+    "rare": [
+     "Lechatelierite",
+     "Okenita",
+     "Schreibersita"
+    ],
+    "v": "a60c2d4732"
+   }
+  ]
  },
  {
   "id": "constelacao",
@@ -1162,26 +1484,54 @@
  {
   "id": "banda-rock",
   "title": "Banda de rock",
-  "total": 379,
-  "obvious": "Paramore",
+  "total": 2042,
+  "obvious": "Beatles",
   "rare": [
-   "Circa Waves",
-   "Divinyls",
-   "Larkin Poe"
+   "After Crying",
+   "Miranda Sex Garden",
+   "Say Anything"
   ],
-  "v": "b3ccef67c2"
+  "v": "6c8d57444c",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Banda de rock",
+    "total": 379,
+    "obvious": "Paramore",
+    "rare": [
+     "Circa Waves",
+     "Divinyls",
+     "Larkin Poe"
+    ],
+    "v": "b3ccef67c2"
+   }
+  ]
  },
  {
   "id": "cantora-pop",
   "title": "Cantora pop internacional",
-  "total": 1376,
-  "obvious": "Shakira",
+  "total": 1455,
+  "obvious": "Taylor Swift",
   "rare": [
-   "Yui Yatyer",
-   "Amelia Lily",
-   "Baby K"
+   "Rebeka Dremelj",
+   "Rita Kleinstein",
+   "S10"
   ],
-  "v": "02b7b46c9c"
+  "v": "0b63a2500d",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Cantora pop internacional",
+    "total": 1376,
+    "obvious": "Shakira",
+    "rare": [
+     "Yui Yatyer",
+     "Amelia Lily",
+     "Baby K"
+    ],
+    "v": "02b7b46c9c"
+   }
+  ]
  },
  {
   "id": "rapper",
@@ -1198,26 +1548,54 @@
  {
   "id": "dj",
   "title": "DJ",
-  "total": 493,
-  "obvious": "Basshunter",
+  "total": 575,
+  "obvious": "Alok",
   "rare": [
-   "Unk",
-   "Virtual Riot",
-   "Zight"
+   "Neil Ross",
+   "Todd Terje",
+   "Gareth Emery"
   ],
-  "v": "bfbbda7daf"
+  "v": "62a1307a30",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "DJ",
+    "total": 493,
+    "obvious": "Basshunter",
+    "rare": [
+     "Unk",
+     "Virtual Riot",
+     "Zight"
+    ],
+    "v": "bfbbda7daf"
+   }
+  ]
  },
  {
   "id": "genero-musical",
   "title": "Gênero musical",
-  "total": 836,
-  "obvious": "Jazz",
+  "total": 889,
+  "obvious": "Funk",
   "rare": [
-   "Urban contemporary",
-   "West Coast Jazz",
-   "Bardcore"
+   "Hino de Coroação do monarca do Reino Unido da Grã-Bretanha e Irlanda do Norte",
+   "Rebético",
+   "Uplifting trance"
   ],
-  "v": "6bd48280d1"
+  "v": "520a614f4b",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Gênero musical",
+    "total": 836,
+    "obvious": "Jazz",
+    "rare": [
+     "Urban contemporary",
+     "West Coast Jazz",
+     "Bardcore"
+    ],
+    "v": "6bd48280d1"
+   }
+  ]
  },
  {
   "id": "instrumento-musical",
@@ -1241,31 +1619,73 @@
    "Francisco Herrera",
    "George Maciunas"
   ],
-  "v": "361f422ad0"
+  "v": "361f422ad0",
+  "from": "2026-11-25",
+  "previous": [
+   {
+    "title": "Pintor ou pintora",
+    "total": 2039,
+    "obvious": "Leonardo da Vinci",
+    "rare": [
+     "Louise Catherine Breslau",
+     "Luis Eduardo Aute",
+     "Maria Cosway"
+    ],
+    "v": "bb0dafeb9b"
+   }
+  ]
  },
  {
   "id": "arquiteto",
   "title": "Arquiteto ou arquiteta",
-  "total": 821,
-  "obvious": "Leonardo da Vinci",
+  "total": 871,
+  "obvious": "Oscar Niemeyer",
   "rare": [
-   "Riccardo Morandi",
-   "Richard Norman Shaw",
-   "Salomon de Brosse"
+   "Frederick Catherwood",
+   "Galeazzo Alessi",
+   "Giovanni Poleni"
   ],
-  "v": "958e985373"
+  "v": "3c8086d4d0",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Arquiteto ou arquiteta",
+    "total": 821,
+    "obvious": "Leonardo da Vinci",
+    "rare": [
+     "Riccardo Morandi",
+     "Richard Norman Shaw",
+     "Salomon de Brosse"
+    ],
+    "v": "958e985373"
+   }
+  ]
  },
  {
   "id": "compositor-classico",
   "title": "Compositor de música clássica",
-  "total": 1133,
-  "obvious": "Leonardo da Vinci",
+  "total": 1189,
+  "obvious": "Wolfgang Amadeus Mozart",
   "rare": [
-   "Pedro Georgievich de Oldemburgo",
-   "Pierre Attaingnant",
-   "Robert de Visée"
+   "Friedrich Wilhelm Zachow",
+   "Gottfried van Swieten",
+   "Hnat Khotkevych"
   ],
-  "v": "a343973bdc"
+  "v": "6a4195dde5",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Compositor de música clássica",
+    "total": 1133,
+    "obvious": "Leonardo da Vinci",
+    "rare": [
+     "Pedro Georgievich de Oldemburgo",
+     "Pierre Attaingnant",
+     "Robert de Visée"
+    ],
+    "v": "a343973bdc"
+   }
+  ]
  },
  {
   "id": "diretor-cinema",
@@ -1282,14 +1702,28 @@
  {
   "id": "livro",
   "title": "Livro (romance ou clássico)",
-  "total": 1858,
-  "obvious": "Alcorão",
+  "total": 2012,
+  "obvious": "Dom Casmurro",
   "rare": [
-   "Bibliotheca historica",
-   "Blood Meridian",
-   "By the Pricking of My Thumbs"
+   "Liezi",
+   "Robots and Empire",
+   "A Saga de Gösta Berling"
   ],
-  "v": "62edbcec0f"
+  "v": "2bfea099c1",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Livro (romance ou clássico)",
+    "total": 1858,
+    "obvious": "Alcorão",
+    "rare": [
+     "Bibliotheca historica",
+     "Blood Meridian",
+     "By the Pricking of My Thumbs"
+    ],
+    "v": "62edbcec0f"
+   }
+  ]
  },
  {
   "id": "videogame",
@@ -1306,14 +1740,28 @@
  {
   "id": "console",
   "title": "Console de videogame",
-  "total": 117,
-  "obvious": "PlayStation 4",
+  "total": 158,
+  "obvious": "PlayStation 2",
   "rare": [
    "VTech CreatiVision",
-   "Evercade",
-   "Nuon"
+   "Entex Adventure Vision",
+   "Atari Panther"
   ],
-  "v": "0318813224"
+  "v": "04eacdf758",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Console de videogame",
+    "total": 117,
+    "obvious": "PlayStation 4",
+    "rare": [
+     "VTech CreatiVision",
+     "Evercade",
+     "Nuon"
+    ],
+    "v": "0318813224"
+   }
+  ]
  },
  {
   "id": "pokemon",
@@ -1330,50 +1778,106 @@
  {
   "id": "super-heroi",
   "title": "Super-herói ou super-heroína",
-  "total": 117,
+  "total": 176,
   "obvious": "Batman",
   "rare": [
-   "Fogo",
    "Psylocke",
-   "Invencível"
+   "Jubileu",
+   "Homem-Animal"
   ],
-  "v": "d7c83d00f8"
+  "v": "fbc34adf5e",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Super-herói ou super-heroína",
+    "total": 117,
+    "obvious": "Batman",
+    "rare": [
+     "Fogo",
+     "Psylocke",
+     "Invencível"
+    ],
+    "v": "d7c83d00f8"
+   }
+  ]
  },
  {
   "id": "personagem-desenho",
   "title": "Personagem de desenho animado",
-  "total": 911,
-  "obvious": "Mickey Mouse",
+  "total": 1141,
+  "obvious": "Mickey",
   "rare": [
-   "OMAC",
-   "Penelope Pitstop",
-   "Penelope Pussycat"
+   "Lara Lor-Van",
+   "Luanne Van Houten",
+   "Lunchlady Doris"
   ],
-  "v": "433550f1fb"
+  "v": "54afba4e70",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Personagem de desenho animado",
+    "total": 911,
+    "obvious": "Mickey Mouse",
+    "rare": [
+     "OMAC",
+     "Penelope Pitstop",
+     "Penelope Pussycat"
+    ],
+    "v": "433550f1fb"
+   }
+  ]
  },
  {
   "id": "personagem-videogame",
   "title": "Personagem de videogame",
-  "total": 517,
-  "obvious": "Mickey Mouse",
+  "total": 648,
+  "obvious": "Mario",
   "rare": [
-   "Sheng Long",
-   "Urien",
-   "Wallace Breen"
+   "Dan Hibiki",
+   "Felicia",
+   "Haohmaru"
   ],
-  "v": "72be41935b"
+  "v": "cacf8c1508",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Personagem de videogame",
+    "total": 517,
+    "obvious": "Mickey Mouse",
+    "rare": [
+     "Sheng Long",
+     "Urien",
+     "Wallace Breen"
+    ],
+    "v": "72be41935b"
+   }
+  ]
  },
  {
   "id": "personagem-quadrinhos",
   "title": "Personagem de quadrinhos",
-  "total": 1297,
-  "obvious": "Mickey Mouse",
+  "total": 1426,
+  "obvious": "Mônica",
   "rare": [
-   "Hot Stuff the Little Devil",
-   "Huey Freeman",
-   "Imediato P.A. Tinhas"
+   "Maggie Sawyer",
+   "Malebolgia",
+   "Maxie Zeus"
   ],
-  "v": "ab3539dda0"
+  "v": "501498cda7",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Personagem de quadrinhos",
+    "total": 1297,
+    "obvious": "Mickey Mouse",
+    "rare": [
+     "Hot Stuff the Little Devil",
+     "Huey Freeman",
+     "Imediato P.A. Tinhas"
+    ],
+    "v": "ab3539dda0"
+   }
+  ]
  },
  {
   "id": "anime",
@@ -1390,50 +1894,106 @@
  {
   "id": "deus-mitologia",
   "title": "Deus ou deusa de alguma mitologia",
-  "total": 620,
-  "obvious": "Deus",
+  "total": 774,
+  "obvious": "Zeus",
   "rare": [
-   "Enódia",
-   "Éolo",
-   "Fames"
+   "Bate",
+   "Dellingr",
+   "Saranyu"
   ],
-  "v": "283304dbbd"
+  "v": "9abf103248",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Deus ou deusa de alguma mitologia",
+    "total": 620,
+    "obvious": "Deus",
+    "rare": [
+     "Enódia",
+     "Éolo",
+     "Fames"
+    ],
+    "v": "283304dbbd"
+   }
+  ]
  },
  {
   "id": "criatura-mitologica",
   "title": "Criatura mitológica ou lendária",
-  "total": 1164,
-  "obvious": "Anjo",
+  "total": 1202,
+  "obvious": "Saci",
   "rare": [
-   "Telo",
-   "Tralalero Tralala",
-   "Valravn"
+   "Afanc",
+   "Ameonna",
+   "Átis"
   ],
-  "v": "fc52b5233d"
+  "v": "883eac9494",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Criatura mitológica ou lendária",
+    "total": 1164,
+    "obvious": "Anjo",
+    "rare": [
+     "Telo",
+     "Tralalero Tralala",
+     "Valravn"
+    ],
+    "v": "fc52b5233d"
+   }
+  ]
  },
  {
   "id": "personagem-biblico",
   "title": "Personagem da Bíblia",
-  "total": 161,
+  "total": 218,
   "obvious": "Jesus",
   "rare": [
-   "Priscila e Áquila",
-   "Balaão",
-   "Amom de Judá"
+   "Potifar",
+   "Jocabede",
+   "Mulher de Ló"
   ],
-  "v": "93b89775d8"
+  "v": "7b5842a507",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Personagem da Bíblia",
+    "total": 161,
+    "obvious": "Jesus",
+    "rare": [
+     "Priscila e Áquila",
+     "Balaão",
+     "Amom de Judá"
+    ],
+    "v": "93b89775d8"
+   }
+  ]
  },
  {
   "id": "santo",
   "title": "Santo ou santa",
-  "total": 1092,
-  "obvious": "Agostinho de Hipona",
+  "total": 1206,
+  "obvious": "São Jorge",
   "rare": [
-   "Helena de Skövde",
-   "Inês da Boêmia",
-   "Ingrid de Skänninge"
+   "André I de Vladimir",
+   "Eustácio de Tessalônica",
+   "Vactangue I da Ibéria"
   ],
-  "v": "b9ab5cabee"
+  "v": "a07800e205",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Santo ou santa",
+    "total": 1092,
+    "obvious": "Agostinho de Hipona",
+    "rare": [
+     "Helena de Skövde",
+     "Inês da Boêmia",
+     "Ingrid de Skänninge"
+    ],
+    "v": "b9ab5cabee"
+   }
+  ]
  },
  {
   "id": "papa",
@@ -1474,26 +2034,54 @@
  {
   "id": "farao",
   "title": "Faraó do Egito",
-  "total": 275,
-  "obvious": "Alexandre, o Grande",
+  "total": 287,
+  "obvious": "Tutancâmon",
   "rare": [
-   "Ameni Quemau",
-   "Elefante",
-   "Hedju-Hor"
+   "Nefercamim II",
+   "Neferircaré II",
+   "Neebe"
   ],
-  "v": "0e8010a503"
+  "v": "64b30fff4b",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Faraó do Egito",
+    "total": 275,
+    "obvious": "Alexandre, o Grande",
+    "rare": [
+     "Ameni Quemau",
+     "Elefante",
+     "Hedju-Hor"
+    ],
+    "v": "0e8010a503"
+   }
+  ]
  },
  {
   "id": "filosofo",
   "title": "Filósofo ou filósofa",
-  "total": 2156,
-  "obvious": "Albert Einstein",
+  "total": 2187,
+  "obvious": "Sócrates",
   "rare": [
-   "Gilbert Cesbron",
-   "Hwang Jin-yi",
-   "Ibne Alcátibe"
+   "Antíoco de Ascalão",
+   "Motoori Norinaga",
+   "William Whiston"
   ],
-  "v": "a9cd35679f"
+  "v": "a79f191933",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Filósofo ou filósofa",
+    "total": 2156,
+    "obvious": "Albert Einstein",
+    "rare": [
+     "Gilbert Cesbron",
+     "Hwang Jin-yi",
+     "Ibne Alcátibe"
+    ],
+    "v": "a9cd35679f"
+   }
+  ]
  },
  {
   "id": "cientista",
@@ -1510,50 +2098,106 @@
  {
   "id": "astronauta",
   "title": "Astronauta",
-  "total": 666,
+  "total": 673,
   "obvious": "Neil Armstrong",
   "rare": [
-   "Reinhold Ewald",
-   "Robert Gilruth",
-   "Sherwood Spring"
+   "Charles Brady",
+   "James Buchli",
+   "James Reilly"
   ],
-  "v": "6bda237260"
+  "v": "eee703291d",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Astronauta",
+    "total": 666,
+    "obvious": "Neil Armstrong",
+    "rare": [
+     "Reinhold Ewald",
+     "Robert Gilruth",
+     "Sherwood Spring"
+    ],
+    "v": "6bda237260"
+   }
+  ]
  },
  {
   "id": "inventor",
   "title": "Inventor ou inventora",
-  "total": 920,
-  "obvious": "Albert Einstein",
+  "total": 964,
+  "obvious": "Santos Dumont",
   "rare": [
-   "Rudolf Hell",
-   "Sarah E. Goode",
-   "Thomas Eugene Kurtz"
+   "Augusto Righi",
+   "Barbara Askins",
+   "Charles Stark Draper"
   ],
-  "v": "e58f167dda"
+  "v": "934d562385",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Inventor ou inventora",
+    "total": 920,
+    "obvious": "Albert Einstein",
+    "rare": [
+     "Rudolf Hell",
+     "Sarah E. Goode",
+     "Thomas Eugene Kurtz"
+    ],
+    "v": "e58f167dda"
+   }
+  ]
  },
  {
   "id": "explorador",
   "title": "Explorador ou navegador",
-  "total": 838,
-  "obvious": "Charles Darwin",
+  "total": 878,
+  "obvious": "Pedro Álvares Cabral",
   "rare": [
-   "Nicolás de Ovando",
-   "Robert Dudley",
-   "Sixto de Bourbon-Parma"
+   "John Oxley",
+   "Olav Bjaaland",
+   "Pierre Poivre"
   ],
-  "v": "8b23870d82"
+  "v": "e5eaa40c79",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Explorador ou navegador",
+    "total": 838,
+    "obvious": "Charles Darwin",
+    "rare": [
+     "Nicolás de Ovando",
+     "Robert Dudley",
+     "Sixto de Bourbon-Parma"
+    ],
+    "v": "8b23870d82"
+   }
+  ]
  },
  {
   "id": "religiao",
   "title": "Religião",
-  "total": 99,
-  "obvious": "Cristianismo",
+  "total": 354,
+  "obvious": "Catolicismo",
   "rare": [
-   "Religião minoica",
-   "Vodu da Luisiana",
-   "Cruz coroada"
+   "Isonade",
+   "Low Church",
+   "Sakya"
   ],
-  "v": "fcf268c346"
+  "v": "9c40cd4d76",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Religião",
+    "total": 99,
+    "obvious": "Cristianismo",
+    "rare": [
+     "Religião minoica",
+     "Vodu da Luisiana",
+     "Cruz coroada"
+    ],
+    "v": "fcf268c346"
+   }
+  ]
  },
  {
   "id": "danca-do-mundo",
@@ -1648,26 +2292,54 @@
  {
   "id": "esporte",
   "title": "Esporte",
-  "total": 398,
+  "total": 462,
   "obvious": "Futebol",
   "rare": [
-   "Esqui de montanha",
-   "Haidong gumdo",
-   "IQFoil"
+   "Fórmula 5000",
+   "Desporto para pessoas com deficiência",
+   "Corrida de Caminhões"
   ],
-  "v": "77324636e1"
+  "v": "a62134887c",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Esporte",
+    "total": 398,
+    "obvious": "Futebol",
+    "rare": [
+     "Esqui de montanha",
+     "Haidong gumdo",
+     "IQFoil"
+    ],
+    "v": "77324636e1"
+   }
+  ]
  },
  {
   "id": "arte-marcial",
   "title": "Arte marcial ou luta",
-  "total": 166,
-  "obvious": "Judo",
+  "total": 199,
+  "obvious": "Jiu-jítsu",
   "rare": [
-   "Jidokwan",
+   "Piguaquan",
    "Jigen-ryu",
-   "Shukokai"
+   "Tai chi chuan estilo Wu/Hao"
   ],
-  "v": "bb18a3baf5"
+  "v": "1591f2600b",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Arte marcial ou luta",
+    "total": 166,
+    "obvious": "Judo",
+    "rare": [
+     "Jidokwan",
+     "Jigen-ryu",
+     "Shukokai"
+    ],
+    "v": "bb18a3baf5"
+   }
+  ]
  },
  {
   "id": "jogador-estrangeiro",
@@ -1733,14 +2405,28 @@
  {
   "id": "lutador-mma",
   "title": "Lutador ou lutadora de MMA",
-  "total": 676,
-  "obvious": "Andrew Tate",
+  "total": 697,
+  "obvious": "Anderson Silva",
   "rare": [
-   "Valérie Létourneau",
-   "Yan Xiaonan",
-   "Adriano Martins"
+   "David Branch",
+   "Jimmie Rivera",
+   "Manuel Torres"
   ],
-  "v": "8bbdd89054"
+  "v": "32a1d4c837",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Lutador ou lutadora de MMA",
+    "total": 676,
+    "obvious": "Andrew Tate",
+    "rare": [
+     "Valérie Létourneau",
+     "Yan Xiaonan",
+     "Adriano Martins"
+    ],
+    "v": "8bbdd89054"
+   }
+  ]
  },
  {
   "id": "participante-bbb",
@@ -1797,15 +2483,29 @@
  {
   "id": "ator-hollywood",
   "title": "Ator ou atriz de Hollywood",
-  "total": 143,
+  "total": 2213,
   "obvious": "Tom Cruise",
   "rare": [
-   "Demi Moore",
-   "Sharon Stone",
-   "Michelle Pfeiffer"
+   "Tobin Bell",
+   "Tom Skerritt",
+   "Troian Bellisario"
   ],
-  "v": "e6d0c9e36e",
-  "since": "2026-11-25"
+  "v": "91cb288654",
+  "since": "2026-11-25",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Ator ou atriz de Hollywood",
+    "total": 143,
+    "obvious": "Tom Cruise",
+    "rare": [
+     "Demi Moore",
+     "Sharon Stone",
+     "Michelle Pfeiffer"
+    ],
+    "v": "e6d0c9e36e"
+   }
+  ]
  },
  {
   "id": "modelo-brasileira",
@@ -1835,26 +2535,54 @@
  {
   "id": "estadio",
   "title": "Estádio",
-  "total": 1163,
-  "obvious": "Coliseu",
+  "total": 1200,
+  "obvious": "Maracanã",
   "rare": [
-   "Estádio Suphachalasai",
-   "Estádio Taïeb Mhiri",
-   "Estádio Ticha"
+   "Estádio de Bata",
+   "Estádio de Tampere",
+   "Estádio Nacional Hasely Crawford"
   ],
-  "v": "8ace0fcac8"
+  "v": "09960f7269",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Estádio",
+    "total": 1163,
+    "obvious": "Coliseu",
+    "rare": [
+     "Estádio Suphachalasai",
+     "Estádio Taïeb Mhiri",
+     "Estádio Ticha"
+    ],
+    "v": "8ace0fcac8"
+   }
+  ]
  },
  {
   "id": "jogo-tabuleiro",
   "title": "Jogo de tabuleiro ou de cartas",
-  "total": 181,
+  "total": 277,
   "obvious": "Xadrez",
   "rare": [
-   "Afrika Korps",
-   "Anachronism",
-   "Béstia"
+   "Xadrez para três jogadores",
+   "Leap Frog",
+   "Agricola"
   ],
-  "v": "9032da7122"
+  "v": "f64df32379",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Jogo de tabuleiro ou de cartas",
+    "total": 181,
+    "obvious": "Xadrez",
+    "rare": [
+     "Afrika Korps",
+     "Anachronism",
+     "Béstia"
+    ],
+    "v": "9032da7122"
+   }
+  ]
  },
  {
   "id": "especialidade-medica",
@@ -1866,7 +2594,21 @@
    "Cirurgia da Mão",
    "Cirurgia do Aparelho Digestivo"
   ],
-  "v": "c832078fa2"
+  "v": "530cb5b624",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Especialidade médica (como \"dermatologia\")",
+    "total": 55,
+    "obvious": "Psiquiatria",
+    "rare": [
+     "Patologia Clínica",
+     "Cirurgia da Mão",
+     "Cirurgia do Aparelho Digestivo"
+    ],
+    "v": "c832078fa2"
+   }
+  ]
  },
  {
   "id": "profissao",
@@ -1895,38 +2637,80 @@
  {
   "id": "fobia",
   "title": "Fobia",
-  "total": 102,
-  "obvious": "Agorafobia",
+  "total": 160,
+  "obvious": "Claustrofobia",
   "rare": [
-   "Mirmecofobia",
-   "Ancraofobia",
-   "Parcopresis"
+   "Oneirofobia",
+   "Doença dos estudantes de medicina",
+   "Acerofobia"
   ],
-  "v": "281b6fa1eb"
+  "v": "0096054e9d",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Fobia",
+    "total": 102,
+    "obvious": "Agorafobia",
+    "rare": [
+     "Mirmecofobia",
+     "Ancraofobia",
+     "Parcopresis"
+    ],
+    "v": "281b6fa1eb"
+   }
+  ]
  },
  {
   "id": "osso",
   "title": "Osso do corpo humano",
-  "total": 98,
-  "obvious": "Costela",
+  "total": 114,
+  "obvious": "Fêmur",
   "rare": [
    "Osso dos Libombos",
-   "Tibiotarso",
-   "Penghu 1"
+   "Casco da tartaruga",
+   "Cuneiforme"
   ],
-  "v": "5992fed1a7"
+  "v": "af01ec3370",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Osso do corpo humano",
+    "total": 98,
+    "obvious": "Costela",
+    "rare": [
+     "Osso dos Libombos",
+     "Tibiotarso",
+     "Penghu 1"
+    ],
+    "v": "5992fed1a7"
+   }
+  ]
  },
  {
   "id": "musculo",
   "title": "Músculo do corpo humano",
-  "total": 202,
-  "obvious": "Músculo diafragma",
+  "total": 230,
+  "obvious": "Bíceps",
   "rare": [
-   "Músculo semiespinal da cabeça",
-   "Músculo vasto intermédio",
-   "Músculo bulbocavernoso"
+   "Músculo extensor curto do polegar",
+   "Músculo romboide",
+   "Músculo abdutor do V dedo"
   ],
-  "v": "cfca01995b"
+  "v": "900cf70777",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Músculo do corpo humano",
+    "total": 202,
+    "obvious": "Músculo diafragma",
+    "rare": [
+     "Músculo semiespinal da cabeça",
+     "Músculo vasto intermédio",
+     "Músculo bulbocavernoso"
+    ],
+    "v": "cfca01995b"
+   }
+  ]
  },
  {
   "id": "orgao",
@@ -1967,26 +2751,54 @@
  {
   "id": "marca-carro",
   "title": "Marca de carro",
-  "total": 325,
-  "obvious": "Toyota",
+  "total": 425,
+  "obvious": "Volkswagen",
   "rare": [
-   "Shineray",
-   "Thames Ironworks and Shipbuilding Company",
-   "Thomas Built Buses"
+   "Ford Germany",
+   "Arzani-Volpini",
+   "Hawtai Motor"
   ],
-  "v": "ecded7d4a0"
+  "v": "bcfde4c9e5",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Marca de carro",
+    "total": 325,
+    "obvious": "Toyota",
+    "rare": [
+     "Shineray",
+     "Thames Ironworks and Shipbuilding Company",
+     "Thomas Built Buses"
+    ],
+    "v": "ecded7d4a0"
+   }
+  ]
  },
  {
   "id": "modelo-carro",
   "title": "Modelo de carro",
-  "total": 2300,
-  "obvious": "Ford Model T",
+  "total": 2408,
+  "obvious": "Gol",
   "rare": [
-   "Mercury Marauder",
-   "Mercury Montego",
-   "MG ZS"
+   "Honda Odyssey",
+   "Honda S660",
+   "Honda S800"
   ],
-  "v": "dde6144070"
+  "v": "07c36612f1",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Modelo de carro",
+    "total": 2300,
+    "obvious": "Ford Model T",
+    "rare": [
+     "Mercury Marauder",
+     "Mercury Montego",
+     "MG ZS"
+    ],
+    "v": "dde6144070"
+   }
+  ]
  },
  {
   "id": "fast-food",
@@ -2003,38 +2815,80 @@
  {
   "id": "coquetel",
   "title": "Drinque ou coquetel",
-  "total": 76,
-  "obvious": "Mojito",
+  "total": 169,
+  "obvious": "Caipirinha",
   "rare": [
-   "Jagertee",
-   "Tamagozake",
-   "Tuxedo"
+   "Niquita",
+   "Submarino",
+   "Negroni Sbagliato"
   ],
-  "v": "bb0614ac17"
+  "v": "084abe332b",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Drinque ou coquetel",
+    "total": 76,
+    "obvious": "Mojito",
+    "rare": [
+     "Jagertee",
+     "Tamagozake",
+     "Tuxedo"
+    ],
+    "v": "bb0614ac17"
+   }
+  ]
  },
  {
   "id": "queijo",
   "title": "Queijo",
-  "total": 155,
-  "obvious": "Mozarela",
+  "total": 209,
+  "obvious": "Mussarela",
   "rare": [
-   "Queijo Sardo",
-   "Zefati",
-   "Queijo canastra"
+   "Leyden",
+   "Chhena",
+   "Herve"
   ],
-  "v": "858dfcce02"
+  "v": "1141420e07",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Queijo",
+    "total": 155,
+    "obvious": "Mozarela",
+    "rare": [
+     "Queijo Sardo",
+     "Zefati",
+     "Queijo canastra"
+    ],
+    "v": "858dfcce02"
+   }
+  ]
  },
  {
   "id": "pao",
   "title": "Tipo de pão",
-  "total": 147,
-  "obvious": "Rosquinha",
+  "total": 206,
+  "obvious": "Pão francês",
   "rare": [
-   "Mola salsa",
-   "Rosca",
-   "Tebirkes"
+   "Shotis puri",
+   "Bialy",
+   "Calzón roto"
   ],
-  "v": "497263ac8f"
+  "v": "37f13a6a43",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Tipo de pão",
+    "total": 147,
+    "obvious": "Rosquinha",
+    "rare": [
+     "Mola salsa",
+     "Rosca",
+     "Tebirkes"
+    ],
+    "v": "497263ac8f"
+   }
+  ]
  },
  {
   "id": "sobremesa",
@@ -2129,38 +2983,80 @@
  {
   "id": "bebida-alcoolica",
   "title": "Bebida alcoólica",
-  "total": 394,
+  "total": 478,
   "obvious": "Cerveja",
   "rare": [
-   "Amontillado",
-   "Bagaceira",
-   "Bee's knees"
+   "Pale lager",
+   "Bacardi 151",
+   "Alcopop"
   ],
-  "v": "1611a011b1"
+  "v": "d1b001451e",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Bebida alcoólica",
+    "total": 394,
+    "obvious": "Cerveja",
+    "rare": [
+     "Amontillado",
+     "Bagaceira",
+     "Bee's knees"
+    ],
+    "v": "1611a011b1"
+   }
+  ]
  },
  {
   "id": "rede-social",
   "title": "Rede social ou aplicativo",
-  "total": 211,
-  "obvious": "Facebook",
+  "total": 327,
+  "obvious": "WhatsApp",
   "rare": [
-   "Gettr",
-   "Google Jamboard",
-   "Mixi"
+   "Waterfox",
+   "Files do Google",
+   "Google Câmera"
   ],
-  "v": "a7bfcd8268"
+  "v": "0ee2998b83",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Rede social ou aplicativo",
+    "total": 211,
+    "obvious": "Facebook",
+    "rare": [
+     "Gettr",
+     "Google Jamboard",
+     "Mixi"
+    ],
+    "v": "a7bfcd8268"
+   }
+  ]
  },
  {
   "id": "linguagem-programacao",
   "title": "Linguagem de programação",
-  "total": 182,
-  "obvious": "JavaScript",
+  "total": 214,
+  "obvious": "Python",
   "rare": [
-   "Modelica",
-   "Pike",
-   "Portlet"
+   "Occam",
+   "REBOL",
+   "METAFONT"
   ],
-  "v": "b10cb6320c"
+  "v": "d12059e59a",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Linguagem de programação",
+    "total": 182,
+    "obvious": "JavaScript",
+    "rare": [
+     "Modelica",
+     "Pike",
+     "Portlet"
+    ],
+    "v": "b10cb6320c"
+   }
+  ]
  },
  {
   "id": "app",
@@ -2216,26 +3112,54 @@
  {
   "id": "movel",
   "title": "Móvel (de casa)",
-  "total": 293,
-  "obvious": "Cadeira",
+  "total": 357,
+  "obvious": "Sofá",
   "rare": [
-   "Banco ritual taíno",
-   "Globo de Matelica",
-   "Mesa de camilha"
+   "Altar de São João",
+   "Tríptico de Braque",
+   "Parque de merendas"
   ],
-  "v": "0d90575cd6"
+  "v": "03282d0e10",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Móvel (de casa)",
+    "total": 293,
+    "obvious": "Cadeira",
+    "rare": [
+     "Banco ritual taíno",
+     "Globo de Matelica",
+     "Mesa de camilha"
+    ],
+    "v": "0d90575cd6"
+   }
+  ]
  },
  {
   "id": "utensilio-cozinha",
   "title": "Utensílio de cozinha",
-  "total": 181,
-  "obvious": "Colher",
+  "total": 279,
+  "obvious": "Panela",
   "rare": [
-   "Tangia",
-   "Cálice de Derrynaflan",
-   "Guampa"
+   "Santa Esponja",
+   "Cerâmica Jōmon",
+   "Papel de cera"
   ],
-  "v": "7bbde9b00c"
+  "v": "2e52baa2ff",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Utensílio de cozinha",
+    "total": 181,
+    "obvious": "Colher",
+    "rare": [
+     "Tangia",
+     "Cálice de Derrynaflan",
+     "Guampa"
+    ],
+    "v": "7bbde9b00c"
+   }
+  ]
  },
  {
   "id": "ferramenta",
@@ -2252,37 +3176,79 @@
  {
   "id": "cor",
   "title": "Cor",
-  "total": 149,
+  "total": 181,
   "obvious": "Vermelho",
   "rare": [
-   "Gema",
-   "Azul-ultramar",
-   "Nude"
+   "Melancia",
+   "Morango",
+   "Cinza-claro"
   ],
-  "v": "8e6aa160fc"
+  "v": "605926f056",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Cor",
+    "total": 149,
+    "obvious": "Vermelho",
+    "rare": [
+     "Gema",
+     "Azul-ultramar",
+     "Nude"
+    ],
+    "v": "8e6aa160fc"
+   }
+  ]
  },
  {
   "id": "unidade-medida",
   "title": "Unidade de medida",
-  "total": 83,
-  "obvious": "Dia",
+  "total": 123,
+  "obvious": "Metro",
   "rare": [
-   "Decibel",
-   "Lúmen",
-   "Tesla"
+   "Dúzia",
+   "Saca",
+   "Tarefa"
   ],
-  "v": "775c358f71"
+  "v": "0506837fc0",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Unidade de medida",
+    "total": 83,
+    "obvious": "Dia",
+    "rare": [
+     "Decibel",
+     "Lúmen",
+     "Tesla"
+    ],
+    "v": "775c358f71"
+   }
+  ]
  },
  {
   "id": "grife",
   "title": "Grife ou marca de moda",
-  "total": 148,
-  "obvious": "Adidas",
+  "total": 246,
+  "obvious": "Nike",
   "rare": [
-   "Reserva",
-   "Dudalina",
-   "Ellus"
+   "Cris Barros",
+   "Lilly Sarti",
+   "Ronaldo Fraga"
   ],
-  "v": "b7dda1592e"
+  "v": "c4771ca4bd",
+  "from": "2026-11-26",
+  "previous": [
+   {
+    "title": "Grife ou marca de moda",
+    "total": 148,
+    "obvious": "Adidas",
+    "rare": [
+     "Reserva",
+     "Dudalina",
+     "Ellus"
+    ],
+    "v": "b7dda1592e"
+   }
+  ]
  }
 ]
