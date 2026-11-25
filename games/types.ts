@@ -161,7 +161,12 @@ export interface PlayView<P = unknown, F = unknown> {
   answerLabel?: string;
   /** Partida de treino ("Jogar outra"): não conta para sequência nem estatísticas. */
   practice?: boolean;
+  /** Um dia anterior jogado depois: fica salvo, mas não conta para sequência, estatísticas nem ranking. */
+  archive?: boolean;
 }
+
+/** De onde vem a partida: o desafio de hoje, um dia anterior jogado depois, ou o treino. */
+export type PlayMode = "daily" | "archive" | "practice";
 
 export interface BoardProps<P = unknown, F = unknown, R extends GameRules = GameRules> {
   play: PlayView<P, F>;

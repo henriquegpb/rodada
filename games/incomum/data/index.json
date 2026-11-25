@@ -1234,14 +1234,14 @@
  {
   "id": "pintor",
   "title": "Pintor ou pintora",
-  "total": 2039,
+  "total": 1724,
   "obvious": "Leonardo da Vinci",
   "rare": [
-   "Louise Catherine Breslau",
-   "Luis Eduardo Aute",
-   "Maria Cosway"
+   "Francis Chantrey",
+   "Francisco Herrera",
+   "George Maciunas"
   ],
-  "v": "bb0dafeb9b"
+  "v": "361f422ad0"
  },
  {
   "id": "arquiteto",

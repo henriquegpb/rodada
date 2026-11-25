@@ -77,7 +77,7 @@ export default function RotaBoard({ play, rules, submitGuess }: BoardProps<RotaP
   function takeHint() {
     const next = Math.min(HINTS.length, hints + 1);
     setHints(next);
-    trackEvent("hint_used", { game: "rota", hint: next, practice: Boolean(play.practice) });
+    trackEvent("hint_used", { game: "rota", hint: next, practice: Boolean(play.practice || play.archive) });
     try {
       localStorage.setItem(hintKey(play.dateKey), String(next));
     } catch {}

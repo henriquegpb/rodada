@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, RotateCcw } from "lucide-react";
+import { ArrowRight, CalendarDays, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { ShareButton } from "@/components/microkit/cursor-follow-share-button";
@@ -46,6 +46,7 @@ function useResult(game: GameDefinition, play: PlayView) {
       ? t.game.timeUp
       : t.game.lost;
   return {
+    today,
     won,
     next,
     headline,
@@ -61,14 +62,35 @@ function useResult(game: GameDefinition, play: PlayView) {
   };
 }
 
-function PlayAnotherButton({ onClick }: { onClick: () => void }) {
+/**
+ * O que jogar depois: o dia anterior mais recente que falta ("Jogar dias anteriores") ou, com todos
+ * feitos, o treino ("Jogar outra"). Quem decide é a tela do jogo.
+ */
+export interface Another {
+  kind: "past" | "practice";
+  onClick: () => void;
+}
+
+function AnotherLabel({ another, size }: { another: Another; size: number }) {
+  return another.kind === "practice" ? (
+    <>
+      <RotateCcw size={size} /> {t.practice.playAnother}
+    </>
+  ) : (
+    <>
+      <CalendarDays size={size} /> {t.archive.playPast}
+    </>
+  );
+}
+
+function PlayAnotherButton({ another }: { another: Another }) {
   return (
     <button
       type="button"
-      onClick={onClick}
+      onClick={another.onClick}
       className="inline-flex items-center gap-1.5 font-semibold text-muted-foreground transition-colors hover:text-foreground"
     >
-      <RotateCcw size={14} /> {t.practice.playAnother}
+      <AnotherLabel another={another} size={14} />
     </button>
   );
 }
@@ -87,12 +109,12 @@ export function ResultStrip({
   game,
   play,
   onOpen,
-  onPlayAnother,
+  another,
 }: {
   game: GameDefinition;
   play: PlayView;
   onOpen: () => void;
-  onPlayAnother: () => void;
+  another: Another;
 }) {
   const { won, next, headline, score, answer } = useResult(game, play);
   return (
@@ -113,7 +135,7 @@ export function ResultStrip({
         <button type="button" onClick={onOpen} className="text-muted-foreground transition-colors hover:text-foreground">
           {t.game.seeResult}
         </button>
-        <PlayAnotherButton onClick={onPlayAnother} />
+        <PlayAnotherButton another={another} />
         <NextLink next={next} className="inline-flex items-center gap-1.5 text-primary" />
       </div>
     </div>
@@ -126,15 +148,17 @@ export function ResultDialog({
   play,
   open,
   onOpenChange,
-  onPlayAnother,
+  another,
 }: {
   game: GameDefinition;
   play: PlayView;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onPlayAnother: () => void;
+  another: Another;
 }) {
-  const { next, headline, score, answer, share } = useResult(game, play);
+  const { today, next, headline, score, answer, share } = useResult(game, play);
+  /** Dia anterior jogado depois e treino não se compartilham nem entram no ranking. */
+  const offline = play.practice || play.archive;
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
@@ -161,14 +185,14 @@ export function ResultDialog({
           <div className="min-h-0 overflow-y-auto">
             <game.Recap play={play} />
           </div>
-          {play.practice ? (
-            // Treino não se compartilha: o principal é emendar outra.
+          {offline ? (
+            // Fora do desafio de hoje não se compartilha: o principal é emendar outra.
             <button
               type="button"
-              onClick={onPlayAnother}
+              onClick={another.onClick}
               className="flex h-14 items-center justify-center gap-2 rounded-full bg-primary text-[17px] font-semibold text-primary-foreground transition-[filter,transform] hover:brightness-110 active:scale-[0.99]"
             >
-              <RotateCcw size={18} /> {t.practice.playAnother}
+              <AnotherLabel another={another} size={18} />
             </button>
           ) : (
             <>
@@ -177,14 +201,14 @@ export function ResultDialog({
             </>
           )}
           <div className="flex items-center justify-between gap-4 text-sm">
-            {play.practice ? (
-              <span className="text-muted-foreground">{t.practice.notice}</span>
+            {offline ? (
+              <span className="text-muted-foreground">{play.practice ? t.practice.notice : t.archive.notice}</span>
             ) : (
-              <PlayAnotherButton onClick={onPlayAnother} />
+              <PlayAnotherButton another={another} />
             )}
             <NextLink next={next} className="inline-flex shrink-0 items-center gap-1.5 font-semibold text-primary" />
           </div>
-          {!play.practice && <Countdown className="justify-center" />}
+          {play.dateKey === today && !offline && <Countdown className="justify-center" />}
         </div>
       </DialogContent>
     </Dialog>

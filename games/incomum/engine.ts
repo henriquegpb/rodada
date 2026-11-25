@@ -1,3 +1,4 @@
+import { EPOCH_DATE } from "@/lib/daily/date";
 import { pickDailyMany } from "@/lib/daily/seed";
 import type { GameEngine, PublicFileReader } from "../types";
 import index from "./data/index.json";
@@ -18,8 +19,12 @@ export interface IncomumAnswer {
 /** O índice só tem categorias com respostas suficientes para o sorteio (veja o build). */
 export const CATEGORIES: readonly IncomumCategoryRef[] = index;
 
-/** As categorias do sorteio no dia: as novas só a partir da estreia, e os dias passados não mudam. */
-export const poolOn = (dateKey: string) => CATEGORIES.filter((c) => !c.since || c.since <= dateKey);
+/**
+ * As categorias do sorteio no dia: as novas só a partir da estreia, e os dias passados não mudam.
+ * Antes do Rodada existir só há treino ("Jogar outra"), que usa a lista inteira.
+ */
+export const poolOn = (dateKey: string) =>
+  CATEGORIES.filter((c) => !c.since || c.since <= dateKey || dateKey < EPOCH_DATE);
 
 // ---------- respostas, baixadas só para as categorias do dia ----------
 
