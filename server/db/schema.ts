@@ -149,6 +149,27 @@ export const timedStarts = pgTable(
   (t) => [primaryKey({ columns: [t.accountId, t.slug, t.dateKey] })],
 );
 
+/* Incomum */
+
+/**
+ * As respostas que os jogadores digitaram e o Incomum recusou ("não está na lista"), somadas por
+ * categoria e pela chave da resposta (sem acento, maiúscula nem artigo). Sem Conta nem IP: é o que
+ * falta nas listas, para a revisão (scripts/incomum-misses.ts).
+ */
+export const incomumMisses = pgTable(
+  "incomum_misses",
+  {
+    category: text("category").notNull(),
+    key: text("key").notNull(),
+    /** Como a primeira pessoa escreveu, para ler na revisão. */
+    text: text("text").notNull(),
+    count: integer("count").notNull().default(1),
+    firstSeen: timestamp("first_seen", { withTimezone: true }).notNull().defaultNow(),
+    lastSeen: timestamp("last_seen", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.category, t.key] }), index("incomum_misses_count_idx").on(t.category, t.count)],
+);
+
 /* Social */
 
 export const groups = pgTable("groups", {
