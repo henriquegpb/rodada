@@ -2,7 +2,7 @@ import { EPOCH_DATE } from "@/lib/daily/date";
 import { pickDailyMany } from "@/lib/daily/seed";
 import type { GameEngine, PublicFileReader } from "../types";
 import index from "./data/index.json";
-import { allWords, answerKey, editDistance, nameWords, suggestionMessage, typoBudget } from "./match";
+import { NOT_IN_LIST, allWords, answerKey, editDistance, nameWords, suggestionMessage, typoBudget } from "./match";
 import { ROUND, SKIP, TIERS, TIMEOUT, tierOf } from "./tiers";
 import type { IncomumCategoryRef, IncomumFeedback, IncomumPuzzle } from "./types";
 
@@ -26,6 +26,20 @@ export const CATEGORIES: readonly IncomumCategoryRef[] = index;
 export const poolOn = (dateKey: string) =>
   CATEGORIES.filter((c) => !c.since || c.since <= dateKey || dateKey < EPOCH_DATE);
 
+/**
+ * As respostas que valiam num dia: a versão atual a partir do `from` dela; antes, a anterior que
+ * valia então. Assim a lista cresce sem mudar a partida de quem jogou num dia que já passou.
+ */
+export function versionOn(ref: IncomumCategoryRef, dateKey: string): IncomumCategoryRef {
+  if (!ref.from || ref.from <= dateKey || dateKey < EPOCH_DATE) return ref;
+  const old = ref.previous?.findLast((p) => !p.from || p.from <= dateKey);
+  return old ? { ...ref, ...old, archived: true } : ref;
+}
+
+/** Onde estão as respostas de uma versão: a atual em incomum/<id>.json, as anteriores em incomum/v/. */
+const fileOf = (ref: IncomumCategoryRef) =>
+  ref.archived ? `incomum/v/${ref.id}.${ref.v}.json` : `incomum/${ref.id}.json?v=${ref.v}`;
+
 // ---------- respostas, baixadas só para as categorias do dia ----------
 
 const loaded = new Map<string, IncomumItems>();
@@ -40,7 +54,7 @@ export function loadCategory(ref: IncomumCategoryRef, read: PublicFileReader): P
   if (loaded.has(key)) return Promise.resolve();
   let pending = loading.get(key);
   if (!pending) {
-    pending = read(`incomum/${ref.id}.json?v=${ref.v}`).then(
+    pending = read(fileOf(ref)).then(
       (items) => {
         loaded.set(key, items as IncomumItems);
       },
@@ -55,7 +69,8 @@ export function loadCategory(ref: IncomumCategoryRef, read: PublicFileReader): P
   return pending;
 }
 
-const itemsOf = (ref: IncomumCategoryRef) => loaded.get(`${ref.id}@${ref.v}`);
+/** As respostas da categoria, se já foram carregadas (veja `loadCategory`). */
+export const itemsOf = (ref: IncomumCategoryRef): IncomumItems | undefined => loaded.get(`${ref.id}@${ref.v}`);
 
 // ---------- encontrar a resposta ----------
 
@@ -141,16 +156,22 @@ export function findAnswer(items: IncomumItems, input: string): Match | null {
 
 /**
  * Parte de um nome da lista ("Cocielo", "Da Vinci"): todas as palavras digitadas estão num mesmo
- * nome. Sugere a resposta mais óbvia assim, que a pessoa confirma.
+ * nome. Sugere a resposta mais óbvia assim, que a pessoa confirma. No nome da tela vale qualquer
+ * pedaço. Num apelido, só palavra que quase só aquele item tem e que seja pelo menos metade dele:
+ * "philosopher" está em "Laughing Philosopher" (Demócrito) e em mais quatro, não é nome de ninguém.
  */
 function partOfName(items: IncomumItems, input: string): Match | null {
   const typed = nameWords(input);
   if (!typed.length) return null;
   const every = allWords(input);
-  for (const item of indexOf(items).words.get(typed[0]) ?? []) {
-    const fits = items[item].some((name) => {
+  const { words } = indexOf(items);
+  // Em quantas respostas está a palavra digitada mais rara: nome, ou palavra comum a várias.
+  const shared = Math.min(...typed.map((w) => words.get(w)?.length ?? 0));
+  for (const item of words.get(typed[0]) ?? []) {
+    const fits = items[item].some((name, n) => {
       const own = allWords(name);
-      return own.length >= every.length && every.every((w) => own.includes(w));
+      if (own.length < every.length || !every.every((w) => own.includes(w))) return false;
+      return n === 0 || (shared <= 2 && every.length * 2 >= own.length);
     });
     if (fits) return { item, name: items[item][0], exact: false };
   }
@@ -161,7 +182,7 @@ function createChallenge(dateKey: string) {
   const categories = pickDailyMany(poolOn(dateKey), ROUND, {
     slug: "incomum",
     dateKey,
-  });
+  }).map((c) => versionOn(c, dateKey));
   return {
     puzzle: {
       categories: categories.map((c) => ({ title: c.title, total: c.total })),
@@ -208,7 +229,7 @@ export const engine: GameEngine<IncomumPuzzle, IncomumAnswer, IncomumFeedback> =
         error: "Ainda carregando as respostas. Tenta de novo em um segundo!",
       };
     const match = findAnswer(items, input);
-    if (!match) return { ok: false, error: "Essa não está na lista. Tenta outra!" };
+    if (!match) return { ok: false, error: NOT_IN_LIST };
     // Parecido não vale sozinho: a pessoa confirma a sugestão, que aí bate exato.
     if (!match.exact) return { ok: false, error: suggestionMessage(match.name) };
     const index = match.item;

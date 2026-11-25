@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { beforeAll, describe, expect, it } from "vitest";
 import { formatResult, playCount } from "@/lib/plays/result";
@@ -9,6 +9,7 @@ import {
   findAnswer,
   loadCategory,
   poolOn,
+  versionOn,
   type IncomumAnswer,
   type IncomumItems,
 } from "./engine";
@@ -108,6 +109,24 @@ describe("findAnswer", () => {
     expect(findAnswer(CITIES, "cwa")).toBeNull();
     expect(findAnswer(CITIES, "x")).toBeNull();
   });
+
+  it("não sugere pela palavra solta de um apelido nem por letras demais trocadas", () => {
+    const people: IncomumItems = [
+      ["Demócrito", "Laughing Philosopher"],
+      ["Heráclito", "Weeping Philosopher"],
+      ["Aristóteles", "Stagirite Philosopher"],
+      ["João Filopono", "Filopono"],
+      ["Sócrates"],
+    ];
+    expect(findAnswer(people, "philosopher")).toBeNull();
+    expect(findAnswer(people, "filosofo")).toBeNull();
+    // Letras trocadas de lugar são um erro só.
+    expect(editDistance("philosohper", "philosopher", 1)).toBe(1);
+    expect(findAnswer([["Philosopher"]], "philosohper")).toMatchObject({ item: 0, exact: false });
+    // Pedaço do nome da tela continua valendo.
+    expect(findAnswer(people, "Filopono")).toMatchObject({ item: 3, exact: true });
+    expect(findAnswer([["Júlio Cocielo"]], "Cocielo")).toMatchObject({ item: 0, exact: false });
+  });
 });
 
 describe("sugestão", () => {
@@ -147,6 +166,48 @@ describe("sorteio", () => {
       const before = new Date(Date.parse(`${c.since}T12:00:00Z`) - 86_400_000).toISOString().slice(0, 10);
       expect(poolOn(before)).not.toContain(c);
       expect(poolOn(c.since!)).toContain(c);
+    }
+  });
+});
+
+describe("versões das respostas", () => {
+  const ref: IncomumCategoryRef = {
+    id: "x",
+    title: "Nova",
+    total: 300,
+    obvious: "A",
+    rare: [],
+    v: "v3",
+    from: "2026-12-10",
+    previous: [
+      { title: "Velha", total: 100, obvious: "B", rare: [], v: "v1" },
+      { title: "Meio", total: 200, obvious: "C", rare: [], v: "v2", from: "2026-12-01" },
+    ],
+  };
+
+  it("cada dia usa a versão que valia nele", () => {
+    expect(versionOn(ref, "2026-12-10")).toBe(ref);
+    expect(versionOn(ref, "2027-01-01")).toBe(ref);
+    expect(versionOn(ref, "2026-12-05")).toMatchObject({ id: "x", v: "v2", total: 200, title: "Meio", archived: true });
+    expect(versionOn(ref, "2026-11-30")).toMatchObject({ id: "x", v: "v1", total: 100, archived: true });
+    // O treino (dias antes do Rodada) usa sempre a lista mais nova.
+    expect(versionOn(ref, "2010-01-01")).toBe(ref);
+  });
+
+  it("a versão anterior é lida da pasta das versões", async () => {
+    const paths: string[] = [];
+    await loadCategory(versionOn(ref, "2026-12-05"), async (path) => {
+      paths.push(path);
+      return [["A"]];
+    });
+    expect(paths).toEqual(["incomum/v/x.v2.json"]);
+  });
+
+  it("toda versão anterior do índice tem o arquivo guardado", () => {
+    for (const c of CATEGORIES) {
+      for (const p of c.previous ?? []) {
+        expect(existsSync(join(process.cwd(), "public/incomum/v", `${c.id}.${p.v}.json`)), `${c.id}.${p.v}`).toBe(true);
+      }
     }
   });
 });
